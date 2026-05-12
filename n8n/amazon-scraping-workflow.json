@@ -128,7 +128,7 @@
       "name": "Upsert to Supabase",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2160, 200],
+      "position": [2400, 200],
       "retryOnFail": true,
       "maxTries": 3,
       "waitBetweenTries": 3000

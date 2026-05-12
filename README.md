@@ -95,6 +95,8 @@ The site boots with **no Supabase keys** (shows empty content + warnings). Add k
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Analytics | GA4 measurement ID |
 | `AMAZON_AFFILIATE_TAG_US` | Affiliate | Default: `proathletica-20` |
 | `CONVERTKIT_API_KEY` + `CONVERTKIT_FORM_ID` | Optional | Newsletter list sync |
+| `OPENROUTER_API_KEY` | Required for AI summaries | Used for article quick-take generation |
+| `OPENROUTER_MODEL` | Optional | Free-model override; code forces `:free` models only |
 
 ---
 
@@ -129,6 +131,7 @@ Required n8n env vars:
 - `SUPABASE_SERVICE_ROLE_KEY` — same as site
 - `NEXT_PUBLIC_SITE_URL` — your production domain
 - `REVALIDATE_SECRET` — same as site
+- `OPENROUTER_API_KEY` — OpenRouter API key for article summary generation
 - `DISCORD_WEBHOOK_URL` — optional, for error alerts
 
 The workflow:

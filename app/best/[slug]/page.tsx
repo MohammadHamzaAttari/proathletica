@@ -9,6 +9,7 @@ import { Newsletter } from '@/components/Newsletter';
 import { ProductGrid } from '@/components/ProductGrid';
 import { ShareButtons } from '@/components/ShareButtons';
 import { SITE_URL } from '@/lib/config';
+import { generateArticleSummary } from '@/lib/ai/article-summary';
 import { getArticleBySlug, getPublishedArticles } from '@/lib/db';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { articleSchema, breadcrumbSchema, itemListSchema, jsonLdProps } from '@/lib/seo/schema';
@@ -58,6 +59,12 @@ export default async function ArticlePage({ params }: { params: { slug: string }
         candidate.cluster === article.cluster || candidate.category === article.category
     )
     .slice(0, 3);
+
+  const quickTake = await generateArticleSummary({
+    title: article.title,
+    excerpt: article.excerpt,
+    content_html: article.content_html,
+  });
 
   const url = `/best/${article.slug}`;
   const breadcrumbs = [
@@ -139,6 +146,15 @@ export default async function ArticlePage({ params }: { params: { slug: string }
             alt={article.title}
             className="mb-10 max-h-[500px] w-full rounded-2xl object-cover"
           />
+        ) : null}
+
+        {quickTake ? (
+          <div className="mb-10 rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-6">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
+              Quick take
+            </div>
+            <p className="mt-3 text-lg leading-8 text-neutral-200">{quickTake}</p>
+          </div>
         ) : null}
 
         {article.content_html ? (
