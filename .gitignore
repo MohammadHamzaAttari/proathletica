@@ -1,0 +1,23 @@
+node_modules/
+.next/
+out/
+build/
+coverage/
+.env
+.env.local
+.env*.local
+.vercel
+.DS_Store
+*.log
+*.tsbuildinfo
+next-env.d.ts
+**__pycache__**/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# FIX (Audit #05-15): never commit service account keys
+gsc-service-account.json
+*-service-account.json
+scripts/*.json
+*.pem

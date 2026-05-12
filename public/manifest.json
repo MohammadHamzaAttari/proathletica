@@ -1,0 +1,16 @@
+{
+  "name": "ProAthletica",
+  "short_name": "ProAthletica",
+  "description": "Independent fitness gear reviews and buyer guides.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

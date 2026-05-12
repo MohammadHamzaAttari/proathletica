@@ -1,0 +1,204 @@
+{
+  "name": "ProAthletica Amazon → Supabase",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 3 * * 0" }]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Weekly Schedule (Sun 3am)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [260, 300]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"niches\": [\n    { \"category\": \"Home Gym\", \"keyword\": \"adjustable dumbbells home gym\" },\n    { \"category\": \"Powerlifting\", \"keyword\": \"powerlifting belt\" },\n    { \"category\": \"Running\", \"keyword\": \"best running shoes marathon\" },\n    { \"category\": \"Recovery\", \"keyword\": \"massage gun muscle recovery\" },\n    { \"category\": \"Resistance Training\", \"keyword\": \"resistance bands set\" }\n  ]\n}"
+      },
+      "id": "seed-niches",
+      "name": "Seed Niches",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const niches = $json.niches || [];\nreturn niches.map((niche) => ({ json: niche }));"
+      },
+      "id": "explode-niches",
+      "name": "Explode Niches",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [740, 300]
+    },
+    {
+      "parameters": { "batchSize": 1, "options": {} },
+      "id": "split-in-batches",
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [980, 300]
+    },
+    {
+      "parameters": { "amount": 30, "unit": "seconds" },
+      "id": "wait-between-batches",
+      "name": "Wait 30s (rate limit)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1220, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.SCRAPER_BASE_URL }}/scrape",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "keyword", "value": "={{ $json.keyword }}" },
+            { "name": "max", "value": "10" },
+            { "name": "maxPages", "value": "3" },
+            { "name": "requireBadge", "value": "true" }
+          ]
+        },
+        "options": { "response": { "response": { "neverError": true } }, "timeout": 180000 }
+      },
+      "id": "scrape-products",
+      "name": "Scrape Products",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1450, 300],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 10000
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "has-products",
+              "leftValue": "={{ $json.products ? $json.products.length : 0 }}",
+              "rightValue": 0,
+              "operator": { "type": "number", "operation": "gt" }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "check-products-found",
+      "name": "Has Products?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1680, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// FIX (Audit #04-A): validate required fields before save — no empty prices\nconst response = $json;\nconst products = Array.isArray(response.products) ? response.products : [];\nconst category = $item(0).$node['Split In Batches'].json.category || 'General';\nconst keyword = $item(0).$node['Split In Batches'].json.keyword || '';\n\nconst validated = products\n  .filter((p) => {\n    // FIX: drop rows missing required fields\n    if (!p.asin || !p.title || !p.affiliateLink) return false;\n    const price = parseFloat(String(p.price || '0').replace(/[^0-9.]/g, ''));\n    if (price <= 0) return false;\n    if (!p.image) return false;\n    return true;\n  })\n  .map((product, index) => ({\n    json: {\n      id: product.asin,\n      asin: product.asin,\n      slug: (product.title || '')\n        .toLowerCase()\n        .replace(/[^a-z0-9]+/g, '-')\n        .replace(/(^-|-$)/g, ''),\n      category,\n      title: product.title,\n      description: product.title,\n      keyword,\n      price_cents: Math.round(\n        (parseFloat(String(product.price).replace(/[^0-9.]/g, '')) || 0) * 100\n      ),\n      currency: 'USD',\n      image_url: product.image || '',\n      affiliate_url: product.affiliateLink,\n      rating: parseFloat(product.rating || '0') || null,\n      review_count:\n        parseInt(String(product.reviewCount || '0').replace(/[^0-9]/g, ''), 10) || 0,\n      badge: product.badge || null,\n      rank: index + 1,\n      is_featured: index < 3,\n    },\n  }));\n\nreturn validated;"
+      },
+      "id": "normalize-and-validate",
+      "name": "Normalize + Validate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1920, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.NEXT_PUBLIC_SUPABASE_URL }}/rest/v1/products?on_conflict=id",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Authorization", "value": "Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Prefer", "value": "resolution=merge-duplicates,return=minimal" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "options": { "timeout": 60000 }
+      },
+      "id": "upsert-supabase",
+      "name": "Upsert to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2160, 200],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={ \"content\": \"⚠️ ProAthletica scraper: no products found for keyword **{{ $item(0).$node['Split In Batches'].json.keyword }}**. Check scraper logs.\" }"
+      },
+      "id": "notify-no-products",
+      "name": "Alert: No Products",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1920, 440],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.NEXT_PUBLIC_SITE_URL }}/api/revalidate?secret={{ $env.REVALIDATE_SECRET }}&tag=products",
+        "options": { "timeout": 30000 }
+      },
+      "id": "bust-cache",
+      "name": "Bust Products Cache",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2400, 200],
+      "continueOnFail": true
+    }
+  ],
+  "connections": {
+    "Weekly Schedule (Sun 3am)": {
+      "main": [[{ "node": "Seed Niches", "type": "main", "index": 0 }]]
+    },
+    "Seed Niches": {
+      "main": [[{ "node": "Explode Niches", "type": "main", "index": 0 }]]
+    },
+    "Explode Niches": {
+      "main": [[{ "node": "Split In Batches", "type": "main", "index": 0 }]]
+    },
+    "Split In Batches": {
+      "main": [[{ "node": "Wait 30s (rate limit)", "type": "main", "index": 0 }]]
+    },
+    "Wait 30s (rate limit)": {
+      "main": [[{ "node": "Scrape Products", "type": "main", "index": 0 }]]
+    },
+    "Scrape Products": {
+      "main": [[{ "node": "Has Products?", "type": "main", "index": 0 }]]
+    },
+    "Has Products?": {
+      "main": [
+        [{ "node": "Normalize + Validate", "type": "main", "index": 0 }],
+        [{ "node": "Alert: No Products", "type": "main", "index": 0 }]
+      ]
+    },
+    "Normalize + Validate": {
+      "main": [[{ "node": "Upsert to Supabase", "type": "main", "index": 0 }]]
+    },
+    "Upsert to Supabase": {
+      "main": [[{ "node": "Bust Products Cache", "type": "main", "index": 0 }]]
+    },
+    "Bust Products Cache": {
+      "main": [[{ "node": "Split In Batches", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "versionId": "2"
+}
