@@ -17,11 +17,7 @@ export function formatReviewCount(n: number | null | undefined): string {
 }
 
 export function upgradeAmazonImage(url: string | null | undefined): string {
-  if (!url) return '';
-  return url
-    .replace(/_SL\d+_/, '_SL1000_')
-    .replace(/_AC_SR\d+,\d+_/, '_SL1000_')
-    .replace(/_AC_SS\d+,\d+_/, '_SL1000_');
+  return url || '';
 }
 
 export function slugToTitle(slug: string): string {

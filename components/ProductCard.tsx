@@ -35,6 +35,7 @@ export function ProductCard({
             width={420}
             height={420}
             className="h-full w-full object-contain"
+            unoptimized
             // FIX: sizes hint so Next.js generates correct srcset
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
