@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { formatPrice, formatReviewCount } from '@/lib/format';
 import { buildEditorialBenchmark } from '@/lib/editorial';
 import type { Product } from '@/lib/types';
@@ -80,13 +79,13 @@ export function ComparisonTable({
                     {formatPrice(product.price_cents, product.currency)}
                   </td>
                   <td className="py-4 pr-0">
-                    <Link
+                    <a
                       href={href}
                       rel="sponsored nofollow noopener noreferrer"
                       className="inline-flex rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-xs font-black uppercase tracking-wider text-emerald-300 hover:bg-emerald-500/20"
                     >
                       Check price
-                    </Link>
+                    </a>
                   </td>
                 </tr>
               );
@@ -96,7 +95,11 @@ export function ComparisonTable({
       </div>
 
       <p className="mt-4 text-xs text-neutral-500">
-        Methodology details live on the <Link href="/methodology" className="underline underline-offset-4">testing methodology</Link> page.
+        Methodology details live on the{' '}
+        <a href="/methodology" className="underline underline-offset-4">
+          testing methodology
+        </a>{' '}
+        page.
       </p>
     </section>
   );

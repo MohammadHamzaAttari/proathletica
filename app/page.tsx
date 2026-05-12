@@ -18,7 +18,7 @@ export default async function HomePage() {
     getPublishedArticles(),
   ]);
 
-  const featured = products.slice(0, 12);
+  const featured = products;
 
   return (
     <>
@@ -112,10 +112,10 @@ export default async function HomePage() {
         <div className="mb-10 flex items-end justify-between gap-4">
           <div>
             <h2 className="text-3xl font-black uppercase italic tracking-tighter sm:text-4xl">
-              This week&apos;s top picks
+              All current product picks
             </h2>
             <p className="mt-2 text-sm font-medium text-neutral-500">
-              Independently reviewed gear from our test lab.
+              Showing all {products.length} products currently loaded from Supabase.
             </p>
           </div>
           <Link href="/methodology" className="text-sm font-bold uppercase tracking-wider text-emerald-400 hover:text-emerald-300">
