@@ -4,10 +4,6 @@
   "regions": ["iad1"],
   "crons": [
     {
-      "path": "/api/revalidate?secret=REPLACE_WITH_REVALIDATE_SECRET&path=/",
-      "schedule": "0 */6 * * *"
-    },
-    {
       "path": "/api/revalidate?secret=REPLACE_WITH_REVALIDATE_SECRET&tag=products",
       "schedule": "0 4 * * *"
     }
