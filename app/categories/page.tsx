@@ -20,6 +20,9 @@ export default async function CategoriesPage() {
         <p className="max-w-2xl text-neutral-400">
           Browse product groups and ranking pages by training focus.
         </p>
+        <Link href="/methodology" className="inline-flex text-sm font-bold uppercase tracking-wider text-emerald-400 hover:text-emerald-300">
+          How rankings are built
+        </Link>
       </div>
 
       {categories.length > 0 ? (

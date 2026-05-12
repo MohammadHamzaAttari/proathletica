@@ -91,31 +91,45 @@ function splitSummary(value: string) {
   return [normalizeSentence(trimmed.length <= 120 ? trimmed : trimmed.slice(0, 120))];
 }
 
+function detailFragment(product: { description?: string | null; badge?: string | null; rating?: number | null }) {
+  const summary = splitSummary(product.description || '');
+  if (summary.length > 0) return summary[0].replace(/\.$/, '');
+  if (product.badge) return product.badge;
+  if (product.rating) return `${Number(product.rating).toFixed(1)} rating`;
+  return 'clear spec fit';
+}
+
 export function buildEditorialBenchmark(
   product: { title?: string; category?: string; description?: string | null; badge?: string | null; rating?: number | null },
   rank: number
 ): string {
   const title = product.title || 'This product';
   const category = (product.category || 'training').toLowerCase();
-  const body = product.description || category;
-  const summary = splitSummary(body);
+  const summary = splitSummary(product.description || category);
   const badge = product.badge || '';
   const rating = product.rating ? Number(product.rating).toFixed(1) : '';
 
   if (rank === 0) {
-    const first = normalizeSentence(
-      `${title} is the most complete option in this ${category} group, with construction details that support hard training without feeling fragile`
+    return normalizeSentence(
+      `${title} is the strongest all-around pick in this ${category} group because it combines the most useful features with the fewest compromises. ${detailFragment(product)}.`
     );
-    const second =
-      summary[0] && summary[0].split(/\s+/).length >= 5
-        ? normalizeSentence(`${summary[0].replace(/\.$/, '')} That profile is why it sits first when durability and day-to-day performance matter most`)
-        : normalizeSentence(`${badge || 'Its balance of build quality and performance'} makes it the strongest all-around buy for serious athletes`);
-    return `${first} ${second}`;
+  }
+
+  if (rank === 1) {
+    return normalizeSentence(
+      `${title} is the best value angle if you want a lower-friction ${category} buy. ${detailFragment(product)}.`
+    );
+  }
+
+  if (rank === 2) {
+    return normalizeSentence(
+      `${title} is the practical budget or space-saving option in the group. ${detailFragment(product)}.`
+    );
   }
 
   if (summary.length >= 2) return summary.join(' ');
 
   return normalizeSentence(
-    `${title} keeps the focus on ${category} performance${badge ? `, with ${badge.toLowerCase()}` : ''}${rating ? ` and a ${rating} rating` : ''} that make it easy to recommend`
+    `${title} is a solid ${category} alternative${badge ? ` with ${badge.toLowerCase()}` : ''}${rating ? ` and a ${rating} rating` : ''}; ${detailFragment(product)}.`
   );
 }

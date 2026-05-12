@@ -2,7 +2,7 @@ import { buildMetadata } from '@/lib/seo/metadata';
 
 export const metadata = buildMetadata({
   title: 'About Us',
-  description: 'Meet the ProAthletica team and learn how we test fitness gear.',
+  description: 'Meet ProAthletica and learn how we evaluate fitness gear, compare products, and label recommendations.',
   canonical: '/about',
 });
 
@@ -26,14 +26,17 @@ export default function AboutPage() {
           commissions never decide what gets recommended.
         </p>
         <p>
-          Our editorial process combines product research, hands-on use, and structured comparison
-          against alternatives in the same price band. Every recommendation is tested for a minimum of
-          30 days before publication.
+          Our editorial process combines product research, hands-on use when available, and structured
+          comparison against alternatives in the same price band. When we have not personally tested
+          something, we say so and rely on transparent spec comparison instead of pretending otherwise.
         </p>
         <p>
           As an Amazon Associate we earn from qualifying purchases. Some outbound links on this site
           are affiliate links. If you click one and buy something, we may earn a commission at no extra
           cost to you.
+        </p>
+        <p>
+          You can read the full <a href="/methodology" className="text-emerald-400 underline underline-offset-4">testing methodology</a> for the exact criteria we use.
         </p>
       </div>
     </article>

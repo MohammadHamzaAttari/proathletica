@@ -17,6 +17,7 @@ export function Header() {
         <nav className="hidden items-center gap-6 text-sm font-bold uppercase tracking-wider text-neutral-300 md:flex">
           <Link href="/" className="hover:text-white">Home</Link>
           <Link href="/categories" className="hover:text-white">Categories</Link>
+          <Link href="/methodology" className="hover:text-white">Methodology</Link>
           <Link href="/about" className="hover:text-white">About</Link>
           <Link href="/contact" className="hover:text-white">Contact</Link>
           <Link href="/disclosure" className="hover:text-white">Disclosure</Link>

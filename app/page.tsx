@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ArrowRight, ShieldCheck, Trophy, Zap } from 'lucide-react';
+import { ComparisonTable } from '@/components/ComparisonTable';
 import { BuyerGuide } from '@/components/BuyerGuide';
 import { DisclosureBar } from '@/components/DisclosureBar';
 import { FAQ } from '@/components/FAQ';
@@ -117,7 +118,15 @@ export default async function HomePage() {
               Independently reviewed gear from our test lab.
             </p>
           </div>
+          <Link href="/methodology" className="text-sm font-bold uppercase tracking-wider text-emerald-400 hover:text-emerald-300">
+            Read methodology
+          </Link>
         </div>
+        {featured.length > 0 ? (
+          <div className="mb-10">
+            <ComparisonTable products={featured} articleSlug="homepage" title="Homepage snapshot" />
+          </div>
+        ) : null}
         {featured.length > 0 ? (
           <ProductGrid products={featured} articleSlug="homepage" />
         ) : (

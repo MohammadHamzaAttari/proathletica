@@ -29,6 +29,7 @@ export function Footer() {
           <h4 className="font-black uppercase tracking-wider text-white">Company</h4>
           <div className="grid gap-2">
             <Link href="/about" className="hover:text-white">About</Link>
+            <Link href="/methodology" className="hover:text-white">Methodology</Link>
             <Link href="/contact" className="hover:text-white">Contact</Link>
             <Link href="/privacy" className="hover:text-white">Privacy</Link>
             <Link href="/terms" className="hover:text-white">Terms</Link>

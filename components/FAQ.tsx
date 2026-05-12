@@ -3,7 +3,7 @@ import { faqSchema, jsonLdProps } from '@/lib/seo/schema';
 const FAQS = [
   {
     q: 'How do you test these products?',
-    a: 'We review construction quality, long-term reliability, price-to-performance, and whether the product actually solves the training problem it claims to solve. Every top pick is used for a minimum of 30 days.',
+    a: 'We verify the public specs, compare the product against close alternatives, and clearly label when a recommendation is based on hands-on use versus structured research. The goal is to explain why a product fits the training problem, not to inflate the claim.',
   },
   {
     q: 'Are your reviews sponsored?',
@@ -15,7 +15,7 @@ const FAQS = [
   },
   {
     q: 'Do you review only Amazon products?',
-    a: 'No. Amazon is our primary link destination right now, but our editorial process is independent of retailer and commission rate.',
+    a: 'No. Amazon is our primary link destination right now, but the editorial process is independent of retailer and commission rate. We rank by fit, not payout.',
   },
   {
     q: 'How do I request data deletion?',

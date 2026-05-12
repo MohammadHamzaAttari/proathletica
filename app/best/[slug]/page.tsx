@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Calendar, Clock, User } from 'lucide-react';
+import { ComparisonTable } from '@/components/ComparisonTable';
 import { DisclosureBar } from '@/components/DisclosureBar';
 import { FAQ } from '@/components/FAQ';
 import { Newsletter } from '@/components/Newsletter';
@@ -155,6 +156,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               </h2>
               <p className="text-sm font-medium text-neutral-500">Independently vetted by the lab.</p>
             </div>
+            <ComparisonTable products={article.products} articleSlug={article.slug} title="Comparison at a glance" />
             <ProductGrid products={article.products} articleSlug={article.slug} />
           </section>
         ) : null}

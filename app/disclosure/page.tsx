@@ -26,6 +26,9 @@ export default function DisclosurePage() {
         We also participate in affiliate programs from other retailers. All affiliate relationships are
         disclosed on the relevant pages.
       </p>
+      <p>
+        For how rankings are built, see our <a href="/methodology" className="text-emerald-400 underline underline-offset-4">testing methodology</a>.
+      </p>
     </article>
   );
 }

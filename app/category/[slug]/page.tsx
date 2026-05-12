@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { ComparisonTable } from '@/components/ComparisonTable';
 import { DisclosureBar } from '@/components/DisclosureBar';
 import { BuyerGuide } from '@/components/BuyerGuide';
 import { FAQ } from '@/components/FAQ';
@@ -77,7 +78,14 @@ export default async function CategoryPage({ params }: { params: { slug: string 
           <p className="max-w-3xl text-lg font-medium text-neutral-400">
             We tested {products.length} options and ranked the top picks for serious athletes.
           </p>
+          <Link href="/methodology" className="inline-flex text-sm font-bold uppercase tracking-wider text-emerald-400 hover:text-emerald-300">
+            See the methodology
+          </Link>
         </header>
+
+        <div className="mb-10">
+          <ComparisonTable products={products} articleSlug={`category-${params.slug}`} title={`${name} comparison`} />
+        </div>
 
         <ProductGrid products={products} articleSlug={`category-${params.slug}`} />
 
