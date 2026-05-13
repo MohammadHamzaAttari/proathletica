@@ -1,9 +1,14 @@
 import { unstable_cache, revalidateTag } from 'next/cache';
 import { normalizeCategory } from '@/lib/editorial';
+import { hydrateProduct } from '@/lib/product-copy';
 import { createReadClient, createServiceClient } from '@/lib/supabase/server';
 import type { Article, ArticleWithProducts, Product } from '@/lib/types';
 
 const CACHE_REVALIDATE = 300; // 5 min
+
+function hydrateProducts(products: Array<Record<string, unknown>>): Product[] {
+  return products.map((product, index) => hydrateProduct(product as unknown as Product, index));
+}
 
 // ─── Products ────────────────────────────────────────────────────────────────
 
@@ -21,7 +26,7 @@ export async function getAllProducts(): Promise<Product[]> {
     console.error('[db] getAllProducts:', error.message);
     return [];
   }
-  return (data || []) as Product[];
+  return hydrateProducts((data || []) as Array<Record<string, unknown>>);
 }
 
 export const getProductById = unstable_cache(
@@ -31,9 +36,9 @@ export const getProductById = unstable_cache(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sb = supabase as any;
     const byId = await sb.from('products').select('*').eq('id', id).maybeSingle();
-    if (byId.data) return byId.data as Product;
+    if (byId.data) return hydrateProduct(byId.data as Product);
     const byAsin = await sb.from('products').select('*').eq('asin', id).maybeSingle();
-    if (byAsin.data) return byAsin.data as Product;
+    if (byAsin.data) return hydrateProduct(byAsin.data as Product);
     return null;
   },
   ['product-by-id'],
@@ -109,7 +114,11 @@ export const getArticleBySlug = unstable_cache(
 
     const products = ((links || []) as Array<{ products: Product; position: number; custom_blurb: string | null }>)
       .filter((link) => link.products)
-      .map((link) => ({ ...link.products, position: link.position, custom_blurb: link.custom_blurb }));
+      .map((link) => ({
+        ...hydrateProduct(link.products),
+        position: link.position,
+        custom_blurb: link.custom_blurb,
+      }));
 
     return { ...(article as Article), products: products as ArticleWithProducts['products'] };
   },

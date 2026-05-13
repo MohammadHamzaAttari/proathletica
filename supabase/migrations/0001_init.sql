@@ -17,6 +17,12 @@ create table if not exists products (
   title           text not null,
   raw_description text,
   description     text,
+  short_title     text,
+  editorial_summary text,
+  pros            text[],
+  cons            text[],
+  best_for_tags   text[],
+  specs           jsonb default '{}'::jsonb,
   keyword         text,
   price_cents     integer,
   currency        text default 'USD',
@@ -118,6 +124,12 @@ drop policy if exists "anon read products"         on products;
 create policy "anon read products"         on products         for select using (true);
 
 alter table products add column if not exists raw_description text;
+alter table products add column if not exists short_title text;
+alter table products add column if not exists editorial_summary text;
+alter table products add column if not exists pros text[];
+alter table products add column if not exists cons text[];
+alter table products add column if not exists best_for_tags text[];
+alter table products add column if not exists specs jsonb default '{}'::jsonb;
 
 drop policy if exists "anon read articles"         on articles;
 create policy "anon read articles"         on articles         for select using (published_at is not null);

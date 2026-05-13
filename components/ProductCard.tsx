@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { ArrowRight, Plus, Star, X } from 'lucide-react';
 import { formatPrice, formatReviewCount, formatTimestamp } from '@/lib/format';
 import type { Product } from '@/lib/types';
@@ -36,14 +37,16 @@ export function ProductCard({
   isSelected?: boolean;
 }) {
   const shortTitle = product.short_title || product.title.split(' ').slice(0, 8).join(' ');
-  const verdict = product.editorial_summary || product.custom_blurb || 
-    `${shortTitle} offers strong performance with clear tradeoffs in this category.`;
+  const verdict = product.editorial_summary || product.custom_blurb || `${shortTitle} offers strong performance with clear tradeoffs in this category.`;
+  const pros = (product.pros || []).slice(0, 2);
+  const cons = (product.cons || []).slice(0, 1);
   
   const timestamp = formatTimestamp(product.last_scraped_at);
   const tier = getCTATier(rank, product.badge);
   const label = getEditorialLabel(product, rank);
   
   const href = `/api/track?productId=${encodeURIComponent(product.asin || product.id)}&articleSlug=${encodeURIComponent(articleSlug)}&rank=${rank + 1}`;
+  const compareHref = `/compare?ids=${encodeURIComponent(product.id)}`;
 
   const handleCompare = () => {
     onCompareToggle?.(product.id, !isSelected);
@@ -125,9 +128,23 @@ export function ProductCard({
           </div>
         )}
 
-        {/* Editor's Verdict - Critical fix for Problem 2 */}
-        <div className="text-[15px] leading-relaxed text-neutral-300 line-clamp-3 border-l-2 border-[#C6FF3D]/40 pl-4">
+        <div className="text-[15px] leading-relaxed text-neutral-200 line-clamp-3 border-l-2 border-[#C6FF3D]/40 pl-4">
           {verdict}
+        </div>
+
+        <div className="grid gap-3 rounded-2xl border border-white/5 bg-black/20 p-4 sm:grid-cols-2">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[#C6FF3D]">Why it wins</div>
+            <ul className="mt-2 space-y-1 text-sm leading-6 text-neutral-300">
+              {pros.length > 0 ? pros.map((item) => <li key={item}>• {item}</li>) : <li>• Clear value for the right buyer</li>}
+            </ul>
+          </div>
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.18em] text-neutral-400">Watch out</div>
+            <ul className="mt-2 space-y-1 text-sm leading-6 text-neutral-400">
+              {cons.length > 0 ? cons.map((item) => <li key={item}>• {item}</li>) : <li>• Not the cheapest option in the category</li>}
+            </ul>
+          </div>
         </div>
 
         {/* Price + CTA */}
@@ -143,36 +160,44 @@ export function ProductCard({
               </div>
             </div>
 
-            {tier === 'tier1' ? (
-              /* Tier 1 - Large prominent CTA (Best Overall / Best Value) */
-              <a
-                href={href}
-                target="_blank"
-                rel="sponsored nofollow noopener noreferrer"
-                className="flex-shrink-0 group-hover:scale-105 transition-transform bg-[#FF6B1A] hover:bg-[#ff8a4d] text-black font-black uppercase tracking-[0.04em] px-8 py-5 rounded-2xl text-sm flex items-center gap-3 shadow-2xl shadow-[#FF6B1A]/40"
+            <div className="flex flex-col gap-2">
+              {tier === 'tier1' ? (
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="sponsored nofollow noopener noreferrer"
+                  className="flex-shrink-0 group-hover:scale-105 transition-transform bg-[#FF6B1A] hover:bg-[#ff8a4d] text-black font-black uppercase tracking-[0.04em] px-8 py-5 rounded-2xl text-sm flex items-center gap-3 shadow-2xl shadow-[#FF6B1A]/40"
+                >
+                  SEE TODAY&apos;S PRICE
+                  <ArrowRight className="h-5 w-5" />
+                </a>
+              ) : tier === 'tier2' ? (
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="sponsored nofollow noopener noreferrer"
+                  className="flex-shrink-0 rounded-2xl border border-white/30 bg-white/5 px-7 py-4 font-black uppercase tracking-widest text-sm hover:bg-white/10 transition-colors"
+                >
+                  Check Price →
+                </a>
+              ) : (
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="sponsored nofollow noopener noreferrer"
+                  className="text-sm text-neutral-400 hover:text-offwhite underline underline-offset-4 transition-colors"
+                >
+                  See price
+                </a>
+              )}
+
+              <Link
+                href={compareHref}
+                className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-neutral-200 transition hover:border-[#C6FF3D]/30 hover:bg-[#C6FF3D]/10 hover:text-[#C6FF3D]"
               >
-                SEE TODAY&apos;S PRICE
-                <ArrowRight className="h-5 w-5" />
-              </a>
-            ) : tier === 'tier2' ? (
-              <a
-                href={href}
-                target="_blank"
-                rel="sponsored nofollow noopener noreferrer"
-                className="flex-shrink-0 rounded-2xl border border-white/30 bg-white/5 px-7 py-4 font-black uppercase tracking-widest text-sm hover:bg-white/10 transition-colors"
-              >
-                Check Price →
-              </a>
-            ) : (
-              <a
-                href={href}
-                target="_blank"
-                rel="sponsored nofollow noopener noreferrer"
-                className="text-sm text-neutral-400 hover:text-offwhite underline underline-offset-4 transition-colors"
-              >
-                See price
-              </a>
-            )}
+                Compare this pick
+              </Link>
+            </div>
           </div>
 
           <div className="text-center mt-4 text-[10px] text-neutral-600">

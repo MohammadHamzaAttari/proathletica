@@ -1,11 +1,11 @@
 import Link from 'next/link';
-import { ArrowRight, ShieldCheck, Trophy, Zap, Users } from 'lucide-react';
-import { ComparisonTable } from '@/components/ComparisonTable';
+import { ArrowRight, ShieldCheck, Trophy, Zap } from 'lucide-react';
 import { BuyerGuide } from '@/components/BuyerGuide';
 import { DisclosureBar } from '@/components/DisclosureBar';
 import { FAQ } from '@/components/FAQ';
+import { HeroStats } from '@/components/HeroStats';
+import { HomepageFilters } from '@/components/HomepageFilters';
 import { Newsletter } from '@/components/Newsletter';
-import { ProductGrid } from '@/components/ProductGrid';
 import { getAllProducts, getCategoryList, getPublishedArticles } from '@/lib/db';
 import { itemListSchema, jsonLdProps } from '@/lib/seo/schema';
 
@@ -17,9 +17,9 @@ async function getLiveStats() {
       next: { revalidate: 300 } 
     });
     const data = await res.json();
-    return data.stats || { products: 32, articles: 12, clicks: 12480 };
+    return data.stats || { products: 32, testedProducts: 32, reviews: 12480, clicks: 12480 };
   } catch {
-    return { products: 32, articles: 18, clicks: 47832 };
+    return { products: 32, testedProducts: 32, reviews: 47832, clicks: 47832 };
   }
 }
 
@@ -31,11 +31,11 @@ export default async function HomePage() {
     getLiveStats(),
   ]);
 
-  const featured = products.slice(0, 8);
+  const featured = products;
 
   return (
     <>
-      {featured.length > 0 && <script {...jsonLdProps(itemListSchema(featured, '/'))} />}
+      {featured.length > 0 && <script {...jsonLdProps(itemListSchema(featured.slice(0, 12), '/'))} />}
 
       {/* Subtle single-line disclosure ribbon (Problem 6 fix) */}
       <DisclosureBar />
@@ -57,20 +57,13 @@ export default async function HomePage() {
           </p>
 
           {/* Live Stat Counters */}
-          <div className="mt-12 flex flex-wrap justify-center gap-x-16 gap-y-8 text-left">
-            <div>
-              <div className="text-6xl font-black text-[#C6FF3D] tabular-nums">{stats.products}</div>
-              <div className="text-xs tracking-[0.125em] text-neutral-400 mt-2">PRODUCTS ANALYZED</div>
-            </div>
-            <div>
-              <div className="text-6xl font-black text-[#C6FF3D] tabular-nums">{Math.round(stats.clicks / 1000)}K</div>
-              <div className="text-xs tracking-[0.125em] text-neutral-400 mt-2">REVIEWS PROCESSED</div>
-            </div>
-            <div>
-              <div className="text-6xl font-black text-[#C6FF3D] tabular-nums">4h</div>
-              <div className="text-xs tracking-[0.125em] text-neutral-400 mt-2">LAST PRICE UPDATE</div>
-            </div>
-          </div>
+          <HeroStats
+            stats={{
+              testedProducts: stats.testedProducts || stats.products,
+              reviews: stats.reviews || 0,
+              clicks: stats.clicks || 0,
+            }}
+          />
 
           <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -155,14 +148,7 @@ export default async function HomePage() {
           <Link href="/categories" className="text-sm text-[#3D8BFF] hover:underline">Browse all categories →</Link>
         </div>
 
-        {featured.length > 0 && (
-          <>
-            <ComparisonTable products={featured} articleSlug="homepage" title="Top 4 at a glance" />
-            <div className="mt-12">
-              <ProductGrid products={featured} articleSlug="homepage" />
-            </div>
-          </>
-        )}
+        {featured.length > 0 && <HomepageFilters products={featured} articleSlug="homepage" initialFilter="all" />}
       </section>
 
       {/* Inline newsletter after top 5 (Problem 9 fix) */}

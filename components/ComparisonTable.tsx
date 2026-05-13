@@ -67,6 +67,13 @@ export function ComparisonTable({
                   <td className="py-8 pr-8">
                     <div className="font-black text-xl text-offwhite">{getLabel(index, product)}</div>
                     <div className="text-sm text-neutral-400 mt-2 line-clamp-2 pr-6">{product.short_title || product.title}</div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {(product.best_for_tags || []).slice(0, 3).map((tag) => (
+                        <span key={tag} className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-neutral-300">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </td>
                   <td className="py-8 pr-8">
                     {product.rating && (
@@ -83,6 +90,15 @@ export function ComparisonTable({
                   </td>
                   <td className="py-8 pr-12 text-sm leading-relaxed text-neutral-300">
                     {verdict}
+                    {product.pros?.length ? (
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {product.pros.slice(0, 2).map((item) => (
+                          <span key={item} className="rounded-full bg-[#C6FF3D]/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-[#C6FF3D]">
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
                   </td>
                   <td className="py-8 pr-8">
                     <div className="font-mono text-3xl font-semibold text-[#C6FF3D]">
@@ -130,6 +146,16 @@ export function ComparisonTable({
               <div className="mt-6 font-medium text-lg text-offwhite line-clamp-2">
                 {product.short_title || product.title}
               </div>
+
+              {(product.best_for_tags || []).length > 0 ? (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {product.best_for_tags!.slice(0, 3).map((tag) => (
+                    <span key={tag} className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-neutral-300">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
 
               <div className="mt-4 text-sm text-neutral-300 leading-relaxed border-l-2 border-[#C6FF3D]/40 pl-4">
                 {verdict}

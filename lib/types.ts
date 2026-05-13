@@ -12,6 +12,8 @@ export interface Product {
   editorial_summary: string | null;
   pros: string[] | null;
   cons: string[] | null;
+  best_for_tags: string[] | null;
+  specs: Record<string, string> | null;
   keyword: string | null;
   price_cents: number | null;
   currency: string;
