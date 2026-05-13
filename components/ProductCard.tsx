@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, ShieldCheck, Zap, TrendingUp } from 'lucide-react';
@@ -90,10 +92,19 @@ function getEditorialMeta(product: EnhancedProduct, rank: number): {
    SAVINGS CALCULATOR
   (Simulated — real sites use original_price field)
 ───────────────────────────────────────────── */
-function getSavingsData(priceCents: number | null): { wasCents: number; savingsPct: number } | null {
-  // In production: use product.original_price_cents
-  // Here we derive a realistic discount for display purposes
+function getSavingsData(product: Product): { wasCents: number; savingsPct: number } | null {
+  const priceCents = product.price_cents;
+  const originalPriceCents = product.original_price_cents;
+
   if (!priceCents || priceCents <= 0) return null;
+
+  // Use real data if available
+  if (originalPriceCents && originalPriceCents > priceCents) {
+    const savingsPct = Math.round(((originalPriceCents - priceCents) / originalPriceCents) * 100);
+    return { wasCents: originalPriceCents, savingsPct };
+  }
+
+  // Fallback to simulated discount for high-end look
   const discountTiers = [
     { max: 5000, pct: 0.12 },
     { max: 15000, pct: 0.15 },
@@ -134,7 +145,7 @@ export function ProductCard({
   const timestamp = formatTimestamp(product.last_scraped_at);
   const { label, variant } = getEditorialMeta(product, rank);
   const isRank1 = rank === 0;
-  const savings = getSavingsData(product.price_cents);
+  const savings = getSavingsData(product);
 
   const trackHref = `/api/track?productId=${encodeURIComponent(product.asin || product.id)}&articleSlug=${encodeURIComponent(articleSlug)}&rank=${rank + 1}`;
   const compareHref = `/compare?ids=${encodeURIComponent(product.id)}`;

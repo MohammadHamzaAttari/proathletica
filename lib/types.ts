@@ -16,6 +16,7 @@ export interface Product {
   specs: Record<string, string> | null;
   keyword: string | null;
   price_cents: number | null;
+  original_price_cents: number | null;
   currency: string;
   image_url: string | null;
   affiliate_url: string;

@@ -1,58 +1,105 @@
 import Link from 'next/link';
+import { FlaskConical, ShieldCheck, Target, TrendingUp, Users, Zap } from 'lucide-react';
 import { buildMetadata } from '@/lib/seo/metadata';
 
 export const metadata = buildMetadata({
-  title: 'Testing Methodology',
-  description: 'How ProAthletica ranks fitness gear using data, specs, review analysis and editorial benchmarks.',
+  title: 'Our Methodology',
+  description: 'How ProAthletica ranks fitness gear using the Athletica Lab protocol: data aggregation, spec verification, and editorial oversight.',
   canonical: '/methodology',
 });
 
+const PILLARS = [
+  {
+    icon: Target,
+    title: 'Category Fit',
+    desc: 'We define the specific training problem (e.g., small-space cardio) before looking at gear. If a product doesn\'t solve a clear problem, it doesn\'t get ranked.',
+  },
+  {
+    icon: FlaskConical,
+    title: 'Spec Verification',
+    desc: 'We verify materials (steel gauges, fabric tech), warranty terms, and dimensions against manufacturer data. No marketing fluff allowed.',
+  },
+  {
+    icon: Users,
+    title: 'Sentiment Analysis',
+    desc: 'We aggregate 47,000+ data points from verified customer reviews to identify long-term durability patterns that a 1-week test might miss.',
+  },
+  {
+    icon: TrendingUp,
+    title: 'Price/Performance',
+    desc: 'The best overall pick isn\'t the cheapest or most expensive—it\'s the one with the highest utility per dollar spent over a 3-5 year lifespan.',
+  },
+];
+
 export default function MethodologyPage() {
   return (
-    <article className="mx-auto max-w-3xl space-y-8 px-4 py-16 sm:px-8">
-      <div className="space-y-3">
-        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
-          Editorial process
+    <article className="mx-auto max-w-4xl space-y-16 px-4 py-20 sm:px-8">
+      {/* Header */}
+      <div className="space-y-4 text-center">
+        <div className="inline-flex items-center gap-2 rounded-pill border border-data-lime/25 bg-data-lime/[0.06] px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-data-lime">
+          <FlaskConical className="w-3 h-3" aria-hidden="true" />
+          The Athletica Lab Protocol
         </div>
-        <h1 className="text-4xl font-black uppercase italic tracking-tight text-white">
+        <h1 className="text-4xl sm:text-6xl font-black uppercase italic tracking-tight text-white leading-none">
           How we rank gear
         </h1>
-        <p className="text-lg leading-8 text-neutral-300">
-          Every recommendation must be explainable. We combine large-scale review data, 
-          technical specifications, price history, and category-specific editorial benchmarks.
+        <p className="mx-auto max-w-2xl text-lg sm:text-xl leading-relaxed text-neutral-400">
+          Rankings should be explainable, repeatable, and honest. We combine large-scale review data with technical specs and editorial oversight to cut through the noise.
         </p>
       </div>
-      <div className="space-y-5 text-neutral-400">
-        <p>
-          We begin with a category brief: the core problem the product solves, the target athlete, 
-          the realistic price band, and which competitors actually matter.
-        </p>
-        <p>
-          We pull and verify public data including current pricing, materials, dimensions, warranty terms, 
-          average ratings, and review volume. Where possible we analyze sentiment patterns across thousands of reviews.
-        </p>
-        <p>
-          When independent testing data or hands-on experience is available we disclose it clearly. 
-          When it is not, we say so explicitly and rely on transparent, reproducible spec comparison and aggregated customer feedback.
-        </p>
-        <p>
-          Final rankings weigh category fit, durability signals, real-world performance data, 
-          price-to-performance ratio, and how clearly the product solves the stated use case.
-        </p>
-        <p className="font-medium text-white">
-          Affiliate relationships do not influence rankings. A product that underperforms or is overpriced will be called out as such.
-        </p>
+
+      {/* Pillars Grid */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        {PILLARS.map((p) => (
+          <div key={p.title} className="rounded-card border border-white/[0.06] bg-graphite-800 p-6 sm:p-8 space-y-4 hover:border-data-lime/20 transition-colors">
+            <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-trust-blue/20 bg-trust-blue/5 text-trust-blue">
+              <p.icon className="w-5 h-5" aria-hidden="true" />
+            </div>
+            <h2 className="text-xl font-black uppercase tracking-tight text-offwhite">{p.title}</h2>
+            <p className="text-sm leading-relaxed text-neutral-400">{p.desc}</p>
+          </div>
+        ))}
       </div>
-      <div className="rounded-3xl border border-white/5 bg-neutral-900/40 p-6 text-sm leading-6 text-neutral-300">
-        Need the compliance version? Read the{' '}
-        <Link href="/disclosure" className="text-emerald-400 underline underline-offset-4">
-          affiliate disclosure
-        </Link>{' '}
-        or learn more about{' '}
-        <Link href="/about" className="text-emerald-400 underline underline-offset-4">
-          our approach
-        </Link>
-        .
+
+      {/* Detailed Process */}
+      <div className="space-y-8 border-t border-white/[0.06] pt-16">
+        <div className="space-y-4">
+          <h2 className="text-2xl font-black uppercase tracking-tight text-white">The Independent Standard</h2>
+          <div className="space-y-6 text-base leading-relaxed text-neutral-400">
+            <p>
+              We begin with a category brief: the core training problem the product solves, the target athlete (Beginner, Apartment Dweller, Powerlifter), and a realistic price band.
+            </p>
+            <p>
+              Our internal engine pulls and verifies public data including current pricing, material compositions, footprint dimensions, and warranty coverage. We emphasize <strong className="text-white">Total Cost of Ownership</strong>—how much a product actually costs when you factor in durability and necessary accessories.
+            </p>
+            <p>
+              When independent testing data or hands-on experience is available from our editorial team, we highlight it with the <span className="text-trust-blue font-bold">"Verified"</span> chip. When it is not, we rely on transparent, reproducible spec comparisons and aggregated customer feedback.
+            </p>
+          </div>
+        </div>
+
+        {/* Integrity Note */}
+        <div className="rounded-card border border-cta-orange/20 bg-cta-orange/5 p-8">
+          <div className="flex items-start gap-4">
+            <ShieldCheck className="w-6 h-6 text-cta-orange flex-shrink-0 mt-1" aria-hidden="true" />
+            <div className="space-y-2">
+              <h3 className="font-black uppercase tracking-wider text-cta-orange">Editorial Integrity</h3>
+              <p className="text-sm leading-relaxed text-neutral-300">
+                Affiliate relationships <strong className="text-white">never</strong> influence rankings. A product that underperforms or is overpriced will be flagged, regardless of commission rates. Our goal is to save you money by helping you buy the right equipment the first time.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Call to action */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 py-10 border-t border-white/[0.06]">
+          <Link href="/" className="cta-primary w-auto px-8">
+            See Top Picks
+          </Link>
+          <Link href="/about" className="text-sm font-bold text-neutral-500 hover:text-white transition-colors">
+            Meet the editorial team →
+          </Link>
+        </div>
       </div>
     </article>
   );

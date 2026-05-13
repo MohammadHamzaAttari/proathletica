@@ -3,12 +3,12 @@
 import { useState } from 'react';
 
 const FILTERS = [
-  { id: 'all', label: 'All', icon: '📊' },
+  { id: 'all', label: 'All Picks', icon: '📊' },
   { id: 'under50', label: 'Under $50', icon: '💰' },
   { id: 'bestvalue', label: "Best Value", icon: '🏆' },
-  { id: 'apartment', label: 'Small Spaces', icon: '🏠' },
+  { id: 'apartment', label: 'Compact', icon: '🏠' },
   { id: 'highestrated', label: 'Highest Rated', icon: '⭐' },
-  { id: 'editors', label: "Editor's Pick", icon: '✍️' },
+  { id: 'editors', label: "Top Pick", icon: '✍️' },
 ];
 
 interface QuickFiltersProps {
@@ -24,18 +24,20 @@ export function QuickFilters({ onFilterChange }: QuickFiltersProps) {
   };
 
   return (
-    <div className="flex flex-wrap gap-3 pb-8">
+    <div className="flex flex-wrap gap-2 pb-8">
       {FILTERS.map((filter) => (
         <button
           key={filter.id}
           onClick={() => handleFilter(filter.id)}
-          className={`inline-flex items-center gap-2 rounded-3xl border px-6 py-3 text-sm font-medium transition-all ${
+          className={`group inline-flex items-center gap-2 rounded-pill border px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-all duration-200 ${
             activeFilter === filter.id
-              ? 'border-[#C6FF3D] bg-[#C6FF3D]/10 text-[#C6FF3D]'
-              : 'border-white/10 bg-[#161B22] text-neutral-400 hover:border-white/30 hover:text-offwhite'
+              ? 'border-data-lime bg-data-lime/10 text-data-lime shadow-[0_0_15px_rgba(198,255,61,0.1)]'
+              : 'border-white/[0.08] bg-graphite-800 text-neutral-400 hover:border-white/20 hover:text-offwhite hover:bg-white/[0.03]'
           }`}
         >
-          <span>{filter.icon}</span>
+          <span className={`text-base transition-transform group-hover:scale-110 ${activeFilter === filter.id ? 'scale-110' : ''}`} aria-hidden="true">
+            {filter.icon}
+          </span>
           {filter.label}
         </button>
       ))}

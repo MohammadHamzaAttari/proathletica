@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ComparisonTable } from '@/components/ComparisonTable';
 import { ProductGrid } from '@/components/ProductGrid';
 import type { Product } from '@/lib/types';
+import { SlidersHorizontal, X } from 'lucide-react';
 
 type FilterKey =
   | 'all'
@@ -30,8 +31,8 @@ const FILTERS: Array<{
   },
   {
     key: 'small-apartments',
-    label: 'Small Apartments',
-    hint: 'Space-saving gear',
+    label: 'Apartments',
+    hint: 'Sub-30 sq ft',
     icon: '🏠',
     match: (p) =>
       /compact|foldable|small footprint|space-saving/i.test(
@@ -41,8 +42,8 @@ const FILTERS: Array<{
   },
   {
     key: 'budget',
-    label: 'Budget Picks',
-    hint: 'Best value buys',
+    label: 'Budget',
+    hint: 'Under $200',
     icon: '💰',
     match: (p) =>
       /budget|value|affordable|entry|starter/i.test(
@@ -52,8 +53,8 @@ const FILTERS: Array<{
   },
   {
     key: 'heavy-lifters',
-    label: 'Heavy Lifters',
-    hint: 'High-load equipment',
+    label: 'Heavy Load',
+    hint: 'Garage proof',
     icon: '🏋️',
     match: (p) =>
       /heavy|garage|high load|durable|steel|pro/i.test(
@@ -63,22 +64,11 @@ const FILTERS: Array<{
   },
   {
     key: 'smart-equipment',
-    label: 'Smart Equipment',
-    hint: 'Connected training',
+    label: 'Smart Gear',
+    hint: 'Connected app',
     icon: '📱',
     match: (p) =>
       /smart|app|bluetooth|connected/i.test(
-        [p.short_title, p.title, p.raw_description, p.editorial_summary, ...(p.best_for_tags || [])]
-          .filter(Boolean).join(' ')
-      ),
-  },
-  {
-    key: 'compact-gear',
-    label: 'Compact Gear',
-    hint: 'Portable & light',
-    icon: '🎒',
-    match: (p) =>
-      /compact|portable|foldable|space-saving|small footprint/i.test(
         [p.short_title, p.title, p.raw_description, p.editorial_summary, ...(p.best_for_tags || [])]
           .filter(Boolean).join(' ')
       ),
@@ -121,103 +111,94 @@ export function HomepageFilters({
   }, [activeFilter, products]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
 
-      {/* ── FILTER PILL ROW ── */}
-      <div
-        role="tablist"
-        aria-label="Filter products by category"
-        className="flex flex-wrap gap-2"
-      >
-        {FILTERS.map((filter) => {
-          const isActive = activeFilter === filter.key;
-          return (
-            <button
-              key={filter.key}
-              role="tab"
-              type="button"
-              aria-selected={isActive}
-              aria-controls="filtered-products-panel"
-              onClick={() => setFilter(filter.key)}
-              className={`filter-pill ${isActive ? 'filter-pill--active' : ''}`}
-            >
-              <span className="flex items-center gap-1.5">
-                <span aria-hidden="true">{filter.icon}</span>
-                <span className="filter-pill__label">{filter.label}</span>
-              </span>
-              <span className="filter-pill__hint">{filter.hint}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* ── RESULTS PANEL ── */}
-      <div
-        id="filtered-products-panel"
-        role="tabpanel"
-        aria-label={`Products filtered by: ${activeFilterMeta?.label || 'All'}`}
-        className="space-y-6"
-      >
-        {/* Results header */}
-        <div className="flex items-center justify-between gap-4 px-1">
-          <div className="flex items-center gap-3">
-            {/* Count badge */}
-            <span
-              className={`inline-flex items-center justify-center min-w-[2rem] h-6 px-2 rounded-full text-xs font-black tabular-nums transition-all duration-300 ${
-                isPending
-                  ? 'bg-white/5 text-neutral-500'
-                  : 'bg-data-lime/10 text-data-lime border border-data-lime/20'
-              }`}
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              {isPending ? '…' : filteredProducts.length}
-            </span>
-            <span className="text-sm text-neutral-400">
-              {filteredProducts.length === products.length
-                ? 'products ranked'
-                : `of ${products.length} products`}
-            </span>
+      {/* ── FILTER TABS ── */}
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-neutral-500">
+            <SlidersHorizontal className="w-3 h-3" />
+            Filter by training focus
           </div>
-
-          {/* Reset — only shown when filter is active */}
           {activeFilter !== 'all' && (
             <button
-              type="button"
               onClick={() => setFilter('all')}
-              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-neutral-500 hover:text-neutral-200 transition-colors duration-150 focus-ring rounded px-2 py-1"
-              aria-label="Clear filter and show all products"
+              className="text-xs font-bold text-trust-blue hover:text-white transition-colors flex items-center gap-1"
             >
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-                <path d="M2 2L8 8M8 2L2 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-              </svg>
-              Clear filter
+              <X className="w-3 h-3" /> Reset
             </button>
           )}
         </div>
+        
+        <div
+          role="tablist"
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2"
+        >
+          {FILTERS.map((filter) => {
+            const isActive = activeFilter === filter.key;
+            return (
+              <button
+                key={filter.key}
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setFilter(filter.key)}
+                className={`group flex flex-col items-start p-4 rounded-inner border transition-all duration-200 ${
+                  isActive 
+                    ? 'border-data-lime bg-data-lime/10 shadow-[0_0_20px_rgba(198,255,61,0.08)]' 
+                    : 'border-white/[0.06] bg-graphite-800 hover:border-white/20'
+                }`}
+              >
+                <div className="flex items-center justify-between w-full mb-1">
+                  <span className={`text-xl transition-transform ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} aria-hidden="true">{filter.icon}</span>
+                  {isActive && <div className="w-1.5 h-1.5 rounded-full bg-data-lime animate-pulse" />}
+                </div>
+                <div className={`text-xs font-black uppercase tracking-tight ${isActive ? 'text-data-lime' : 'text-offwhite'}`}>
+                  {filter.label}
+                </div>
+                <div className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mt-0.5 whitespace-nowrap">
+                  {filter.hint}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
-        {/* Comparison at-a-glance table */}
+      {/* ── RESULTS ── */}
+      <div className="space-y-8 animate-cardIn">
+        {/* Results Metadata */}
+        <div className="flex items-center gap-4">
+          <div className="h-px flex-1 bg-white/[0.06]" />
+          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/[0.06] bg-white/[0.02]">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">
+              Showing
+            </span>
+            <span className="text-sm font-black text-data-lime tabular-nums">
+              {isPending ? '...' : filteredProducts.length}
+            </span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">
+              of {products.length} picks
+            </span>
+          </div>
+          <div className="h-px flex-1 bg-white/[0.06]" />
+        </div>
+
+        {/* At a glance Comparison */}
         {filteredProducts.length > 1 && (
-          <div className="overflow-hidden rounded-[1.25rem] border border-white/[0.05] bg-black/20">
-            <div className="px-4 py-3 border-b border-white/[0.04]">
-              <span className="section-eyebrow">At a Glance</span>
-            </div>
-            <div className="p-4">
-              <ComparisonTable
-                products={filteredProducts}
-                articleSlug={articleSlug}
-                title=""
-              />
-            </div>
+          <div className="space-y-4">
+            <ComparisonTable
+              products={filteredProducts}
+              articleSlug={articleSlug}
+              title={`${activeFilterMeta?.label || 'Top'} picks compared`}
+            />
           </div>
         )}
 
-        {/* Product cards grid */}
+        {/* Product Cards */}
         <ProductGrid
           products={filteredProducts}
           articleSlug={articleSlug}
           isLoading={isPending}
-          emptyFilterLabel={activeFilterMeta?.label}
         />
       </div>
     </div>
