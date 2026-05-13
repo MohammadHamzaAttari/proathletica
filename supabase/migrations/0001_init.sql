@@ -146,14 +146,14 @@ insert into products (
   rating, review_count, badge, rank, is_featured
 ) values
   (
-    'B001ARYU58', 'B001ARYU58', 'bowflex-selecttech-552',
-    'Home Gym', 'Bowflex',
-    'Bowflex SelectTech 552 Adjustable Dumbbells',
-    'Compact adjustable dumbbells that replace a full rack for beginner home gyms.',
+    ('B001ARYU58', 'B001ARYU58', 'bowflex-selecttech-552',
+     'Home Gym', 'Bowflex',
+     'Bowflex SelectTech 552 Adjustable Dumbbells',
+     'Compact adjustable dumbbells that replace a full rack for beginner home gyms.',
     'adjustable dumbbells home gym',
     34900, 'USD',
     null,
-    'https://www.amazon.com/s?k=Bowflex+SelectTech+552&tag=proathletica-20',
+     'https://www.amazon.com/dp/B001ARYU58?tag=proathletica-20&linkCode=ll1&language=en_US',
     4.8, 32000, '#1 Best Seller', 1, true
   ),
   (
