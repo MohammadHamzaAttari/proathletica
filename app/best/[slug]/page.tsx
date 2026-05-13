@@ -119,10 +119,13 @@ export default async function ArticlePage({ params }: { params: { slug: string }
             <p className="text-lg font-medium leading-relaxed text-neutral-400">{article.excerpt}</p>
           ) : null}
           <div className="flex flex-wrap items-center gap-6 border-t border-white/5 pt-4 text-[10px] font-bold uppercase tracking-widest text-neutral-500">
-            <span className="flex items-center gap-2">
+            <Link
+              href={`/about#${article.author?.toLowerCase().replace(/\s+/g, '-')}`}
+              className="flex items-center gap-2 hover:text-trust-blue transition-colors"
+            >
               <User className="h-3.5 w-3.5" />
               {article.author}
-            </span>
+            </Link>
             <span className="flex items-center gap-2">
               <Calendar className="h-3.5 w-3.5" />
               Updated{' '}
@@ -176,6 +179,28 @@ export default async function ArticlePage({ params }: { params: { slug: string }
             <ProductGrid products={article.products} articleSlug={article.slug} />
           </section>
         ) : null}
+
+        <section className="mt-16 border-t border-white/5 pt-12">
+          <div className="rounded-card border border-white/[0.06] bg-graphite-800 p-8 space-y-6">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-trust-blue/10 text-trust-blue">
+                <FlaskConical className="w-5 h-5" />
+              </div>
+              <h3 className="text-xl font-black uppercase tracking-tight text-white">Editorial Methodology</h3>
+            </div>
+            <p className="text-sm leading-relaxed text-neutral-400">
+              ProAthletica rankings are independently vetted by our editorial board. We analyze thousands of data points — including real customer reviews and technical specs — to give you an honest score. No brand pays for a higher ranking.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 pt-2">
+              <Link href="/methodology" className="text-sm font-bold text-trust-blue hover:text-white transition-colors underline underline-offset-4">
+                Read our full scoring protocol →
+              </Link>
+              <Link href="/disclosure" className="text-sm font-bold text-neutral-500 hover:text-white transition-colors underline underline-offset-4">
+                Affiliate Disclosure →
+              </Link>
+            </div>
+          </div>
+        </section>
 
         <section className="mt-16 border-t border-white/5 pt-12">
           <FAQ />

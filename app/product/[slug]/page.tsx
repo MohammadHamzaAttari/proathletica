@@ -17,7 +17,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     title: `Is the ${product.short_title || product.title} Worth It in 2026?`,
     description: product.editorial_summary || `Data-driven review of the ${product.title}.`,
     canonical: `/product/${params.slug}`,
+    pinterestImage: `/api/pinterest/${product.asin || product.id}`,
     image: product.image_url || undefined,
+    priceAmount: product.price_cents ? product.price_cents / 100 : undefined,
+    priceCurrency: product.currency || "USD",
   });
 }
 

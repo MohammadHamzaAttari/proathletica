@@ -55,7 +55,7 @@ function trimToWordBoundary(value: string, maxChars: number) {
   return lastSpace > 24 ? slice.slice(0, lastSpace).trim() : slice.trim();
 }
 
-export function normalizeProductTitle(title: string, maxChars = 55): string {
+export function normalizeProductTitle(title: string, maxChars = 80): string {
   const cleaned = compactSpaces(
     TITLE_FUZZ.reduce((value, pattern) => value.replace(pattern, ' '), title)
       .replace(/[\s,;:|/–—-]+$/g, '')
@@ -103,27 +103,51 @@ function pickAudience(product: ProductSource, traits: Record<string, boolean>) {
   if (traits.budget) return 'first-time buyers';
   if (product.category.toLowerCase().includes('bench')) return 'home bench pressers';
   if (product.category.toLowerCase().includes('bands')) return 'warm-up focused lifters';
-  return 'buyers building a serious home gym';
+  
+  const fallbacks = [
+    'buyers building a serious home gym',
+    'fitness enthusiasts seeking reliability',
+    'dedicated athletes upgrading their setup',
+    'beginners looking for a solid foundation',
+    'home gym builders prioritizing value',
+  ];
+  return fallbacks[Math.abs(product.id.split('').reduce((a, b) => a + b.charCodeAt(0), 0)) % fallbacks.length];
 }
 
-function pickStrength(traits: Record<string, boolean>) {
+function pickStrength(product: ProductSource, traits: Record<string, boolean>) {
   if (traits.quickAdjust) return 'fast load changes and easy progression';
   if (traits.compact) return 'serious training without eating floor space';
   if (traits.stable) return 'a planted feel under heavier sets';
   if (traits.grip) return 'better control when the work gets heavy';
   if (traits.smart) return 'connected tracking and cleaner progression';
   if (traits.portable) return 'easy storage and simple warm-up use';
-  return 'useful performance with a clear training purpose';
+  
+  const fallbacks = [
+    'useful performance with a clear training purpose',
+    'dependable durability for consistent daily use',
+    'a well-rounded balance of features and cost',
+    'straightforward functionality for core lifting',
+    'reliable support for high-volume training blocks',
+  ];
+  return fallbacks[Math.abs(product.asin.split('').reduce((a, b) => a + b.charCodeAt(0), 0)) % fallbacks.length];
 }
 
-function pickTradeoff(traits: Record<string, boolean>) {
+function pickTradeoff(product: ProductSource, traits: Record<string, boolean>) {
   if (traits.quickAdjust) return 'the mechanism adds thickness and weight';
   if (traits.compact) return 'compactness usually means a denser, less forgiving feel';
   if (traits.smart) return 'the app layer adds cost and complexity';
   if (traits.budget) return 'the finish is more basic than premium rivals';
   if (traits.heavyDuty) return 'it is less portable than lighter alternatives';
   if (traits.portable) return 'lighter builds usually give up some stability';
-  return 'it is not the cheapest option in the category';
+  
+  const fallbacks = [
+    'it is not the cheapest option in the category',
+    'the footprint is slightly larger than some rivals',
+    'it lacks the premium branding of high-end tools',
+    'the setup takes a few more minutes than expected',
+    'the aesthetics are functional rather than sleek',
+  ];
+  return fallbacks[Math.abs((product.id + product.asin).split('').reduce((a, b) => a + b.charCodeAt(0), 0)) % fallbacks.length];
 }
 
 function deriveTraits(product: ProductSource) {
@@ -200,8 +224,8 @@ export function buildProductEditorialCopy(product: ProductSource, rank = 0): Pro
   const short_title = normalizeProductTitle(baseTitle);
   const traits = deriveTraits(product);
   const audience = pickAudience(product, traits);
-  const strength = pickStrength(traits);
-  const tradeoff = pickTradeoff(traits);
+  const strength = pickStrength(product, traits);
+  const tradeoff = pickTradeoff(product, traits);
   const editorial_summary = normalizeLabel(
     `Best for ${audience} needing ${strength}, though ${tradeoff}.`
   );

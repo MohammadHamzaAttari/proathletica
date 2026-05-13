@@ -76,7 +76,9 @@ export function categoryToSlug(category: string): string {
 }
 
 export function slugify(text: string): string {
-  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  const s = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  if (s.length <= 60) return s;
+  return s.slice(0, 60).replace(/-$/, '');
 }
 
 function normalizeSentence(value: string) {

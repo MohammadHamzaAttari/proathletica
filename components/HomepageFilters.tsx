@@ -189,7 +189,7 @@ export function HomepageFilters({
             <ComparisonTable
               products={filteredProducts}
               articleSlug={articleSlug}
-              title={`${activeFilterMeta?.label || 'Top'} picks compared`}
+              title={`${activeFilterMeta?.key === 'all' ? 'All Ranked' : activeFilterMeta?.label || 'Top'} Gear Compared`}
             />
           </div>
         )}

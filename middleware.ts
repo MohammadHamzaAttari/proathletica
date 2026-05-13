@@ -54,6 +54,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 308);
   }
 
+  // Redirect /best/*-2026 → /best/* (Audit #02-F)
+  if (url.pathname.startsWith('/best/') && url.pathname.endsWith('-2026')) {
+    url.pathname = url.pathname.replace(/-2026$/, '');
+    return NextResponse.redirect(url, 308);
+  }
+
   return NextResponse.next();
 }
 

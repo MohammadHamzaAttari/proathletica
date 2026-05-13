@@ -237,6 +237,11 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* ── HOME GYM MATCHER (Audit #03-E) ── */}
+      <section className="mx-auto max-w-6xl px-4 sm:px-8 py-16" aria-label="Home gym setup quiz">
+        <GymQuiz />
+      </section>
+
       {/* ── TOP PICKS ── */}
       <section
         id="top-picks"
@@ -277,10 +282,6 @@ export default async function HomePage() {
       </section>
 
       {/* ── FAQ (schema-rich, buyer-intent) ── */}
-      <section className="mx-auto max-w-4xl px-4 sm:px-8 pb-16" aria-label="Home gym setup quiz">
-        <GymQuiz />
-      </section>
-
       <section
         className="mx-auto max-w-4xl px-4 sm:px-8 border-t border-white/[0.05] py-16"
         aria-label="Frequently asked questions about fitness gear"
@@ -288,7 +289,7 @@ export default async function HomePage() {
         <FAQ />
       </section>
 
-      {/* ── BOTTOM NEWSLETTER ── */}
+      {/* ── BOTTOM NEWSLETTER (Audit #04-D) ── */}
       <div className="mx-auto max-w-6xl px-4 sm:px-8 pb-20">
         <Newsletter source="homepage-bottom" />
       </div>

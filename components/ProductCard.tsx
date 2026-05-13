@@ -171,7 +171,7 @@ export function ProductCard({
             fill
             className="object-contain p-4"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            priority={rank < 3}
+            priority={rank === 0}
           />
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -272,6 +272,18 @@ export function ProductCard({
           {verdict}
         </p>
 
+        {/* Specs at a glance (Audit #02-B) */}
+        {product.specs && Object.keys(product.specs).length > 0 && (
+          <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/[0.04]">
+            {Object.entries(product.specs).slice(0, 4).map(([key, value]) => (
+              <div key={key} className="flex flex-col">
+                <span className="text-[9px] font-black uppercase tracking-widest text-neutral-600">{key}</span>
+                <span className="text-[11px] font-bold text-neutral-300 truncate">{value}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Pros / Cons */}
         <div className="pros-cons-grid">
           <div>
@@ -367,37 +379,31 @@ export function ProductCard({
           </div>
 
           {/* Primary CTA — unified across ALL tiers */}
-          <a
-            href={trackHref}
-            target="_blank"
-            rel="sponsored nofollow noopener noreferrer"
-            aria-label={`Check price for ${shortTitle} on Amazon (opens in new tab)`}
-            className="cta-primary"
-          >
-            {isRank1 ? (
-              <>
-                See Today's Best Price
-                <ArrowRight className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-              </>
-            ) : (
-              <>
-                Check Price on Amazon
-                <ArrowRight className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-              </>
+          <div className="space-y-2">
+            <a
+              href={trackHref}
+              target="_blank"
+              rel="sponsored nofollow noopener noreferrer"
+              aria-label={`Check today's price for ${shortTitle} on Amazon (opens in new tab)`}
+              className="cta-primary h-12"
+            >
+              Check Today&apos;s Price on Amazon
+              <ArrowRight className="w-4 h-4 flex-shrink-0 ml-1" aria-hidden="true" />
+            </a>
+            {product.review_count && product.review_count > 0 && (
+              <div className="text-center text-[10px] font-bold text-neutral-500 uppercase tracking-widest">
+                Based on {formatReviewCount(product.review_count)} Amazon reviews
+              </div>
             )}
-          </a>
+          </div>
 
-          {/* Secondary CTA — Compare */}
+          {/* Secondary CTA (Audit #03-C) */}
           <Link
             href={compareHref}
-            aria-label={`Compare ${shortTitle} with other products`}
-            className="cta-secondary"
+            aria-label={`Compare ${shortTitle} with top rivals`}
+            className="flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-neutral-500 hover:text-trust-blue transition-colors"
           >
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-              <rect x="1" y="3" width="5" height="9" rx="1" stroke="currentColor" strokeWidth="1.2"/>
-              <rect x="7" y="1" width="5" height="11" rx="1" stroke="currentColor" strokeWidth="1.2"/>
-            </svg>
-            Compare This Pick
+            📊 Compare to #2 pick
           </Link>
 
           {/* Affiliate micro-disclosure — WCAG AA: 11px min, proper contrast */}

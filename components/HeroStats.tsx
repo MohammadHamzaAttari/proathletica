@@ -10,47 +10,11 @@ function formatCompact(value: number) {
   }).format(value);
 }
 
-function CountUp({ value, compact = false }: { value: number; compact?: boolean }) {
-  const [current, setCurrent] = useState<number | null>(null);
-  const [reducedMotion, setReducedMotion] = useState(false);
-
-  useEffect(() => {
-    setReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  }, []);
-
-  useEffect(() => {
-    if (reducedMotion) {
-      setCurrent(value);
-      return;
-    }
-
-    let frame = 0;
-    let startTime = 0;
-    const duration = 1400;
-
-    const step = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const elapsed = timestamp - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 4); // steeper ease-out
-      setCurrent(Math.round(value * eased));
-      if (progress < 1) {
-        frame = window.requestAnimationFrame(step);
-      }
-    };
-
-    setCurrent(0);
-    frame = window.requestAnimationFrame(step);
-    return () => window.cancelAnimationFrame(frame);
-  }, [reducedMotion, value]);
-
-  const label = useMemo(() => {
-    const resolved = current ?? value;
-    return compact ? formatCompact(resolved) : resolved.toLocaleString('en-US');
-  }, [compact, current, value]);
+function StatValue({ value, compact = false }: { value: number; compact?: boolean }) {
+  const label = compact ? formatCompact(value) : value.toLocaleString('en-US');
 
   return (
-    <span className="tabular-nums" suppressHydrationWarning>
+    <span className="tabular-nums">
       {label}
     </span>
   );
@@ -114,7 +78,7 @@ export function HeroStats({
             </div>
             <div className="flex items-baseline gap-1">
               <span className="text-4xl sm:text-5xl font-black tracking-[-0.04em] text-offwhite">
-                <CountUp value={value} compact={compact} />
+                <StatValue value={value} compact={compact} />
               </span>
               {suffix && <span className="text-2xl font-black text-neutral-500">{suffix}</span>}
             </div>

@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: `${SITE_NAME} | Best Fitness Gear 2026 — Tested & Reviewed`,
-    template: `%s | ${SITE_NAME}`,
+    template: '%s',
   },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
@@ -64,6 +64,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         {/* FIX: Organization + WebSite schema in <head> for all pages */}
         <script {...jsonLdProps([organizationSchema(), websiteSchema()])} />
+        {/* FIX (Audit #01-5): Preconnect to Amazon for faster product image resolution */}
+        <link rel="preconnect" href="https://m.media-amazon.com" crossOrigin="anonymous" />
       </head>
       <body className="min-h-screen bg-[#0A0D12] font-sans text-neutral-100 antialiased">
         <Header />

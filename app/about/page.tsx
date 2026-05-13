@@ -10,18 +10,21 @@ export const metadata = buildMetadata({
 
 const EDITORS = [
   {
+    id: 'alex-rivera',
     name: 'Alex Rivera',
     role: 'Editorial Director',
     bio: 'Former competitive powerlifter and CSCS with 12+ years of experience in gear testing.',
     img: 'AR'
   },
   {
+    id: 'jordan-kim',
     name: 'Jordan Kim',
     role: 'Technical Lead',
     bio: 'Material scientist focused on durability benchmarks and steel gauge verification.',
     img: 'JK'
   },
   {
+    id: 'sam-torres',
     name: 'Sam Torres',
     role: 'Testing Lead',
     bio: 'Marathoner and CrossFit coach specializing in cardio equipment and small-space setups.',
@@ -115,7 +118,7 @@ export default function AboutPage() {
         </div>
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {EDITORS.map((editor) => (
-            <div key={editor.name} className="space-y-4">
+            <div key={editor.name} id={editor.id} className="scroll-mt-24 space-y-4">
               <div className="flex h-20 w-20 items-center justify-center rounded-card bg-gradient-to-br from-graphite-700 to-graphite-900 border border-white/[0.06] text-xl font-black text-offwhite">
                 {editor.img}
               </div>

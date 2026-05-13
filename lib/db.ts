@@ -39,6 +39,8 @@ export const getProductById = unstable_cache(
     if (byId.data) return hydrateProduct(byId.data as Product);
     const byAsin = await sb.from('products').select('*').eq('asin', id).maybeSingle();
     if (byAsin.data) return hydrateProduct(byAsin.data as Product);
+    const bySlug = await sb.from('products').select('*').eq('slug', id).maybeSingle();
+    if (bySlug.data) return hydrateProduct(bySlug.data as Product);
     return null;
   },
   ['product-by-id'],

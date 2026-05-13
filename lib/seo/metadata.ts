@@ -9,6 +9,9 @@ interface PageMetaInput {
   type?: 'website' | 'article';
   publishedTime?: string;
   modifiedTime?: string;
+  priceAmount?: number;
+  priceCurrency?: string;
+  pinterestImage?: string;
   noindex?: boolean;
 }
 
@@ -18,7 +21,8 @@ interface PageMetaInput {
  * Facebook, and AI crawlers all see it.
  */
 export function buildMetadata(input: PageMetaInput = {}): Metadata {
-  const fullTitle = input.title ? `${input.title} | ${SITE_NAME}` : SITE_NAME;
+  const pageTitle = input.title || '';
+  const fullTitle = pageTitle ? `${pageTitle} | ${SITE_NAME}` : SITE_NAME;
   const description = input.description || SITE_DESCRIPTION;
   const canonical = input.canonical
     ? input.canonical.startsWith('http')
@@ -46,6 +50,8 @@ export function buildMetadata(input: PageMetaInput = {}): Metadata {
       locale: 'en_US',
       ...(input.publishedTime ? { publishedTime: input.publishedTime } : {}),
       ...(input.modifiedTime ? { modifiedTime: input.modifiedTime } : {}),
+      ...(input.priceAmount ? { 'product:price:amount': input.priceAmount } : {}),
+      ...(input.priceCurrency ? { 'product:price:currency': input.priceCurrency } : {}),
     },
     twitter: {
       card: 'summary_large_image',
@@ -55,6 +61,7 @@ export function buildMetadata(input: PageMetaInput = {}): Metadata {
     },
     other: {
       'msapplication-TileColor': '#10b981',
+      ...(input.pinterestImage ? { 'pinterest:image': input.pinterestImage } : {}),
     },
   };
 }

@@ -1,0 +1,32 @@
+# ProAthletica (athletica.page)
+
+Independent, data-driven fitness equipment rankings. We analyze thousands of reviews and technical specifications to rank gear for home gyms, apartments, and specific training goals.
+
+## Core Values
+- **Data-First**: Rankings based on aggregate review data, steel gauges, motor specs, and warranty analysis.
+- **Independent**: No paid placements or pay-to-play rankings.
+- **Reproducible**: Methodology is public and based on verifiable manufacturer specs.
+
+## Key Product Categories
+- Adjustable Dumbbells
+- Resistance Bands
+- Weight Benches
+- Massage Guns
+- Running Shoes
+
+## Authors & Experts
+- **Alex Rivera**: Editorial Director, CSCS, former competitive powerlifter.
+- **Jordan Kim**: Technical Lead, Material Scientist.
+- **Sam Torres**: Testing Lead, CrossFit Coach.
+
+## Methodology
+The Athletica Lab protocol involves:
+1. **Aggregation**: Collecting 500+ reviews per product.
+2. **Verification**: Cross-referencing manufacturer specs (steel gauge, weight limits).
+3. **Scoring**: Calculating the Athletica Score (Price/Performance/Durability).
+
+## Ethics
+- Amazon Associate: We earn commissions on qualifying purchases.
+- Editorial Independence: Affiliate relationships do not influence rankings.
+
+For full rankings and data-verified picks, visit [athletica.page](https://athletica.page).
