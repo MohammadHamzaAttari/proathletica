@@ -15,25 +15,28 @@ const EDITORS = [
     id: 'alex-rivera',
     name: 'Alex Rivera',
     role: 'Editorial Director',
-    bio: 'Former competitive powerlifter and CSCS with 12+ years of experience in gear testing.',
+    bio: 'Former competitive powerlifter and CSCS with 12+ years of experience in gear testing. Alex oversees the Athletica Score weights.',
     credentials: ['CSCS', 'NSCA-CPT'],
-    img: 'AR'
+    img: 'AR',
+    linkedin: 'https://linkedin.com/in/alex-rivera-proathletica'
   },
   {
     id: 'jordan-kim',
     name: 'Jordan Kim',
     role: 'Technical Lead',
-    bio: 'Material scientist focused on durability benchmarks and steel gauge verification.',
+    bio: 'Material scientist focused on durability benchmarks and steel gauge verification. Jordan leads our spec validation lab.',
     credentials: ['Material Science MSc'],
-    img: 'JK'
+    img: 'JK',
+    linkedin: 'https://linkedin.com/in/jordan-kim-proathletica'
   },
   {
     id: 'sam-torres',
     name: 'Sam Torres',
     role: 'Testing Lead',
-    bio: 'Marathoner and CrossFit coach specializing in cardio equipment and small-space setups.',
+    bio: 'Marathoner and CrossFit coach specializing in cardio equipment and small-space setups for urban athletes.',
     credentials: ['CrossFit Level 2', 'RRCA Coach'],
-    img: 'ST'
+    img: 'ST',
+    linkedin: 'https://linkedin.com/in/sam-torres-proathletica'
   }
 ];
 
@@ -139,10 +142,22 @@ export default function AboutPage() {
                 {editor.img}
               </div>
               <div className="space-y-1">
-                <h3 className="text-lg font-black uppercase tracking-tight text-white">{editor.name}</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-black uppercase tracking-tight text-white">{editor.name}</h3>
+                  {editor.linkedin && (
+                    <a href={editor.linkedin} target="_blank" rel="noopener noreferrer" className="text-neutral-600 hover:text-trust-blue transition-colors">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                    </a>
+                  )}
+                </div>
                 <p className="text-xs font-bold uppercase tracking-widest text-trust-blue">{editor.role}</p>
               </div>
               <p className="text-sm leading-relaxed text-neutral-500">{editor.bio}</p>
+              <div className="flex flex-wrap gap-2 pt-2">
+                {editor.credentials.map(c => (
+                  <span key={c} className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[9px] font-bold text-neutral-400 uppercase tracking-wider">{c}</span>
+                ))}
+              </div>
             </div>
           ))}
         </div>

@@ -47,7 +47,26 @@ export function Header() {
         </nav>
 
         {/* Right actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          {/* Desktop Search Bar (Audit #08-B) */}
+          <div className="hidden lg:flex relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-neutral-500" />
+            <input
+              type="text"
+              placeholder="Search gear..."
+              className="h-9 w-48 rounded-xl border border-white/10 bg-white/[0.04] pl-9 pr-4 text-xs font-semibold text-offwhite placeholder:text-neutral-600 focus:border-trust-blue/50 focus:bg-white/[0.08] focus:outline-none transition-all"
+            />
+          </div>
+
+          {/* Mobile/Tablet Search Icon */}
+          <Link
+            href="/search"
+            className="lg:hidden flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-neutral-300 hover:text-offwhite focus-ring"
+            aria-label="Search products"
+          >
+            <Search className="h-4 w-4" aria-hidden="true" />
+          </Link>
+
           {/* Disclosure link — subtle trust signal */}
           <Link
             href="/disclosure"
@@ -59,16 +78,6 @@ export function Header() {
               <path d="M6 5.5V8.5M6 3.5V4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
             </svg>
             Disclosure
-          </Link>
-
-          {/* Search — mobile + desktop */}
-          <Link
-            href="/search"
-            className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm font-semibold text-neutral-300 hover:border-white/20 hover:bg-white/[0.07] hover:text-offwhite transition-all duration-150 focus-ring"
-            aria-label="Search products"
-          >
-            <Search className="h-3.5 w-3.5" aria-hidden="true" />
-            <span className="hidden sm:inline text-xs tracking-wide">Search</span>
           </Link>
         </div>
       </div>

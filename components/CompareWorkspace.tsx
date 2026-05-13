@@ -46,6 +46,8 @@ export function CompareWorkspace({ products }: { products: Product[] }) {
     { key: 'warranty', label: 'Warranty', render: (product: Product) => specValue(product, 'warranty') },
     { key: 'dimensions', label: 'Dimensions', render: (product: Product) => specValue(product, 'dimensions') },
     { key: 'weight', label: 'Weight', render: (product: Product) => specValue(product, 'weight') },
+    { key: 'noise', label: 'Noise Level', render: (product: Product) => specValue(product, 'noise_level') },
+    { key: 'footprint', label: 'Footprint', render: (product: Product) => specValue(product, 'footprint') },
   ] as const;
 
   const updateQuery = (patch: Record<string, string | null>) => {

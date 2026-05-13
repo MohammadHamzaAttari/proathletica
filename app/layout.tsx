@@ -66,6 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script {...jsonLdProps([organizationSchema(), websiteSchema()])} />
         {/* FIX (Audit #01-5): Preconnect to Amazon for faster product image resolution */}
         <link rel="preconnect" href="https://m.media-amazon.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://www.amazon.com" crossOrigin="anonymous" />
       </head>
       <body className="min-h-screen bg-[#0A0D12] font-sans text-neutral-100 antialiased">
         <Header />

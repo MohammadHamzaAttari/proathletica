@@ -118,8 +118,8 @@ export default async function HomePage() {
 
           {/* H1 — primary keyword target */}
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-none text-offwhite text-balance">
-            The best fitness gear. <br />
-            <span className="text-data-lime">Ranked by real data.</span>
+            Best Home Gym Gear. <br />
+            <span className="text-data-lime">Expert-Ranked.</span>
           </h1>
 
           <p className="mx-auto mt-6 max-w-2xl text-lg text-neutral-400 leading-relaxed">
