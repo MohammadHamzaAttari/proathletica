@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { FlaskConical, ShieldCheck, Target, TrendingUp, Users, Zap } from 'lucide-react';
 import { buildMetadata } from '@/lib/seo/metadata';
+import { articleSchema, jsonLdProps } from '@/lib/seo/schema';
+import { SITE_URL } from '@/lib/config';
 
 export const metadata = buildMetadata({
   title: 'Our Methodology',
@@ -32,8 +34,18 @@ const PILLARS = [
 ];
 
 export default function MethodologyPage() {
+  const schema = articleSchema({
+    title: 'The Athletica Lab Protocol: How We Rank Fitness Gear',
+    excerpt: 'Rankings should be explainable, repeatable, and honest. We combine large-scale review data with technical specs and editorial oversight to cut through the noise.',
+    slug: 'methodology',
+    author: 'ProAthletica Editorial Board',
+    published_at: '2026-05-13T00:00:00Z',
+    updated_at: new Date().toISOString(),
+  }, '/methodology');
+
   return (
     <article className="mx-auto max-w-4xl space-y-16 px-4 py-20 sm:px-8">
+      <script {...jsonLdProps(schema)} />
       {/* Header */}
       <div className="space-y-4 text-center">
         <div className="inline-flex items-center gap-2 rounded-pill border border-data-lime/25 bg-data-lime/[0.06] px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-data-lime">

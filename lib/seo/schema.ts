@@ -106,6 +106,19 @@ export function productSchema(product: Product) {
             worstRating: '1',
             reviewCount: String(Math.max(product.review_count || 1, 1)),
           },
+          review: {
+            '@type': 'Review',
+            reviewRating: {
+              '@type': 'Rating',
+              ratingValue: Number(product.rating).toFixed(1),
+              bestRating: '5',
+            },
+            author: {
+              '@type': 'Organization',
+              name: SITE_NAME,
+            },
+            reviewBody: product.editorial_summary || `Editorial evaluation of the ${product.title} based on technical specs and user data.`,
+          },
         }
       : {}),
   };

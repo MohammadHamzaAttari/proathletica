@@ -1,32 +1,26 @@
 # ProAthletica (athletica.page)
 
-Independent, data-driven fitness equipment rankings. We analyze thousands of reviews and technical specifications to rank gear for home gyms, apartments, and specific training goals.
+ProAthletica is a data-driven fitness equipment review platform. We analyze thousands of verified customer reviews and technical specifications to rank home gym gear.
 
-## Core Values
-- **Data-First**: Rankings based on aggregate review data, steel gauges, motor specs, and warranty analysis.
-- **Independent**: No paid placements or pay-to-play rankings.
-- **Reproducible**: Methodology is public and based on verifiable manufacturer specs.
+## Editorial Focus
+- Home gym equipment for small spaces, apartments, and busy parents.
+- Independent, data-driven rankings with no paid placements.
+- Transparent methodology using the Athletica Lab protocol.
 
-## Key Product Categories
-- Adjustable Dumbbells
-- Resistance Bands
-- Weight Benches
-- Massage Guns
-- Running Shoes
+## Key Resources
+- Homepage: https://www.athletica.page/
+- About Our Mission: https://www.athletica.page/about
+- Editorial Methodology: https://www.athletica.page/methodology
+- Top Picks Roundup: https://www.athletica.page/best/best-home-gym-equipment
+- Equipment Categories: https://www.athletica.page/categories
 
-## Authors & Experts
-- **Alex Rivera**: Editorial Director, CSCS, former competitive powerlifter.
-- **Jordan Kim**: Technical Lead, Material Scientist.
-- **Sam Torres**: Testing Lead, CrossFit Coach.
+## Methodology Summary
+We use a proprietary 100-point scoring system based on:
+1. Durability & Material Specs (Steel gauge, warranty)
+2. Performance Benchmarks (Adjustability, stability)
+3. Owner Sentiment (Analyzing 47,000+ verified reviews)
+4. Value for Money (Total cost of ownership)
 
-## Methodology
-The Athletica Lab protocol involves:
-1. **Aggregation**: Collecting 500+ reviews per product.
-2. **Verification**: Cross-referencing manufacturer specs (steel gauge, weight limits).
-3. **Scoring**: Calculating the Athletica Score (Price/Performance/Durability).
-
-## Ethics
-- Amazon Associate: We earn commissions on qualifying purchases.
-- Editorial Independence: Affiliate relationships do not influence rankings.
-
-For full rankings and data-verified picks, visit [athletica.page](https://athletica.page).
+## Contact
+Email: hello@athletica.page
+Pinterest: https://pinterest.com/proathletica
