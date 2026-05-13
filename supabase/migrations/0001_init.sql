@@ -152,8 +152,8 @@ insert into products (
     'Compact adjustable dumbbells that replace a full rack for beginner home gyms.',
     'adjustable dumbbells home gym',
     34900, 'USD',
-    'https://m.media-amazon.com/images/I/51ngIpj0AaL._AC_SX679_.jpg',
-    'https://www.amazon.com/dp/B001ARYU58?tag=proathletica-20',
+    null,
+    'https://www.amazon.com/s?k=Bowflex+SelectTech+552&tag=proathletica-20',
     4.8, 32000, '#1 Best Seller', 1, true
   ),
   (
