@@ -1,4 +1,6 @@
+import { notFound } from 'next/navigation';
 import { getProductById, getAllProducts } from '@/lib/db';
+import { buildMetadata } from '@/lib/seo/metadata';
 import { productSchema, jsonLdProps, breadcrumbSchema } from '@/lib/seo/schema';
 import { DisclosureBar } from '@/components/DisclosureBar';
 import { formatPrice, formatTimestamp } from '@/lib/format';

@@ -41,7 +41,7 @@ export default function MethodologyPage() {
     author: 'ProAthletica Editorial Board',
     published_at: '2026-05-13T00:00:00Z',
     updated_at: new Date().toISOString(),
-  }, '/methodology');
+  } as any, '/methodology');
 
   return (
     <article className="mx-auto max-w-4xl space-y-16 px-4 py-20 sm:px-8">
