@@ -1,21 +1,28 @@
-import { notFound } from 'next/navigation';
-import { buildMetadata } from '@/lib/seo/metadata';
-import { getProductById } from '@/lib/db';
-import { productSchema, jsonLdProps } from '@/lib/seo/schema';
+import { getProductById, getAllProducts } from '@/lib/db';
+import { productSchema, jsonLdProps, breadcrumbSchema } from '@/lib/seo/schema';
 import { DisclosureBar } from '@/components/DisclosureBar';
 import { formatPrice, formatTimestamp } from '@/lib/format';
+import { SITE_NAME } from '@/lib/config';
 import Image from 'next/image';
 import Link from 'next/link';
 
 export const revalidate = 3600;
 
+export async function generateStaticParams() {
+  const products = await getAllProducts();
+  return products.map((p) => ({ slug: p.slug || p.asin || p.id }));
+}
+
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const product = await getProductById(params.slug);
   if (!product) return buildMetadata({ title: 'Product Not Found', noindex: true });
   
+  const brand = product.brand || 'This';
+  const category = (product.category || 'Fitness Gear').toLowerCase();
+  
   return buildMetadata({
-    title: `Is the ${product.short_title || product.title} Worth It in 2026?`,
-    description: product.editorial_summary || `Data-driven review of the ${product.title}.`,
+    title: `Is the ${product.short_title || product.title} Worth It? (2026 Review)`,
+    description: `Independent ${category} review: ${product.editorial_summary} Vetted ${brand} specs, price data, and real owner tradeoffs.`,
     canonical: `/product/${params.slug}`,
     pinterestImage: `/api/pinterest/${product.asin || product.id}`,
     image: product.image_url || undefined,

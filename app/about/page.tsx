@@ -1,4 +1,6 @@
 import { buildMetadata } from '@/lib/seo/metadata';
+import { personSchema, jsonLdProps } from '@/lib/seo/schema';
+import { SITE_URL } from '@/lib/config';
 import { ShieldCheck, Target, Users, Zap, Award, Microscope, FlaskConical } from 'lucide-react';
 import Link from 'next/link';
 
@@ -14,6 +16,7 @@ const EDITORS = [
     name: 'Alex Rivera',
     role: 'Editorial Director',
     bio: 'Former competitive powerlifter and CSCS with 12+ years of experience in gear testing.',
+    credentials: ['CSCS', 'NSCA-CPT'],
     img: 'AR'
   },
   {
@@ -21,6 +24,7 @@ const EDITORS = [
     name: 'Jordan Kim',
     role: 'Technical Lead',
     bio: 'Material scientist focused on durability benchmarks and steel gauge verification.',
+    credentials: ['Material Science MSc'],
     img: 'JK'
   },
   {
@@ -28,13 +32,25 @@ const EDITORS = [
     name: 'Sam Torres',
     role: 'Testing Lead',
     bio: 'Marathoner and CrossFit coach specializing in cardio equipment and small-space setups.',
+    credentials: ['CrossFit Level 2', 'RRCA Coach'],
     img: 'ST'
   }
 ];
 
 export default function AboutPage() {
+  const schemas = [
+    ...EDITORS.map(e => personSchema({
+      name: e.name,
+      jobTitle: e.role,
+      description: e.bio,
+      credentials: (e as any).credentials,
+      url: `${SITE_URL}/about#${e.id}`
+    }))
+  ];
+
   return (
     <article className="mx-auto max-w-5xl space-y-24 px-4 py-20 sm:px-8">
+      <script {...jsonLdProps(schemas)} />
       {/* Hero Section */}
       <div className="space-y-6 text-center">
         <div className="inline-flex items-center gap-2 rounded-full border border-trust-blue/20 bg-trust-blue/5 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-trust-blue">

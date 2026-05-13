@@ -110,8 +110,12 @@ function pickAudience(product: ProductSource, traits: Record<string, boolean>) {
     'dedicated athletes upgrading their setup',
     'beginners looking for a solid foundation',
     'home gym builders prioritizing value',
+    'busy professionals optimizing their home workout',
+    'strength-focused lifters needing durable gear',
+    'apartment dwellers maximizing every square foot',
   ];
-  return fallbacks[Math.abs(product.id.split('').reduce((a, b) => a + b.charCodeAt(0), 0)) % fallbacks.length];
+  const hash = product.id.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+  return `${product.brand || 'top-tier'} ${fallbacks[Math.abs(hash) % fallbacks.length]}`;
 }
 
 function pickStrength(product: ProductSource, traits: Record<string, boolean>) {
@@ -128,8 +132,11 @@ function pickStrength(product: ProductSource, traits: Record<string, boolean>) {
     'a well-rounded balance of features and cost',
     'straightforward functionality for core lifting',
     'reliable support for high-volume training blocks',
+    'premium material quality and stable ergonomics',
+    'efficient space utilization without sacrificing utility',
   ];
-  return fallbacks[Math.abs(product.asin.split('').reduce((a, b) => a + b.charCodeAt(0), 0)) % fallbacks.length];
+  const hash = product.asin?.split('').reduce((a, b) => a + b.charCodeAt(0), 0) || 0;
+  return fallbacks[Math.abs(hash) % fallbacks.length];
 }
 
 function pickTradeoff(product: ProductSource, traits: Record<string, boolean>) {

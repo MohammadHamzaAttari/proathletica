@@ -78,7 +78,8 @@ export function categoryToSlug(category: string): string {
 export function slugify(text: string): string {
   const s = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   if (s.length <= 60) return s;
-  return s.slice(0, 60).replace(/-$/, '');
+  // Clean up partial words at the end (Audit #02-H)
+  return s.slice(0, 60).replace(/-[^-]*$/, '');
 }
 
 function normalizeSentence(value: string) {

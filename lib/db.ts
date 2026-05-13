@@ -99,12 +99,26 @@ export const getArticleBySlug = unstable_cache(
     if (!supabase) return null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sb = supabase as any;
-    const { data: article, error: articleError } = await sb
+    
+    // Try provided slug first
+    let { data: article, error: articleError } = await sb
       .from('articles')
       .select('*')
       .eq('slug', slug)
       .not('published_at', 'is', null)
       .maybeSingle();
+
+    // Fallback for legacy -2026 URLs (Audit #02-F cleanup)
+    if (!article && !slug.endsWith('-2026')) {
+      const fallback = await sb
+        .from('articles')
+        .select('*')
+        .eq('slug', `${slug}-2026`)
+        .not('published_at', 'is', null)
+        .maybeSingle();
+      if (fallback.data) article = fallback.data;
+    }
+
     if (articleError || !article) return null;
 
     const { data: links, error: linksError } = await sb

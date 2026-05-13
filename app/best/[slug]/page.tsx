@@ -18,7 +18,7 @@ export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const articles = await getPublishedArticles();
-  return articles.map((article) => ({ slug: article.slug }));
+  return articles.map((article) => ({ slug: article.slug.replace(/-2026$/, '') }));
 }
 
 /**

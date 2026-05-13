@@ -46,7 +46,10 @@ export function buildMetadata(input: PageMetaInput = {}): Metadata {
       url: canonical,
       siteName: SITE_NAME,
       type: input.type || 'website',
-      images: [{ url: image, width: 1200, height: 630, alt: input.title || SITE_NAME }],
+      images: [
+        { url: image, width: 1200, height: 630, alt: input.title || SITE_NAME },
+        ...(input.pinterestImage ? [{ url: input.pinterestImage, width: 1000, height: 1500, alt: input.title || SITE_NAME }] : []),
+      ],
       locale: 'en_US',
       ...(input.publishedTime ? { publishedTime: input.publishedTime } : {}),
       ...(input.modifiedTime ? { modifiedTime: input.modifiedTime } : {}),

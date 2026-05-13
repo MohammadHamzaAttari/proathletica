@@ -26,7 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const articlePages: MetadataRoute.Sitemap = articles.map((article) => ({
-    url: `${SITE_URL}/best/${article.slug}`,
+    url: `${SITE_URL}/best/${article.slug.replace(/-2026$/, '')}`,
     lastModified: new Date(article.updated_at),
     changeFrequency: 'weekly' as const,
     priority: 0.8,
@@ -40,12 +40,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // NEW: Individual product pages (addresses Audit Part 2 orphan pages / long-tail SEO)
-  const productPages: MetadataRoute.Sitemap = products.map((product) => ({
-    url: `${SITE_URL}/product/${product.slug || product.asin?.toLowerCase() || product.id}`,
-    lastModified: new Date(product.updated_at || product.last_scraped_at || now),
-    changeFrequency: 'weekly' as const,
-    priority: 0.65,
-  }));
+  const productPages: MetadataRoute.Sitemap = products.map((product) => {
+    const rawSlug = product.slug || product.asin?.toLowerCase() || product.id;
+    // Cap at 60 and clean bleed (Audit #02-H)
+    const slug = rawSlug.length <= 60 ? rawSlug : rawSlug.slice(0, 60).replace(/-[^-]*$/, '');
+    return {
+      url: `${SITE_URL}/product/${slug}`,
+      lastModified: new Date(product.updated_at || product.last_scraped_at || now),
+      changeFrequency: 'weekly' as const,
+      priority: 0.65,
+    };
+  });
 
   return [...staticPages, ...articlePages, ...categoryPages, ...productPages];
 }

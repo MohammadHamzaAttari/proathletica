@@ -115,9 +115,9 @@ export default async function HomePage() {
           </div>
 
           {/* H1 — primary keyword target */}
-          <h1 className="font-black uppercase tracking-[-0.04em] leading-none text-offwhite text-balance">
-            The best fitness gear.<br />
-            <span className="text-gradient-lime">Ranked by real data.</span>
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-none text-offwhite text-balance">
+            The best fitness gear. <br />
+            <span className="text-data-lime">Ranked by real data.</span>
           </h1>
 
           <p className="mx-auto mt-6 max-w-2xl text-lg text-neutral-400 leading-relaxed">
