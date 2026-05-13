@@ -6,8 +6,12 @@ export interface Product {
   subcategory: string | null;
   brand: string | null;
   title: string;
+  short_title: string | null;
   raw_description: string | null;
   description: string | null;
+  editorial_summary: string | null;
+  pros: string[] | null;
+  cons: string[] | null;
   keyword: string | null;
   price_cents: number | null;
   currency: string;

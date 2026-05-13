@@ -64,6 +64,10 @@ export async function generateArticleSummary(input: ArticleSummaryInput): Promis
     const summary = sanitizeSummary(completion);
     return summary || fallback;
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (message.includes('(429)') || message.includes('rate-limited') || message.includes('temporarily rate-limited')) {
+      return fallback;
+    }
     console.error('[ai] generateArticleSummary failed:', error);
     return fallback;
   }

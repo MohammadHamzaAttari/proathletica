@@ -3,13 +3,9 @@ import { ArrowRight, Plus, Star, X } from 'lucide-react';
 import { formatPrice, formatReviewCount, formatTimestamp } from '@/lib/format';
 import type { Product } from '@/lib/types';
 
-interface EnhancedProduct extends Product {
-  short_title?: string | null;
-  editorial_summary?: string | null;
-  pros?: string[];
-  cons?: string[];
+type EnhancedProduct = Product & {
   custom_blurb?: string | null;
-}
+};
 
 function getEditorialLabel(product: EnhancedProduct, rank: number): string {
   if (product.badge) return product.badge;

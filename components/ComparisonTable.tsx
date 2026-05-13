@@ -1,11 +1,9 @@
 import { formatPrice, formatReviewCount, formatTimestamp } from '@/lib/format';
 import type { Product } from '@/lib/types';
 
-interface EnhancedProduct extends Product {
-  short_title?: string | null;
-  editorial_summary?: string | null;
+type EnhancedProduct = Product & {
   custom_blurb?: string | null;
-}
+};
 
 function getLabel(index: number, product: EnhancedProduct): string {
   if (product.badge) return product.badge;
