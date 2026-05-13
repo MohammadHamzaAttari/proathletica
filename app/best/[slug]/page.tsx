@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { Calendar, Clock, User } from 'lucide-react';
+import { Calendar, Clock, User, FlaskConical } from 'lucide-react';
 import { ComparisonTable } from '@/components/ComparisonTable';
 import { DisclosureBar } from '@/components/DisclosureBar';
 import { FAQ } from '@/components/FAQ';
