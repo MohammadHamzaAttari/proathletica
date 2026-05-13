@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { ArrowRight, FlaskConical, ShieldCheck, Trophy, TrendingUp } from 'lucide-react';
 import { BuyerGuide } from '@/components/BuyerGuide';
@@ -6,6 +7,7 @@ import { FAQ } from '@/components/FAQ';
 import { GymQuiz } from '@/components/GymQuiz';
 import { HeroStats } from '@/components/HeroStats';
 import { HomepageFilters } from '@/components/HomepageFilters';
+import { LifestyleHubs } from '@/components/LifestyleHubs';
 import { Newsletter } from '@/components/Newsletter';
 import { getAllProducts, getCategoryList, getPublishedArticles } from '@/lib/db';
 import { itemListSchema, jsonLdProps, organizationSchema, howToSchema } from '@/lib/seo/schema';
@@ -152,6 +154,11 @@ export default async function HomePage() {
               clicks: stats.clicks || 0,
             }}
           />
+
+          {/* Lifestyle Hubs (Audit #04-A) */}
+          <div className="mt-20">
+            <LifestyleHubs />
+          </div>
         </div>
       </section>
 
@@ -267,7 +274,9 @@ export default async function HomePage() {
         </div>
 
         {featured.length > 0 && (
-          <HomepageFilters products={featured} articleSlug="homepage" initialFilter="all" />
+          <Suspense fallback={<div className="h-40 animate-pulse bg-white/[0.03] rounded-card" />}>
+            <HomepageFilters products={featured} articleSlug="homepage" initialFilter="all" />
+          </Suspense>
         )}
       </section>
 

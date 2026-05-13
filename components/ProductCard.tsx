@@ -397,14 +397,22 @@ export function ProductCard({
             )}
           </div>
 
-          {/* Secondary CTA (Audit #03-C) */}
-          <Link
-            href={compareHref}
-            aria-label={`Compare ${shortTitle} with top rivals`}
-            className="flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-neutral-500 hover:text-trust-blue transition-colors"
-          >
-            📊 Compare to #2 pick
-          </Link>
+          {/* Secondary CTAs (Audit #03-C) */}
+          <div className="grid grid-cols-2 gap-2">
+            <Link
+              href={`/product/${product.slug || product.asin || product.id}`}
+              className="flex items-center justify-center gap-2 py-2.5 text-[9px] font-black uppercase tracking-[0.1em] text-neutral-400 hover:text-offwhite transition-colors border border-white/[0.06] rounded-lg hover:bg-white/[0.04] bg-white/[0.02]"
+            >
+              📖 Review
+            </Link>
+            <Link
+              href={compareHref}
+              aria-label={`Compare ${shortTitle} with top rivals`}
+              className="flex items-center justify-center gap-2 py-2.5 text-[9px] font-black uppercase tracking-[0.1em] text-neutral-400 hover:text-trust-blue transition-colors border border-white/[0.06] rounded-lg hover:bg-white/[0.04] bg-white/[0.02]"
+            >
+              📊 Compare
+            </Link>
+          </div>
 
           {/* Affiliate micro-disclosure — WCAG AA: 11px min, proper contrast */}
           <p className="text-center text-2xs text-neutral-600 leading-tight">

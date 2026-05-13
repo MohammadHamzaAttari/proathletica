@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { CompareWorkspace } from '@/components/CompareWorkspace';
 import { getAllProducts } from '@/lib/db';
@@ -19,5 +20,9 @@ export default async function ComparePage({ searchParams }: { searchParams: { id
   const ids = searchParams.ids?.split(',').map((id) => id.trim()).filter(Boolean) || [];
   const selected = ids.length > 0 ? products.filter((product) => ids.includes(product.id) || ids.includes(product.asin)) : [];
 
-  return <CompareWorkspace products={selected} />;
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#0A0D12] pt-24 text-center text-neutral-500">Loading comparison...</div>}>
+      <CompareWorkspace products={selected} />
+    </Suspense>
+  );
 }

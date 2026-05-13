@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import './globals.css';
 import { CookieConsent } from '@/components/CookieConsent';
+import { ExitIntentModal } from '@/components/ExitIntentModal';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, PINTEREST_DOMAIN_VERIFY } from '@/lib/config';
@@ -22,7 +23,6 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
   authors: [{ name: SITE_NAME }],
-  keywords: ['fitness gear reviews', 'best gym equipment 2026', 'home gym', 'powerlifting', 'running shoes'],
   referrer: 'strict-origin-when-cross-origin',
   robots: { index: true, follow: true, 'max-image-preview': 'large' },
   alternates: { canonical: SITE_URL },
@@ -72,6 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main>{children}</main>
         <Footer />
         <CookieConsent />
+        <ExitIntentModal />
 
         {/* FIX (Audit #06-B): Pinterest tag — only loads when configured */}
         {process.env.NEXT_PUBLIC_PINTEREST_TAG_ID ? (

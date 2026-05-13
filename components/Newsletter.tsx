@@ -16,6 +16,12 @@ const LEAD_MAGNETS: Record<string, { headline: string; subline: string; benefit:
     benefit: '📬 Unsubscribe anytime, takes 5 seconds',
     cta: 'Get Deal Alerts',
   },
+  'exit-intent': {
+    headline: 'Wait! Don\'t Buy the Wrong Gear.',
+    subline: 'Download our "5 Gear Mistakes" PDF and the $250 Apartment Gym Blueprint before you spend a dime.',
+    benefit: '🔥 Used by 4,200+ athletes to save $500+',
+    cta: 'Send Me the Blueprint',
+  },
   'default': {
     headline: 'Free Home Gym Planner',
     subline: 'The exact gear combos our lab recommends for every budget. Used by 4,200+ readers.',
