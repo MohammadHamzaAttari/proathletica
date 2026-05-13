@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { FlaskConical, ShieldCheck, Target, TrendingUp, Users, Zap } from 'lucide-react';
 import { buildMetadata } from '@/lib/seo/metadata';
-import { articleSchema, jsonLdProps } from '@/lib/seo/schema';
+import { articleSchema, howToSchema, jsonLdProps } from '@/lib/seo/schema';
 import { SITE_URL } from '@/lib/config';
 
 export const metadata = buildMetadata({
@@ -43,9 +43,20 @@ export default function MethodologyPage() {
     updated_at: new Date().toISOString(),
   } as any, '/methodology');
 
+  const howTo = howToSchema({
+    name: 'How We Rank Fitness Equipment',
+    description: 'Our proprietary Athletica Lab scoring system uses a 4-step data aggregation and verification process.',
+    steps: [
+      { name: 'Category Definition', text: 'Define the training problem and target athlete persona (e.g., beginner, small-space, heavy-lifter).' },
+      { name: 'Spec Verification', text: 'Cross-reference manufacturer technical data, material gauges, and warranty coverage.' },
+      { name: 'Sentiment Analysis', text: 'Aggregate 47,000+ data points from verified customer reviews for long-term durability insights.' },
+      { name: 'Editorial Oversight', text: 'Human experts assign final rankings based on utility-per-dollar and real-world performance.' },
+    ],
+  });
+
   return (
     <article className="mx-auto max-w-4xl space-y-16 px-4 py-20 sm:px-8">
-      <script {...jsonLdProps(schema)} />
+      <script {...jsonLdProps([schema, howTo])} />
       {/* Header */}
       <div className="space-y-4 text-center">
         <div className="inline-flex items-center gap-2 rounded-pill border border-data-lime/25 bg-data-lime/[0.06] px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-data-lime">
