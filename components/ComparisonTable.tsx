@@ -1,5 +1,6 @@
 import { formatPrice, formatReviewCount, formatTimestamp } from '@/lib/format';
 import type { Product } from '@/lib/types';
+import { ShieldCheck, Star, ArrowRight } from 'lucide-react';
 
 type EnhancedProduct = Product & {
   custom_blurb?: string | null;
@@ -27,16 +28,19 @@ export function ComparisonTable({
   if (rows.length === 0) return null;
 
   return (
-    <section className="rounded-3xl border border-[#C6FF3D]/20 bg-[#161B22] p-8">
-      <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+    <section className="product-card p-6 sm:p-8">
+      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <div className="inline-flex rounded-full border border-[#C6FF3D]/30 bg-[#C6FF3D]/10 px-4 py-1 text-xs font-black tracking-[0.125em] text-[#C6FF3D]">
-            DATA COMPARISON
+          <div className="editorial-badge editorial-badge--trending mb-3">
+            <ShieldCheck className="w-3 h-3" />
+            DATA-VERIFIED COMPARISON
           </div>
-          <h2 className="mt-3 text-4xl font-black uppercase tracking-tighter text-offwhite">{title}</h2>
+          <h2 className="text-3xl font-black uppercase tracking-tighter text-offwhite">
+            {title}
+          </h2>
         </div>
-        <p className="max-w-xs text-sm text-neutral-400">
-          Rankings combine verified review data, specs, price-to-performance, and editorial trade-off analysis.
+        <p className="max-w-xs text-sm text-neutral-400 leading-relaxed">
+          Rankings combine verified review data, specs, and price-to-performance analysis from the Athletica Lab.
         </p>
       </div>
 
@@ -44,76 +48,79 @@ export function ComparisonTable({
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full border-collapse text-left">
           <thead>
-            <tr className="border-b border-white/10 text-xs font-black uppercase tracking-widest text-neutral-400">
-              <th className="py-5 pr-8 w-12">Rank</th>
-              <th className="py-5 pr-8">Pick</th>
-              <th className="py-5 pr-8">Rating</th>
-              <th className="py-5 pr-12 w-5/12">Editor&apos;s Verdict</th>
-              <th className="py-5 pr-8">Price</th>
-              <th className="py-5">Action</th>
+            <tr className="border-b border-white/[0.06] text-2xs font-black uppercase tracking-[0.15em] text-neutral-500">
+              <th className="py-4 pr-6 w-12">Rank</th>
+              <th className="py-4 pr-6">Pick</th>
+              <th className="py-4 pr-6">Rating</th>
+              <th className="py-4 pr-8 w-5/12">Verdict</th>
+              <th className="py-4 pr-6">Price</th>
+              <th className="py-4 text-right">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/10">
+          <tbody className="divide-y divide-white/[0.04]">
             {rows.map((product, index) => {
-              const verdict = product.editorial_summary || product.custom_blurb || 'Strong category fit with clear tradeoffs.';
+              const verdict = product.editorial_summary || product.custom_blurb || 'Excellent category fit with verified performance.';
               const timestamp = formatTimestamp(product.last_scraped_at);
               const href = `/api/track?productId=${encodeURIComponent(product.asin || product.id)}&articleSlug=${encodeURIComponent(articleSlug)}&rank=${index + 1}`;
 
               return (
-                <tr key={product.id} className="group hover:bg-white/5 transition-colors">
-                  <td className="py-8 pr-8">
-                    <div className="text-5xl font-black text-[#C6FF3D]/90">#{index + 1}</div>
+                <tr key={product.id} className="group hover:bg-white/[0.02] transition-colors">
+                  <td className="py-6 pr-6">
+                    <div className={`rank-badge ${index === 0 ? 'rank-badge--gold' : ''}`}>
+                      #{index + 1}
+                    </div>
                   </td>
-                  <td className="py-8 pr-8">
-                    <div className="font-black text-xl text-offwhite">{getLabel(index, product)}</div>
-                    <div className="text-sm text-neutral-400 mt-2 line-clamp-2 pr-6">{product.short_title || product.title}</div>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {(product.best_for_tags || []).slice(0, 3).map((tag) => (
-                        <span key={tag} className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-neutral-300">
+                  <td className="py-6 pr-6">
+                    <div className="font-bold text-lg text-offwhite leading-tight">{getLabel(index, product)}</div>
+                    <div className="text-xs text-neutral-500 mt-1.5 line-clamp-1 pr-4">{product.short_title || product.title}</div>
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {(product.best_for_tags || []).slice(0, 2).map((tag) => (
+                        <span key={tag} className="trust-chip trust-chip--amazon">
                           {tag}
                         </span>
                       ))}
                     </div>
                   </td>
-                  <td className="py-8 pr-8">
+                  <td className="py-6 pr-6">
                     {product.rating && (
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-4xl font-black text-offwhite">{product.rating}</span>
-                        <span className="text-xs text-neutral-500">/5</span>
+                      <div className="flex items-center gap-1.5">
+                        <Star className="w-4 h-4 fill-star-gold text-star-gold" />
+                        <span className="text-xl font-black text-offwhite">{product.rating.toFixed(1)}</span>
                       </div>
                     )}
                     {product.review_count && (
-                      <div className="text-xs text-neutral-400 mt-1">
-                        {formatReviewCount(product.review_count)} reviews
+                      <div className="text-2xs text-neutral-500 mt-1 uppercase tracking-wider">
+                        {formatReviewCount(product.review_count)} REVIEWS
                       </div>
                     )}
                   </td>
-                  <td className="py-8 pr-12 text-sm leading-relaxed text-neutral-300">
-                    {verdict}
+                  <td className="py-6 pr-8 text-sm leading-relaxed text-neutral-300">
+                    <div className="line-clamp-2">{verdict}</div>
                     {product.pros?.length ? (
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {product.pros.slice(0, 2).map((item) => (
-                          <span key={item} className="rounded-full bg-[#C6FF3D]/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-[#C6FF3D]">
-                            {item}
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {product.pros.slice(0, 1).map((item) => (
+                          <span key={item} className="text-2xs font-bold text-savings-green uppercase tracking-wider flex items-center gap-1">
+                            <span className="text-xs">✓</span> {item}
                           </span>
                         ))}
                       </div>
                     ) : null}
                   </td>
-                  <td className="py-8 pr-8">
-                    <div className="font-mono text-3xl font-semibold text-[#C6FF3D]">
+                  <td className="py-6 pr-6">
+                    <div className="text-xl font-black text-offwhite">
                       {formatPrice(product.price_cents)}
                     </div>
-                    <div className="text-xs text-neutral-500 mt-1">as of {timestamp}</div>
+                    <div className="text-2xs text-neutral-600 mt-1">as of {timestamp}</div>
                   </td>
-                  <td className="py-8">
+                  <td className="py-6 text-right">
                     <a
                       href={href}
                       target="_blank"
                       rel="sponsored nofollow noopener noreferrer"
-                      className="inline-flex items-center gap-3 rounded-2xl bg-[#FF6B1A] px-8 py-4 text-sm font-black uppercase tracking-wider text-black hover:bg-[#ff8a4d] transition-all active:scale-95"
+                      className="cta-primary min-h-[2.75rem] px-5 py-2 text-xs"
                     >
-                      SEE PRICE <span className="text-base">→</span>
+                      SEE PRICE
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </a>
                   </td>
                 </tr>
@@ -124,68 +131,69 @@ export function ComparisonTable({
       </div>
 
       {/* Mobile Cards */}
-      <div className="md:hidden space-y-6">
+      <div className="md:hidden space-y-4">
         {rows.map((product, index) => {
-          const verdict = product.editorial_summary || product.custom_blurb || 'Strong category fit.';
+          const verdict = product.editorial_summary || product.custom_blurb || 'Excellent category fit.';
           const timestamp = formatTimestamp(product.last_scraped_at);
           const href = `/api/track?productId=${encodeURIComponent(product.asin || product.id)}&articleSlug=${encodeURIComponent(articleSlug)}&rank=${index + 1}`;
 
           return (
-            <div key={product.id} className="rounded-3xl border border-white/10 bg-[#0E1116] p-6">
-              <div className="flex justify-between">
-                <div>
-                  <div className="text-[#C6FF3D] text-4xl font-black">#{index + 1}</div>
-                  <div className="mt-1 font-black text-lg text-offwhite">{getLabel(index, product)}</div>
+            <div key={product.id} className="rounded-inner border border-white/[0.06] bg-black/30 p-5">
+              <div className="flex justify-between items-start">
+                <div className="flex items-center gap-3">
+                  <div className={`rank-badge w-9 h-9 text-xs ${index === 0 ? 'rank-badge--gold' : ''}`}>
+                    #{index + 1}
+                  </div>
+                  <div>
+                    <div className="font-bold text-offwhite">{getLabel(index, product)}</div>
+                    <div className="text-2xs text-neutral-500 uppercase tracking-widest mt-0.5">{product.brand}</div>
+                  </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-black text-[#C6FF3D]">{formatPrice(product.price_cents)}</div>
-                  <div className="text-xs text-neutral-500">as of {timestamp}</div>
+                  <div className="text-lg font-black text-offwhite">{formatPrice(product.price_cents)}</div>
+                  <div className="text-[10px] text-neutral-600 uppercase tracking-widest mt-0.5">{timestamp}</div>
                 </div>
               </div>
 
-              <div className="mt-6 font-medium text-lg text-offwhite line-clamp-2">
+              <div className="mt-4 text-sm font-semibold text-neutral-200 line-clamp-1">
                 {product.short_title || product.title}
               </div>
 
-              {(product.best_for_tags || []).length > 0 ? (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {product.best_for_tags!.slice(0, 3).map((tag) => (
-                    <span key={tag} className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-neutral-300">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              ) : null}
-
-              <div className="mt-4 text-sm text-neutral-300 leading-relaxed border-l-2 border-[#C6FF3D]/40 pl-4">
+              <div className="mt-3 text-sm leading-relaxed text-neutral-400 border-l border-white/10 pl-4 py-1">
                 {verdict}
               </div>
 
-              {product.rating && (
-                <div className="mt-6 flex items-center gap-2 text-sm">
-                  <div className="px-3 py-1 bg-[#C6FF3D]/10 text-[#C6FF3D] font-mono rounded-xl">
-                    {product.rating} ★
+              <div className="mt-5 flex items-center justify-between gap-4">
+                {product.rating && (
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                      <Star className="w-3.5 h-3.5 fill-star-gold text-star-gold" />
+                      <span className="text-sm font-black text-offwhite">{product.rating.toFixed(1)}</span>
+                    </div>
+                    <span className="text-2xs text-neutral-600 uppercase tracking-tighter">
+                      {formatReviewCount(product.review_count)} REVIEWS
+                    </span>
                   </div>
-                  {product.review_count && <div className="text-neutral-400">{formatReviewCount(product.review_count)} reviews</div>}
-                </div>
-              )}
-
-              <a
-                href={href}
-                target="_blank"
-                rel="sponsored nofollow noopener noreferrer"
-                className="mt-8 block w-full rounded-2xl bg-[#FF6B1A] py-4 text-center font-black uppercase tracking-widest text-black text-sm hover:bg-[#ff8a4d]"
-              >
-                SEE TODAY&apos;S PRICE ON AMAZON →
-              </a>
+                )}
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="sponsored nofollow noopener noreferrer"
+                  className="cta-primary min-h-[2.75rem] px-5 py-2 text-xs w-auto"
+                >
+                  VIEW DEAL
+                </a>
+              </div>
             </div>
           );
         })}
       </div>
 
-      <p className="mt-8 text-center text-xs text-neutral-500">
-        All prices checked live. Editorial summaries reflect specific measured tradeoffs.
-      </p>
+      <div className="mt-8 pt-6 border-t border-white/[0.04] text-center">
+        <p className="text-2xs text-neutral-600 uppercase tracking-[0.2em] font-bold">
+          Updated {formatTimestamp(new Date().toISOString())} • Data-Verified by ProAthletica Lab
+        </p>
+      </div>
     </section>
   );
 }

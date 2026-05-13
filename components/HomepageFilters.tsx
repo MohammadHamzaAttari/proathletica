@@ -1,83 +1,87 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ComparisonTable } from '@/components/ComparisonTable';
 import { ProductGrid } from '@/components/ProductGrid';
 import type { Product } from '@/lib/types';
 
-type FilterKey = 'all' | 'small-apartments' | 'budget' | 'heavy-lifters' | 'smart-equipment' | 'compact-gear';
+type FilterKey =
+  | 'all'
+  | 'small-apartments'
+  | 'budget'
+  | 'heavy-lifters'
+  | 'smart-equipment'
+  | 'compact-gear';
 
 const FILTERS: Array<{
   key: FilterKey;
   label: string;
   hint: string;
+  icon: string;
   match: (product: Product) => boolean;
 }> = [
   {
     key: 'all',
-    label: 'All picks',
-    hint: 'Everything currently loaded',
+    label: 'All Picks',
+    hint: 'Full ranked list',
+    icon: '⚡',
     match: () => true,
   },
   {
     key: 'small-apartments',
-    label: 'Best for Small Apartments',
-    hint: 'Space-saving gear first',
-    match: (product) => /compact|foldable|small footprint|space-saving/i.test([
-      product.short_title,
-      product.title,
-      product.raw_description,
-      product.editorial_summary,
-      ...(product.best_for_tags || []),
-    ].filter(Boolean).join(' ')),
+    label: 'Small Apartments',
+    hint: 'Space-saving gear',
+    icon: '🏠',
+    match: (p) =>
+      /compact|foldable|small footprint|space-saving/i.test(
+        [p.short_title, p.title, p.raw_description, p.editorial_summary, ...(p.best_for_tags || [])]
+          .filter(Boolean).join(' ')
+      ),
   },
   {
     key: 'budget',
-    label: 'Best Budget Picks',
-    hint: 'Value-first buys',
-    match: (product) => /budget|value|affordable|entry|starter/i.test([
-      product.short_title,
-      product.title,
-      product.editorial_summary,
-      ...(product.best_for_tags || []),
-    ].filter(Boolean).join(' ')) || (product.price_cents || 0) <= 20000,
+    label: 'Budget Picks',
+    hint: 'Best value buys',
+    icon: '💰',
+    match: (p) =>
+      /budget|value|affordable|entry|starter/i.test(
+        [p.short_title, p.title, p.editorial_summary, ...(p.best_for_tags || [])]
+          .filter(Boolean).join(' ')
+      ) || (p.price_cents || 0) <= 20000,
   },
   {
     key: 'heavy-lifters',
-    label: 'Best for Heavy Lifters',
-    hint: 'Higher-load, sturdier gear',
-    match: (product) => /heavy|garage|high load|durable|steel|pro/i.test([
-      product.short_title,
-      product.title,
-      product.raw_description,
-      product.editorial_summary,
-      ...(product.best_for_tags || []),
-    ].filter(Boolean).join(' ')),
+    label: 'Heavy Lifters',
+    hint: 'High-load equipment',
+    icon: '🏋️',
+    match: (p) =>
+      /heavy|garage|high load|durable|steel|pro/i.test(
+        [p.short_title, p.title, p.raw_description, p.editorial_summary, ...(p.best_for_tags || [])]
+          .filter(Boolean).join(' ')
+      ),
   },
   {
     key: 'smart-equipment',
-    label: 'Best Smart Equipment',
-    hint: 'Connected training systems',
-    match: (product) => /smart|app|bluetooth|connected/i.test([
-      product.short_title,
-      product.title,
-      product.raw_description,
-      product.editorial_summary,
-      ...(product.best_for_tags || []),
-    ].filter(Boolean).join(' ')),
+    label: 'Smart Equipment',
+    hint: 'Connected training',
+    icon: '📱',
+    match: (p) =>
+      /smart|app|bluetooth|connected/i.test(
+        [p.short_title, p.title, p.raw_description, p.editorial_summary, ...(p.best_for_tags || [])]
+          .filter(Boolean).join(' ')
+      ),
   },
   {
     key: 'compact-gear',
-    label: 'Best Compact Gear',
-    hint: 'Low-footprint utilities',
-    match: (product) => /compact|portable|foldable|space-saving|small footprint/i.test([
-      product.short_title,
-      product.title,
-      product.raw_description,
-      product.editorial_summary,
-      ...(product.best_for_tags || []),
-    ].filter(Boolean).join(' ')),
+    label: 'Compact Gear',
+    hint: 'Portable & light',
+    icon: '🎒',
+    match: (p) =>
+      /compact|portable|foldable|space-saving|small footprint/i.test(
+        [p.short_title, p.title, p.raw_description, p.editorial_summary, ...(p.best_for_tags || [])]
+          .filter(Boolean).join(' ')
+      ),
   },
 ];
 
@@ -93,7 +97,10 @@ export function HomepageFilters({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+
   const activeFilter = (searchParams.get('focus') as FilterKey) || initialFilter || 'all';
+  const activeFilterMeta = FILTERS.find(f => f.key === activeFilter);
 
   const setFilter = (nextFilter: FilterKey) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -103,66 +110,115 @@ export function HomepageFilters({
       params.set('focus', nextFilter);
     }
     const query = params.toString();
-    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    startTransition(() => {
+      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    });
   };
 
   const filteredProducts = useMemo(() => {
-    const filter = FILTERS.find((entry) => entry.key === activeFilter);
-    return products.filter((product) => (filter ? filter.match(product) : true));
+    const filter = FILTERS.find(f => f.key === activeFilter);
+    return products.filter(p => (filter ? filter.match(p) : true));
   }, [activeFilter, products]);
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-wrap gap-3">
+    <div className="space-y-6">
+
+      {/* ── FILTER PILL ROW ── */}
+      <div
+        role="tablist"
+        aria-label="Filter products by category"
+        className="flex flex-wrap gap-2"
+      >
         {FILTERS.map((filter) => {
-          const selected = activeFilter === filter.key;
+          const isActive = activeFilter === filter.key;
           return (
             <button
               key={filter.key}
+              role="tab"
               type="button"
+              aria-selected={isActive}
+              aria-controls="filtered-products-panel"
               onClick={() => setFilter(filter.key)}
-              className={`rounded-full border px-4 py-2 text-left transition-all duration-200 ${
-                selected
-                  ? 'border-[#C6FF3D]/30 bg-[#C6FF3D]/10 text-[#C6FF3D] shadow-[0_0_0_1px_rgba(198,255,61,0.2)]'
-                  : 'border-white/10 bg-white/5 text-neutral-300 hover:border-white/20 hover:bg-white/10'
-              }`}
+              className={`filter-pill ${isActive ? 'filter-pill--active' : ''}`}
             >
-              <div className="text-[11px] font-black uppercase tracking-[0.18em]">{filter.label}</div>
-              <div className="mt-0.5 text-[10px] font-medium text-neutral-500">{filter.hint}</div>
+              <span className="flex items-center gap-1.5">
+                <span aria-hidden="true">{filter.icon}</span>
+                <span className="filter-pill__label">{filter.label}</span>
+              </span>
+              <span className="filter-pill__hint">{filter.hint}</span>
             </button>
           );
         })}
       </div>
 
-      <div className="rounded-[1.75rem] border border-white/5 bg-white/5 p-4 sm:p-6">
-        <div className="mb-6 flex items-center justify-between gap-4">
-          <div>
-            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-[#C6FF3D]">Filtered product rail</div>
-            <div className="mt-1 text-sm text-neutral-400">
-              Showing {filteredProducts.length} of {products.length} products.
-            </div>
+      {/* ── RESULTS PANEL ── */}
+      <div
+        id="filtered-products-panel"
+        role="tabpanel"
+        aria-label={`Products filtered by: ${activeFilterMeta?.label || 'All'}`}
+        className="space-y-6"
+      >
+        {/* Results header */}
+        <div className="flex items-center justify-between gap-4 px-1">
+          <div className="flex items-center gap-3">
+            {/* Count badge */}
+            <span
+              className={`inline-flex items-center justify-center min-w-[2rem] h-6 px-2 rounded-full text-xs font-black tabular-nums transition-all duration-300 ${
+                isPending
+                  ? 'bg-white/5 text-neutral-500'
+                  : 'bg-data-lime/10 text-data-lime border border-data-lime/20'
+              }`}
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              {isPending ? '…' : filteredProducts.length}
+            </span>
+            <span className="text-sm text-neutral-400">
+              {filteredProducts.length === products.length
+                ? 'products ranked'
+                : `of ${products.length} products`}
+            </span>
           </div>
-          <button
-            type="button"
-            onClick={() => setFilter('all')}
-            className="text-xs font-black uppercase tracking-[0.18em] text-neutral-500 hover:text-white"
-          >
-            Reset
-          </button>
+
+          {/* Reset — only shown when filter is active */}
+          {activeFilter !== 'all' && (
+            <button
+              type="button"
+              onClick={() => setFilter('all')}
+              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-neutral-500 hover:text-neutral-200 transition-colors duration-150 focus-ring rounded px-2 py-1"
+              aria-label="Clear filter and show all products"
+            >
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                <path d="M2 2L8 8M8 2L2 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+              Clear filter
+            </button>
+          )}
         </div>
 
-        {filteredProducts.length > 0 ? (
-          <>
-            <div className="mb-8 overflow-hidden rounded-[1.5rem] border border-white/5 bg-black/20 p-4">
-              <ComparisonTable products={filteredProducts} articleSlug={articleSlug} title="At a glance" />
+        {/* Comparison at-a-glance table */}
+        {filteredProducts.length > 1 && (
+          <div className="overflow-hidden rounded-[1.25rem] border border-white/[0.05] bg-black/20">
+            <div className="px-4 py-3 border-b border-white/[0.04]">
+              <span className="section-eyebrow">At a Glance</span>
             </div>
-            <ProductGrid products={filteredProducts} articleSlug={articleSlug} />
-          </>
-        ) : (
-          <div className="rounded-[1.5rem] border border-dashed border-white/10 p-10 text-center text-neutral-400">
-            No products match this filter yet.
+            <div className="p-4">
+              <ComparisonTable
+                products={filteredProducts}
+                articleSlug={articleSlug}
+                title=""
+              />
+            </div>
           </div>
         )}
+
+        {/* Product cards grid */}
+        <ProductGrid
+          products={filteredProducts}
+          articleSlug={articleSlug}
+          isLoading={isPending}
+          emptyFilterLabel={activeFilterMeta?.label}
+        />
       </div>
     </div>
   );

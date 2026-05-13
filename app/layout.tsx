@@ -52,7 +52,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#10b981',
+  themeColor: '#0A0D12',
   colorScheme: 'dark',
   // FIX (Audit #01-E): viewport-fit=cover for iPhone notch areas
   viewportFit: 'cover',
@@ -65,7 +65,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* FIX: Organization + WebSite schema in <head> for all pages */}
         <script {...jsonLdProps([organizationSchema(), websiteSchema()])} />
       </head>
-      <body className="min-h-screen bg-neutral-950 font-sans text-neutral-100 antialiased">
+      <body className="min-h-screen bg-[#0A0D12] font-sans text-neutral-100 antialiased">
         <Header />
         <main>{children}</main>
         <Footer />
