@@ -7,6 +7,7 @@ import { BuyerGuide } from '@/components/BuyerGuide';
 import { FAQ } from '@/components/FAQ';
 import { Newsletter } from '@/components/Newsletter';
 import { ProductGrid } from '@/components/ProductGrid';
+import { QuickFilters } from '@/components/QuickFilters';
 import { slugToTitle } from '@/lib/format';
 import { getCategoryList, getProductsByCategory } from '@/lib/db';
 import { buildMetadata } from '@/lib/seo/metadata';
@@ -47,59 +48,57 @@ export default async function CategoryPage({ params }: { params: { slug: string 
   return (
     <>
       <script {...jsonLdProps([breadcrumbSchema(breadcrumbs), itemListSchema(products, url)])} />
-
-      {/* FIX (Audit #03-A): FTC disclosure above every category product list */}
       <DisclosureBar />
 
-      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-8">
-        {/* Breadcrumb */}
-        <nav
-          className="mb-6 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-neutral-500"
-          aria-label="Breadcrumb"
-        >
+      <div className="mx-auto max-w-6xl px-6 py-12">
+        {/* Breadcrumb + Hero */}
+        <nav className="mb-6 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
           {breadcrumbs.map((crumb, index) => (
             <span key={crumb.name} className="flex items-center gap-2">
               {index < breadcrumbs.length - 1 ? (
-                <Link href={crumb.url} className="hover:text-emerald-400">
-                  {crumb.name}
-                </Link>
+                <Link href={crumb.url} className="hover:text-[#3D8BFF]">{crumb.name}</Link>
               ) : (
-                <span className="text-neutral-300">{crumb.name}</span>
+                <span className="text-offwhite">{crumb.name}</span>
               )}
-              {index < breadcrumbs.length - 1 ? <span>/</span> : null}
+              {index < breadcrumbs.length - 1 && <span className="text-neutral-600">/</span>}
             </span>
           ))}
         </nav>
 
-        <header className="mb-12 space-y-4">
-          <h1 className="text-4xl font-black uppercase italic tracking-tighter sm:text-5xl lg:text-6xl">
-            Best <span className="text-emerald-500">{name}</span> for 2026
+        <header className="mb-12">
+          <h1 className="text-6xl font-black uppercase tracking-tighter text-offwhite">
+            Best <span className="text-[#C6FF3D]">{name}</span> for 2026
           </h1>
-          <p className="max-w-3xl text-lg font-medium text-neutral-400">
-            We tested {products.length} options and ranked the top picks for serious athletes.
+          <p className="mt-4 max-w-2xl text-xl text-neutral-400">
+            We analyzed {products.length} options using real review data, specs, and performance benchmarks. No paid placements.
           </p>
-          <Link href="/methodology" className="inline-flex text-sm font-bold uppercase tracking-wider text-emerald-400 hover:text-emerald-300">
-            See the methodology
+          <Link href="/methodology" className="mt-6 inline-flex text-sm font-black uppercase tracking-widest text-[#3D8BFF] hover:underline">
+            See full methodology →
           </Link>
         </header>
 
-        <div className="mb-10">
-          <ComparisonTable products={products} articleSlug={`category-${params.slug}`} title={`${name} comparison`} />
+        {/* Quick filters (Problem 5 fix) */}
+        <QuickFilters />
+
+        {/* Comparison + Grid */}
+        <ComparisonTable products={products} articleSlug={`category-${params.slug}`} title={`${name} comparison`} />
+        
+        <div className="mt-16">
+          <ProductGrid products={products} articleSlug={`category-${params.slug}`} />
         </div>
 
-        <ProductGrid products={products} articleSlug={`category-${params.slug}`} />
-
-        <section className="mt-20 border-t border-white/5 pt-16">
+        {/* Buying guide + trust content */}
+        <div className="mt-24 border-t border-white/10 pt-16">
           <BuyerGuide category={name.toLowerCase()} />
-        </section>
+        </div>
 
-        <section className="mt-20 border-t border-white/5 pt-16">
+        <div className="mt-20 border-t border-white/10 pt-16">
           <FAQ />
-        </section>
+        </div>
 
-        <section className="mt-20 border-t border-white/5 pt-16">
+        <div className="mt-20">
           <Newsletter source={`category:${params.slug}`} />
-        </section>
+        </div>
       </div>
     </>
   );
