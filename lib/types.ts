@@ -6,6 +6,7 @@ export interface Product {
   subcategory: string | null;
   brand: string | null;
   title: string;
+  raw_description: string | null;
   description: string | null;
   keyword: string | null;
   price_cents: number | null;

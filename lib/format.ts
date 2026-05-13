@@ -17,9 +17,23 @@ export function formatReviewCount(n: number | null | undefined): string {
 }
 
 export function upgradeAmazonImage(url: string | null | undefined): string {
-  return url || '';
+  if (!url) return '';
+  // Ensure we request high quality image from Amazon
+  return url.replace(/\.jpg.*$/, '.jpg').replace('._AC_UL320_.jpg', '._AC_SL1000_.jpg');
 }
 
 export function slugToTitle(slug: string): string {
-  return slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  return slug
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+export function formatTimestamp(dateStr: string | null | undefined): string {
+  if (!dateStr) return 'recently';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
 }

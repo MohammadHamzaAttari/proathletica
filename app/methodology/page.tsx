@@ -3,7 +3,7 @@ import { buildMetadata } from '@/lib/seo/metadata';
 
 export const metadata = buildMetadata({
   title: 'Testing Methodology',
-  description: 'How ProAthletica evaluates fitness gear, ranks products, and labels recommendations.',
+  description: 'How ProAthletica ranks fitness gear using data, specs, review analysis and editorial benchmarks.',
   canonical: '/methodology',
 });
 
@@ -15,39 +15,44 @@ export default function MethodologyPage() {
           Editorial process
         </div>
         <h1 className="text-4xl font-black uppercase italic tracking-tight text-white">
-          Testing methodology
+          How we rank gear
         </h1>
         <p className="text-lg leading-8 text-neutral-300">
-          We publish fitness gear recommendations only when we can explain why a product earned its
-          place, what the tradeoffs are, and what evidence supports the ranking.
+          Every recommendation must be explainable. We combine large-scale review data, 
+          technical specifications, price history, and category-specific editorial benchmarks.
         </p>
       </div>
-
       <div className="space-y-5 text-neutral-400">
         <p>
-          Every guide starts with a category brief: what problem the product solves, who it is for,
-          the price band it sits in, and which competitors matter most.
+          We begin with a category brief: the core problem the product solves, the target athlete, 
+          the realistic price band, and which competitors actually matter.
         </p>
         <p>
-          We then verify the public facts that can be checked directly, including price, materials,
-          specs, ratings, review volume, dimensions, and warranty language when it is available.
+          We pull and verify public data including current pricing, materials, dimensions, warranty terms, 
+          average ratings, and review volume. Where possible we analyze sentiment patterns across thousands of reviews.
         </p>
         <p>
-          When hands-on testing is available, we call it out explicitly. When it is not, we say so and
-          rely on transparent spec comparison instead of pretending to have used the item.
+          When independent testing data or hands-on experience is available we disclose it clearly. 
+          When it is not, we say so explicitly and rely on transparent, reproducible spec comparison and aggregated customer feedback.
         </p>
         <p>
-          Rankings are based on a mix of category fit, durability signals, price-to-performance, and
-          how clearly the product solves the use case described in the guide.
+          Final rankings weigh category fit, durability signals, real-world performance data, 
+          price-to-performance ratio, and how clearly the product solves the stated use case.
         </p>
-        <p>
-          Affiliate links do not change a recommendation. If a product is weak, overpriced, or
-          overhyped, we say that plainly.
+        <p className="font-medium text-white">
+          Affiliate relationships do not influence rankings. A product that underperforms or is overpriced will be called out as such.
         </p>
       </div>
-
       <div className="rounded-3xl border border-white/5 bg-neutral-900/40 p-6 text-sm leading-6 text-neutral-300">
-        Need the compliance version? Read the <Link href="/disclosure" className="text-emerald-400 underline underline-offset-4">affiliate disclosure</Link> or learn more <Link href="/about" className="text-emerald-400 underline underline-offset-4">about the site</Link>.
+        Need the compliance version? Read the{' '}
+        <Link href="/disclosure" className="text-emerald-400 underline underline-offset-4">
+          affiliate disclosure
+        </Link>{' '}
+        or learn more about{' '}
+        <Link href="/about" className="text-emerald-400 underline underline-offset-4">
+          our approach
+        </Link>
+        .
       </div>
     </article>
   );

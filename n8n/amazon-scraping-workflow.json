@@ -1,204 +1,554 @@
 {
-  "name": "ProAthletica Amazon → Supabase",
   "nodes": [
+    {
+      "parameters": {},
+      "id": "ea1ce973-9add-4261-aba9-6cc7037dc18e",
+      "name": "When clicking 'Execute workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -848,
+        4608
+      ]
+    },
     {
       "parameters": {
         "rule": {
-          "interval": [{ "field": "cronExpression", "expression": "0 3 * * 0" }]
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 3 * * 0"
+            }
+          ]
         }
       },
-      "id": "schedule-trigger",
-      "name": "Weekly Schedule (Sun 3am)",
+      "id": "f516e3d6-3af5-47e4-8c6c-c0b5356f1df1",
+      "name": "Weekly Schedule Sun 3am UTC",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [260, 300]
+      "position": [
+        -848,
+        4400
+      ]
     },
     {
       "parameters": {
         "mode": "raw",
-        "jsonOutput": "={\n  \"niches\": [\n    { \"category\": \"Home Gym\", \"keyword\": \"adjustable dumbbells home gym\" },\n    { \"category\": \"Powerlifting\", \"keyword\": \"powerlifting belt\" },\n    { \"category\": \"Running\", \"keyword\": \"best running shoes marathon\" },\n    { \"category\": \"Recovery\", \"keyword\": \"massage gun muscle recovery\" },\n    { \"category\": \"Resistance Training\", \"keyword\": \"resistance bands set\" }\n  ]\n}"
+        "jsonOutput": "{\n  \"niches\": [\n    { \"category\": \"Home Gym\", \"keyword\": \"adjustable dumbbells\" },\n    { \"category\": \"Powerlifting\", \"keyword\": \"powerlifting belt\" },\n    { \"category\": \"Running\", \"keyword\": \"best running shoes marathon\" },\n    { \"category\": \"Recovery\", \"keyword\": \"massage gun muscle recovery\" },\n    { \"category\": \"Resistance Training\", \"keyword\": \"resistance bands set\" }\n  ]\n}",
+        "options": {}
       },
-      "id": "seed-niches",
+      "id": "b0725ff5-5950-4c70-b3a1-9daf0cd39706",
       "name": "Seed Niches",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [500, 300]
+      "position": [
+        -608,
+        4512
+      ]
     },
     {
       "parameters": {
         "jsCode": "const niches = $json.niches || [];\nreturn niches.map((niche) => ({ json: niche }));"
       },
-      "id": "explode-niches",
+      "id": "b10ae45e-5097-409f-8a2e-1228a90174b9",
       "name": "Explode Niches",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [740, 300]
-    },
-    {
-      "parameters": { "batchSize": 1, "options": {} },
-      "id": "split-in-batches",
-      "name": "Split In Batches",
-      "type": "n8n-nodes-base.splitInBatches",
-      "typeVersion": 3,
-      "position": [980, 300]
-    },
-    {
-      "parameters": { "amount": 30, "unit": "seconds" },
-      "id": "wait-between-batches",
-      "name": "Wait 30s (rate limit)",
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1.1,
-      "position": [1220, 300]
+      "position": [
+        -368,
+        4512
+      ]
     },
     {
       "parameters": {
-        "method": "GET",
-        "url": "={{ $env.SCRAPER_BASE_URL }}/scrape",
+        "options": {}
+      },
+      "id": "dcdf1a4e-d266-48ac-b5e4-74d51a02f1bc",
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -128,
+        4512
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "id": "9373fdac-7f95-48b4-a21b-651920ba98f7",
+      "name": "Wait 10s",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        112,
+        4512
+      ],
+      "webhookId": "proathletica-wait"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:4000/scrape",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            { "name": "keyword", "value": "={{ $json.keyword }}" },
-            { "name": "max", "value": "10" },
-            { "name": "maxPages", "value": "3" },
-            { "name": "requireBadge", "value": "true" }
+            {
+              "name": "keyword",
+              "value": "={{ $json.keyword }}"
+            },
+            {
+              "name": "category",
+              "value": "={{ $json.category }}"
+            },
+            {
+              "name": "max",
+              "value": "5"
+            },
+            {
+              "name": "maxPages",
+              "value": "1"
+            },
+            {
+              "name": "requireBadge",
+              "value": "false"
+            },
+            {
+              "name": "scrapeDetails",
+              "value": "false"
+            },
+            {
+              "name": "tag",
+              "value": "=proathletica-20"
+            }
           ]
         },
-        "options": { "response": { "response": { "neverError": true } }, "timeout": 180000 }
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          },
+          "timeout": 120000
+        }
       },
-      "id": "scrape-products",
+      "id": "5dd03917-2f61-4435-80bf-46ab95a5145c",
       "name": "Scrape Products",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1450, 300],
-      "retryOnFail": true,
-      "maxTries": 3,
-      "waitBetweenTries": 10000
+      "position": [
+        352,
+        4512
+      ],
+      "retryOnFail": false,
+      "maxTries": 1
     },
     {
       "parameters": {
         "conditions": {
-          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
           "conditions": [
             {
               "id": "has-products",
-              "leftValue": "={{ $json.products ? $json.products.length : 0 }}",
+              "leftValue": "={{ Array.isArray($json) ? (($json[0] && Array.isArray($json[0].products)) ? $json[0].products.length : 0) : (Array.isArray($json.products) ? $json.products.length : 0) }}",
               "rightValue": 0,
-              "operator": { "type": "number", "operation": "gt" }
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
             }
           ],
           "combinator": "and"
-        }
+        },
+        "options": {}
       },
-      "id": "check-products-found",
+      "id": "eb3c1ab8-a89e-4c50-aba5-b0ca9fb61885",
       "name": "Has Products?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [1680, 300]
+      "position": [
+        592,
+        4512
+      ]
     },
     {
       "parameters": {
-        "jsCode": "// FIX (Audit #04-A): validate required fields before save — no empty prices\nconst response = $json;\nconst products = Array.isArray(response.products) ? response.products : [];\nconst category = $item(0).$node['Split In Batches'].json.category || 'General';\nconst keyword = $item(0).$node['Split In Batches'].json.keyword || '';\n\nconst validated = products\n  .filter((p) => {\n    // FIX: drop rows missing required fields\n    if (!p.asin || !p.title || !p.affiliateLink) return false;\n    const price = parseFloat(String(p.price || '0').replace(/[^0-9.]/g, ''));\n    if (price <= 0) return false;\n    if (!p.image) return false;\n    return true;\n  })\n  .map((product, index) => ({\n    json: {\n      id: product.asin,\n      asin: product.asin,\n      slug: (product.title || '')\n        .toLowerCase()\n        .replace(/[^a-z0-9]+/g, '-')\n        .replace(/(^-|-$)/g, ''),\n      category,\n      title: product.title,\n      description: product.title,\n      keyword,\n      price_cents: Math.round(\n        (parseFloat(String(product.price).replace(/[^0-9.]/g, '')) || 0) * 100\n      ),\n      currency: 'USD',\n      image_url: product.image || '',\n      affiliate_url: product.affiliateLink,\n      rating: parseFloat(product.rating || '0') || null,\n      review_count:\n        parseInt(String(product.reviewCount || '0').replace(/[^0-9]/g, ''), 10) || 0,\n      badge: product.badge || null,\n      rank: index + 1,\n      is_featured: index < 3,\n    },\n  }));\n\nreturn validated;"
+        "jsCode": "/**\n * Normalize + Validate Price\n *\n * Primary strategy: Scraper forces amazon.com/USD via locale cookies/headers.\n * The scraper attaches detectedCurrency to each product.\n *\n * This node:\n * 1. Rejects products where detectedCurrency is non-USD (locale enforcement failed)\n * 2. Parses USD prices directly — no conversion math needed\n * 3. Falls back to conversion ONLY as last resort with a warning\n * 4. Does NOT send source_currency — column does not exist in products table\n */\n\nlet response = $input.first().json;\n\nif (response && response.body) {\n  if (typeof response.body === 'string') {\n    try { response = JSON.parse(response.body); } catch (e) { response = {}; }\n  } else {\n    response = response.body;\n  }\n}\n\nif (Array.isArray(response)) response = response[0] || {};\n\nconst products = Array.isArray(response.products) ? response.products : [];\n\nconst niche = $('Split In Batches').item.json;\nconst category = niche.category || response.category || 'General';\nconst keyword = niche.keyword || response.keyword || '';\n\n// Emergency-only FX rates (last resort if locale enforcement failed)\nconst FX_TO_USD = {\n  USD: 1,\n  PKR: 1 / 280,\n  AED: 0.272294,\n  GBP: 1.27,\n  EUR: 1.08,\n  CAD: 0.73,\n  AUD: 0.66,\n  INR: 0.012,\n  SAR: 0.266667\n};\n\nfunction cleanUrl(value) {\n  const s = String(value || '').trim();\n  const md = s.match(/^\\[(https?:\\/\\/[^\\]]+)\\]\\((https?:\\/\\/[^)]+)\\)$/i);\n  if (md) return md[2];\n  return s;\n}\n\nfunction detectCurrency(raw) {\n  const s = String(raw || '').replace(/\\s+/g, ' ').trim();\n  if (/\\bPKR\\b|₨|Rs\\.?/i.test(s)) return 'PKR';\n  if (/\\bAED\\b|د\\.إ/i.test(s)) return 'AED';\n  if (/\\bGBP\\b/.test(s) || (/£/.test(s) && !/\\$/.test(s))) return 'GBP';\n  if (/\\bEUR\\b|€/.test(s)) return 'EUR';\n  if (/\\bCAD\\b|CA\\$/.test(s)) return 'CAD';\n  if (/\\bAUD\\b|AU\\$/.test(s)) return 'AUD';\n  if (/\\bINR\\b|₹/.test(s)) return 'INR';\n  if (/\\bSAR\\b|ر\\.س/.test(s)) return 'SAR';\n  if (/\\$|\\bUSD\\b/.test(s)) return 'USD';\n  return 'UNKNOWN';\n}\n\nfunction parsePriceToUsdCents(priceText, detectedCurrencyHint) {\n  const raw = String(priceText || '').replace(/\\s+/g, ' ').trim();\n  if (!raw) return null;\n  if (/price not available|currently unavailable|check latest price/i.test(raw)) return null;\n\n  const currency = (detectedCurrencyHint && detectedCurrencyHint !== 'UNKNOWN' && detectedCurrencyHint !== 'NONE')\n    ? detectedCurrencyHint\n    : detectCurrency(raw);\n\n  const numericText = raw.replace(/,/g, '');\n  const matches = [...numericText.matchAll(/\\d+(?:\\.\\d+)?/g)]\n    .map((m) => Number(m[0]))\n    .filter((n) => Number.isFinite(n) && n > 0);\n\n  if (matches.length === 0) return null;\n\n  const amount = Math.min(...matches);\n\n  if (currency !== 'USD') {\n    if (currency === 'UNKNOWN') {\n      if (amount > 500) {\n        return {\n          raw, sourceAmount: amount,\n          usdAmount: null, priceCents: null,\n          error: `Ambiguous price ${amount} with no currency symbol — too large to be USD`\n        };\n      }\n      const usdAmount = amount;\n      if (usdAmount < 1 || usdAmount > 999) return null;\n      return {\n        raw, sourceAmount: amount,\n        usdAmount, priceCents: Math.round(usdAmount * 100),\n        warning: 'No currency symbol — assumed USD'\n      };\n    }\n\n    const rate = FX_TO_USD[currency];\n    if (!rate) return {\n      raw, sourceAmount: amount,\n      usdAmount: null, priceCents: null,\n      error: `No FX rate for ${currency}`\n    };\n\n    const usdAmount = amount * rate;\n    if (!Number.isFinite(usdAmount) || usdAmount <= 0) return null;\n    if (usdAmount < 1 || usdAmount > 999) return null;\n\n    return {\n      raw, sourceAmount: amount,\n      usdAmount, priceCents: Math.round(usdAmount * 100),\n      warning: `LOCALE_ENFORCEMENT_FAILED: Scraped ${currency} ${amount}, converted to USD ${usdAmount.toFixed(2)}`\n    };\n  }\n\n  // Happy path: confirmed USD\n  if (!Number.isFinite(amount) || amount <= 0) return null;\n  if (amount < 1 || amount > 999) return null;\n\n  return {\n    raw, sourceAmount: amount,\n    usdAmount: amount, priceCents: Math.round(amount * 100)\n  };\n}\n\n// FIX: rating 0 from scraper means no rating found — store null\n// Valid Amazon ratings are 1.0–5.0\nfunction parseRating(value) {\n  const raw = String(value || '').trim();\n  if (!raw || raw === '0') return null;\n  const ratingRaw = parseFloat(raw.replace(/[^0-9.]/g, ''));\n  if (!Number.isFinite(ratingRaw) || ratingRaw < 1 || ratingRaw > 5) return null;\n  return ratingRaw;\n}\n\nfunction parseReviewCount(value) {\n  return parseInt(String(value || '0').replace(/[^0-9]/g, ''), 10) || 0;\n}\n\nfunction makeSlug(title, asin) {\n  const slug = String(title || '')\n    .toLowerCase()\n    .replace(/[^a-z0-9]+/g, '-')\n    .replace(/(^-|-$)/g, '')\n    .slice(0, 100);\n  return slug || String(asin || '').toLowerCase();\n}\n\nconst rows = [];\nconst rejected = [];\nconst currencyWarnings = [];\n\nfor (const [index, p] of products.entries()) {\n  const asin = String(p.asin || '').trim();\n  const title = String(p.title || '').trim();\n  const affiliateLink = cleanUrl(p.affiliateLink || p.affiliate_url || '');\n  const image = cleanUrl(p.image || p.image_url || '');\n\n  if (!asin) { rejected.push({ index, reason: 'missing asin' }); continue; }\n  if (!title) { rejected.push({ asin, reason: 'missing title' }); continue; }\n  if (!affiliateLink) { rejected.push({ asin, reason: 'missing affiliate link' }); continue; }\n  if (!image) { rejected.push({ asin, reason: 'missing image' }); continue; }\n\n  const priceInfo = parsePriceToUsdCents(\n    p.price || p.rawPrice || '',\n    p.detectedCurrency || null\n  );\n\n  if (!priceInfo || priceInfo.priceCents === null) {\n    rejected.push({\n      asin,\n      reason: priceInfo ? priceInfo.error : 'invalid/unparseable price',\n      price: p.price || p.rawPrice || '',\n      detectedCurrency: p.detectedCurrency || 'unknown'\n    });\n    continue;\n  }\n\n  if (priceInfo.warning) {\n    currencyWarnings.push({ asin, warning: priceInfo.warning });\n    console.warn(`⚠️ ${asin}: ${priceInfo.warning}`);\n  }\n\n  const description =\n    (typeof p.reviewSnippet === 'string' && p.reviewSnippet.trim()) ||\n    (Array.isArray(p.features) && p.features[0] && String(p.features[0]).trim()) ||\n    title;\n\n  // NOTE: source_currency is intentionally excluded — not a column in products table\n  rows.push({\n    json: {\n      id: asin,\n      asin,\n      slug: makeSlug(title, asin),\n      category,\n      subcategory: null,\n      brand: p.brand && String(p.brand).trim() ? String(p.brand).trim() : null,\n      title,\n      description,\n      keyword,\n      price_cents: priceInfo.priceCents,\n      currency: 'USD',\n      image_url: image,\n      affiliate_url: affiliateLink,\n      rating: parseRating(p.rating),\n      review_count: parseReviewCount(p.reviewCount),\n      badge: p.badge && String(p.badge).trim() ? String(p.badge).trim() : null,\n      rank: index + 1,\n      is_featured: index < 3,\n      last_scraped_at: new Date().toISOString()\n    }\n  });\n}\n\nif (rows.length === 0) {\n  return [{\n    json: {\n      _noValidProducts: true,\n      keyword, category, rejected, currencyWarnings,\n      reason: 'No valid products after validation. Check rejected for currency/price issues.'\n    }\n  }];\n}\n\nif (currencyWarnings.length > 0) {\n  console.warn('Currency warnings (locale enforcement may have failed):', JSON.stringify(currencyWarnings));\n}\n\nreturn rows;"
       },
-      "id": "normalize-and-validate",
-      "name": "Normalize + Validate",
+      "id": "3874736f-4486-4222-a2fe-a0608019c74d",
+      "name": "Normalize + Validate Price Fixed",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1920, 200]
+      "position": [
+        832,
+        4400
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "not-sentinel",
+              "leftValue": "={{ $json._noValidProducts === true }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "481d535f-7868-4373-afe4-173c6d259948",
+      "name": "Skip If No Valid Products",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        4400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input\n  .all()\n  .map((item) => item.json)\n  .filter((row) => row && !row._noValidProducts && row.asin);\n\nif (rows.length === 0) {\n  return [{ json: { _noValidProducts: true, reason: 'No rows to upsert' } }];\n}\n\nreturn [{ json: { rows, count: rows.length } }];"
+      },
+      "id": "71e41e19-0ef6-4102-99d1-837313a654c0",
+      "name": "Prepare Supabase Upsert Batch",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        4288
+      ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.NEXT_PUBLIC_SUPABASE_URL }}/rest/v1/products?on_conflict=id",
-        "sendBody": true,
-        "contentType": "json",
-        "specifyBody": "json",
-        "jsonBody": "={{ $json }}",
+        "url": "={{ 'https://kiphiogcysnyiwjaptff.supabase.co' + '/rest/v1/products?on_conflict=id' }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "={{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Authorization", "value": "Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Prefer", "value": "resolution=merge-duplicates,return=minimal" },
-            { "name": "Content-Type", "value": "application/json" }
+            {
+              "name": "apikey",
+              "value": "=sb_publishable_ln3aSyHDdwfNX5K-LgMc1A_RpA2AIMt"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpcGhpb2djeXNueWl3amFwdGZmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODU3ODkxNywiZXhwIjoyMDk0MTU0OTE3fQ.ZiYloD1AUbwe0rAgDbsZbKX6F9IpcBJE6_MOhl-SJII' }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=minimal"
+            }
           ]
         },
-        "options": { "timeout": 60000 }
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.rows) }}",
+        "options": {
+          "timeout": 30000
+        }
       },
-      "id": "upsert-supabase",
-      "name": "Upsert to Supabase",
+      "id": "8c015afd-5962-4d34-bb8a-003fdbcee661",
+      "name": "Upsert to Supabase HTTP",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2400, 200],
-      "retryOnFail": true,
-      "maxTries": 3,
-      "waitBetweenTries": 3000
+      "position": [
+        1552,
+        4288
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst error = item.error || null;\nif (error) {\n  const msg = typeof error === 'object' ? JSON.stringify(error) : String(error);\n  console.log('Supabase HTTP upsert failed: ' + msg);\n}\nreturn [{ json: { ok: !error, error, response: item } }];"
+      },
+      "id": "c2e8483b-c016-4050-9efe-f5c6bd7e849e",
+      "name": "Log Upsert Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1792,
+        4288
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://athletica.page' + '/api/revalidate' }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "tag",
+              "value": "products"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "bf8865e8-7970-4c91-829e-0ce617c05102",
+      "name": "Bust Products Cache",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2048,
+        4288
+      ],
+      "continueOnFail": true
     },
     {
       "parameters": {
         "method": "POST",
         "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
         "sendBody": true,
-        "contentType": "json",
         "specifyBody": "json",
-        "jsonBody": "={ \"content\": \"⚠️ ProAthletica scraper: no products found for keyword **{{ $item(0).$node['Split In Batches'].json.keyword }}**. Check scraper logs.\" }"
+        "jsonBody": "={{ JSON.stringify({ content: '⚠️ ProAthletica scraper: 0 products returned for keyword **' + $('Split In Batches').item.json.keyword + '** category **' + $('Split In Batches').item.json.category + '**. Possible CAPTCHA or Amazon layout issue.' }) }}",
+        "options": {}
       },
-      "id": "notify-no-products",
+      "id": "fa507faf-50a2-4222-8109-948460fe4f62",
       "name": "Alert: No Products",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1920, 440],
+      "position": [
+        832,
+        4656
+      ],
       "continueOnFail": true
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.NEXT_PUBLIC_SITE_URL }}/api/revalidate?secret={{ $env.REVALIDATE_SECRET }}&tag=products",
-        "options": { "timeout": 30000 }
+        "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ content: '⚠️ ProAthletica scraper: products returned for keyword **' + $json.keyword + '** but all failed validation. Rejected: ' + JSON.stringify($json.rejected) + ' CurrencyWarnings: ' + JSON.stringify($json.currencyWarnings) }) }}",
+        "options": {}
       },
-      "id": "bust-cache",
-      "name": "Bust Products Cache",
+      "id": "3d3bf9f3-9bad-44b5-a038-8c4ab9803aca",
+      "name": "Alert: Validation Failed",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2400, 200],
+      "position": [
+        1312,
+        4496
+      ],
       "continueOnFail": true
     }
   ],
   "connections": {
-    "Weekly Schedule (Sun 3am)": {
-      "main": [[{ "node": "Seed Niches", "type": "main", "index": 0 }]]
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Seed Niches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weekly Schedule Sun 3am UTC": {
+      "main": [
+        [
+          {
+            "node": "Seed Niches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Seed Niches": {
-      "main": [[{ "node": "Explode Niches", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Explode Niches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Explode Niches": {
-      "main": [[{ "node": "Split In Batches", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Split In Batches": {
-      "main": [[{ "node": "Wait 30s (rate limit)", "type": "main", "index": 0 }]]
+      "main": [
+        [],
+        [
+          {
+            "node": "Wait 10s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "Wait 30s (rate limit)": {
-      "main": [[{ "node": "Scrape Products", "type": "main", "index": 0 }]]
+    "Wait 10s": {
+      "main": [
+        [
+          {
+            "node": "Scrape Products",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Scrape Products": {
-      "main": [[{ "node": "Has Products?", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Has Products?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Has Products?": {
       "main": [
-        [{ "node": "Normalize + Validate", "type": "main", "index": 0 }],
-        [{ "node": "Alert: No Products", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Normalize + Validate Price Fixed",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Alert: No Products",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
-    "Normalize + Validate": {
-      "main": [[{ "node": "Upsert to Supabase", "type": "main", "index": 0 }]]
+    "Normalize + Validate Price Fixed": {
+      "main": [
+        [
+          {
+            "node": "Skip If No Valid Products",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "Upsert to Supabase": {
-      "main": [[{ "node": "Bust Products Cache", "type": "main", "index": 0 }]]
+    "Skip If No Valid Products": {
+      "main": [
+        [
+          {
+            "node": "Prepare Supabase Upsert Batch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Alert: Validation Failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Supabase Upsert Batch": {
+      "main": [
+        [
+          {
+            "node": "Upsert to Supabase HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert to Supabase HTTP": {
+      "main": [
+        [
+          {
+            "node": "Log Upsert Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Upsert Result": {
+      "main": [
+        [
+          {
+            "node": "Bust Products Cache",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Bust Products Cache": {
-      "main": [[{ "node": "Split In Batches", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alert: No Products": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alert: Validation Failed": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": false,
-  "settings": { "executionOrder": "v1" },
-  "versionId": "2"
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d3fc3c89b4f6591f11695080fd3c719321c686c5a57094337a40fa8fe01dba4f"
+  }
 }

@@ -2,7 +2,7 @@ import { buildMetadata } from '@/lib/seo/metadata';
 
 export const metadata = buildMetadata({
   title: 'About Us',
-  description: 'Meet ProAthletica and learn how we evaluate fitness gear, compare products, and label recommendations.',
+  description: 'How ProAthletica uses real customer data, specs, and AI analysis to rank fitness equipment.',
   canonical: '/about',
 });
 
@@ -13,31 +13,32 @@ export default function AboutPage() {
         About ProAthletica
       </h1>
       <p className="text-lg leading-8 text-neutral-300">
-        ProAthletica is an independent review site built for athletes who want grounded
-        recommendations, not generic roundup spam.
+        ProAthletica delivers data-driven fitness gear recommendations using thousands of verified customer reviews,
+        technical specifications, and structured AI analysis.
       </p>
       <div className="space-y-5 text-neutral-400">
         <p>
-          We focus on real-world performance, build quality, durability, and value across powerlifting
-          gear, home gym equipment, running shoes, and recovery tools.
+          We focus on real-world performance signals: durability indicators, price-to-performance ratio, 
+          review sentiment patterns, and category-specific tradeoffs. Rankings are never influenced by affiliate commissions.
         </p>
         <p>
-          We do not sell rankings. We may earn a commission when readers buy through links, but
-          commissions never decide what gets recommended.
+          Where hands-on testing data exists we highlight it. Most rankings are built from transparent, 
+          publicly verifiable data sources and editorial benchmarks developed over years of category research.
         </p>
         <p>
-          Our editorial process combines product research, hands-on use when available, and structured
-          comparison against alternatives in the same price band. When we have not personally tested
-          something, we say so and rely on transparent spec comparison instead of pretending otherwise.
+          Our goal is to cut through marketing noise and give athletes clear, evidence-based guidance so they 
+          can buy the right equipment the first time.
         </p>
         <p>
-          As an Amazon Associate we earn from qualifying purchases. Some outbound links on this site
-          are affiliate links. If you click one and buy something, we may earn a commission at no extra
-          cost to you.
+          As an Amazon Associate we earn from qualifying purchases. Some outbound links on this site are affiliate links. 
+          If you click one and buy something, we may earn a commission at no extra cost to you. This never affects our rankings.
         </p>
         <p>
-          You can read the full <a href="/methodology" className="text-emerald-400 underline underline-offset-4">testing methodology</a> for the exact criteria we use.
+          You can read the full <a href="/methodology" className="text-emerald-400 underline underline-offset-4">testing methodology</a> for complete transparency.
         </p>
+      </div>
+      <div className="rounded-3xl border border-white/5 bg-neutral-900/40 p-6 text-sm leading-6 text-neutral-300">
+        Questions about our process? <a href="/contact" className="text-emerald-400 underline underline-offset-4">Get in touch</a>.
       </div>
     </article>
   );

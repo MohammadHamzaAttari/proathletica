@@ -15,6 +15,7 @@ create table if not exists products (
   subcategory     text,
   brand           text,
   title           text not null,
+  raw_description text,
   description     text,
   keyword         text,
   price_cents     integer,
@@ -116,6 +117,8 @@ alter table subscribers      enable row level security;
 drop policy if exists "anon read products"         on products;
 create policy "anon read products"         on products         for select using (true);
 
+alter table products add column if not exists raw_description text;
+
 drop policy if exists "anon read articles"         on articles;
 create policy "anon read articles"         on articles         for select using (published_at is not null);
 
@@ -141,7 +144,7 @@ create trigger articles_updated_at
 
 -- ─── Seed data (safe to re-run) ──────────────────────────────
 insert into products (
-  id, asin, slug, category, brand, title, description, keyword,
+  id, asin, slug, category, brand, title, raw_description, description, keyword,
   price_cents, currency, image_url, affiliate_url,
   rating, review_count, badge, rank, is_featured
 ) values
@@ -149,6 +152,7 @@ insert into products (
     ('B001ARYU58', 'B001ARYU58', 'bowflex-selecttech-552',
      'Home Gym', 'Bowflex',
      'Bowflex SelectTech 552 Adjustable Dumbbells',
+     'Compact adjustable dumbbells that replace a full rack for beginner home gyms.',
      'Compact adjustable dumbbells that replace a full rack for beginner home gyms.',
     'adjustable dumbbells home gym',
     34900, 'USD',
@@ -161,6 +165,7 @@ insert into products (
     'Home Gym', 'YOLEO',
     'YOLEO Adjustable Weight Bench',
     'Adjustable bench with multiple incline positions and a compact footprint.',
+    'Adjustable bench with multiple incline positions and a compact footprint.',
     'adjustable bench home gym',
     12999, 'USD',
     'https://m.media-amazon.com/images/I/81pu4FK5uSL._AC_UL320_.jpg',
@@ -171,6 +176,7 @@ insert into products (
     'B01AVDVHTI', 'B01AVDVHTI', 'fit-simplify-resistance-loop-bands',
     'Home Gym', 'Fit Simplify',
     'Fit Simplify Resistance Loop Bands',
+    'Set of loop bands for warmups, rehab, and glute activation.',
     'Set of loop bands for warmups, rehab, and glute activation.',
     'resistance loop bands',
     1295, 'USD',

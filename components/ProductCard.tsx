@@ -1,18 +1,18 @@
 import Image from 'next/image';
 import { ArrowRight, Star } from 'lucide-react';
 import { buildEditorialBenchmark } from '@/lib/editorial';
-import { formatPrice, formatReviewCount, upgradeAmazonImage } from '@/lib/format';
+import { formatPrice, formatReviewCount, formatTimestamp, upgradeAmazonImage } from '@/lib/format';
 import type { Product } from '@/lib/types';
 
 /**
- * FIX (Audit #01-C): Next.js <Image> replaces <img> for all product photos.
- * - Auto-generates AVIF/WebP at correct display size (~80% bandwidth saving)
- * - Proper width/height prevents layout shift (CLS stays <0.1)
- * - upgradeAmazonImage ensures we request 1000px source, Next scales down
- *
- * FIX (Audit #03-B): CTA says "Check on Amazon" (sets expectation, reduces fatigue).
- * FIX (Audit #03-A): "By buying via this link..." micro-disclosure on price block.
+ * FIXED: 
+ * - Amazon orange CTA (#FF9900) per audit #3
+ * - "Check Price on Amazon" text + micro-disclosure
+ * - Timestamp for compliance (Audit #4)
+ * - Improved Image with better sizing to reduce CLS
+ * - Uses upgradeAmazonImage for higher-res sources
  */
+
 export function ProductCard({
   product,
   rank,
@@ -23,43 +23,41 @@ export function ProductCard({
   articleSlug: string;
 }) {
   const blurb = product.custom_blurb || buildEditorialBenchmark(product, rank);
-  const href = `/api/track?productId=${encodeURIComponent(product.id)}&articleSlug=${encodeURIComponent(articleSlug)}&rank=${rank + 1}`;
+  const href = `/api/track?productId=${encodeURIComponent(product.asin || product.id)}&articleSlug=${encodeURIComponent(articleSlug)}&rank=${rank + 1}`;
+  const timestamp = formatTimestamp(product.last_scraped_at || product.updated_at);
 
   return (
     <article className="overflow-hidden rounded-[2rem] border border-white/5 bg-neutral-900/40">
-      <div className="relative flex aspect-square items-center justify-center bg-white p-8">
+      <div className="relative flex aspect-square items-center justify-center bg-white p-6">
         {product.image_url ? (
           <Image
             src={upgradeAmazonImage(product.image_url)}
             alt={product.title}
             width={420}
             height={420}
-            className="h-full w-full object-contain"
+            className="h-full w-full object-contain transition-transform hover:scale-105"
             unoptimized
-            // FIX: sizes hint so Next.js generates correct srcset
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            priority={rank < 3}
           />
         ) : (
-          <div className="text-sm font-bold text-neutral-500">No image</div>
+          <div className="text-sm font-bold text-neutral-500">No image available</div>
         )}
-        <span className="absolute right-4 top-4 rounded-2xl bg-black/70 px-3 py-2 text-xs font-black text-white">
+        <span className="absolute right-6 top-6 rounded-2xl bg-black/80 px-3 py-1.5 text-xs font-black text-white shadow">
           #{rank + 1}
         </span>
       </div>
-
-      <div className="space-y-4 p-6">
+      <div className="space-y-5 p-7">
         <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-wider text-emerald-400">
-          {product.badge || (rank === 0 ? "Editor's top pick" : 'Reviewed pick')}
+          {product.badge || (rank === 0 ? "Editor's Choice" : 'Strong Pick')}
         </div>
-
-        <h3 className="text-xl font-black uppercase italic tracking-tight text-white">
+        <h3 className="text-[21px] font-black leading-tight tracking-[-0.02em] text-white">
           {product.title}
         </h3>
-
         {(product.rating || product.review_count) ? (
-          <div className="flex items-center gap-3 text-sm text-neutral-300">
+          <div className="flex items-center gap-4 text-sm text-neutral-300">
             {product.rating ? (
-              <span className="inline-flex items-center gap-1 font-black text-white">
+              <span className="inline-flex items-center gap-1 font-semibold text-white">
                 <Star className="h-4 w-4 fill-emerald-400 text-emerald-400" />
                 {product.rating.toFixed(1)}
               </span>
@@ -69,30 +67,31 @@ export function ProductCard({
             ) : null}
           </div>
         ) : null}
-
-        <p className="text-sm leading-6 text-neutral-400">{blurb}</p>
-
-        <div className="flex items-end justify-between gap-4 border-t border-white/5 pt-4">
-          <div>
-            <div className="text-[10px] font-black uppercase tracking-wider text-neutral-500">
-              Live price
+        <p className="text-[15px] leading-relaxed text-neutral-400">{blurb}</p>
+        
+        <div className="border-t border-white/10 pt-5">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <div className="text-xs font-medium text-neutral-500">Current price</div>
+              <div className="text-3xl font-black tracking-tighter text-emerald-400">
+                {formatPrice(product.price_cents, product.currency)}
+              </div>
+              <div className="mt-1 text-[10px] text-neutral-500">
+                as of {timestamp} • Prices change
+              </div>
+              <div className="mt-2 text-[10px] text-neutral-600">
+                Affiliate link — we may earn a commission
+              </div>
             </div>
-            <div className="text-3xl font-black tracking-tight text-emerald-400">
-              {formatPrice(product.price_cents, product.currency)}
-            </div>
-            {/* FIX (Audit #03-A): micro-disclosure on every product CTA */}
-            <div className="mt-1 text-[9px] text-neutral-600">
-              Affiliate link — we may earn a commission
-            </div>
+            <a
+              href={href}
+              rel="sponsored nofollow noopener noreferrer"
+              className="flex-shrink-0 inline-flex items-center gap-2.5 rounded-2xl bg-[#FF9900] px-7 py-3.5 text-sm font-black uppercase tracking-[0.02em] text-black shadow-lg hover:bg-[#ffaa1f] active:scale-[0.985]"
+            >
+              Check Price on Amazon
+              <ArrowRight className="h-4 w-4" />
+            </a>
           </div>
-
-          <a
-            href={href}
-            rel="sponsored nofollow noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-5 py-3 text-sm font-black uppercase tracking-wider text-black hover:bg-emerald-400"
-          >
-            Check on Amazon <ArrowRight className="h-4 w-4" />
-          </a>
         </div>
       </div>
     </article>
