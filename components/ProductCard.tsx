@@ -158,7 +158,7 @@ export function ProductCard({
 
   return (
     <article
-      className={`product-card animate-card-in gpu ${isRank1 ? 'product-card--rank1' : ''}`}
+      className={`product-card animate-card-in gpu flex flex-col h-full ${isRank1 ? 'product-card--rank1' : ''}`}
       style={{ animationDelay: `${animationDelay}ms` }}
       aria-labelledby={`product-title-${product.id}`}
     >
@@ -219,7 +219,7 @@ export function ProductCard({
       </div>
 
       {/* ── CARD BODY ── */}
-      <div className="p-5 space-y-4">
+      <div className="p-5 flex flex-col flex-1 gap-4">
 
         {/* Trust strip */}
         <div className="trust-strip">
@@ -321,7 +321,7 @@ export function ProductCard({
         </div>
 
         {/* ── PRICE + CTA SECTION ── */}
-        <div className="pt-3 border-t border-white/[0.06] space-y-3">
+        <div className="mt-auto pt-3 border-t border-white/[0.06] space-y-3">
 
           {/* Price row */}
           <div className="flex items-baseline justify-between gap-3">

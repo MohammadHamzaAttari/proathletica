@@ -136,7 +136,7 @@ export function ProductGrid({
     <>
       {/* Grid */}
       <div
-        className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
+        className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 items-stretch"
         role="list"
         aria-label="Product recommendations"
         aria-live="polite"
@@ -153,7 +153,7 @@ export function ProductGrid({
           <EmptyState filterLabel={emptyFilterLabel} />
         ) : (
           products.map((product, index) => (
-            <div key={product.id} role="listitem">
+            <div key={product.id} role="listitem" className="h-full">
               <ProductCard
                 product={product}
                 rank={index}
