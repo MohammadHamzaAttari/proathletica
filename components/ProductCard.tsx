@@ -52,11 +52,11 @@ function StarRating({ rating, reviewCount }: { rating: number; reviewCount?: num
       <span className="text-sm font-bold text-star-gold tabular-nums">
         {rating.toFixed(1)}
       </span>
-      {reviewCount && reviewCount > 0 && (
+      {(reviewCount || 0) > 0 ? (
         <span className="text-sm text-neutral-500">
-          ({formatReviewCount(reviewCount)})
+          ({formatReviewCount(reviewCount as number)})
         </span>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -231,19 +231,19 @@ export function ProductCard({
             Amazon
           </span>
 
-          {product.rating && product.rating >= 4.5 && (
+          {(product.rating || 0) >= 4.5 ? (
             <span className="trust-chip trust-chip--verified">
               <ShieldCheck className="w-2.5 h-2.5" aria-hidden="true" />
               Verified
             </span>
-          )}
+          ) : null}
 
-          {product.review_count && product.review_count >= 1000 && (
+          {(product.review_count || 0) >= 1000 ? (
             <span className="trust-chip trust-chip--amazon">
               <Zap className="w-2.5 h-2.5" aria-hidden="true" />
               Popular
             </span>
-          )}
+          ) : null}
         </div>
 
         {/* Brand + Title */}
@@ -263,9 +263,9 @@ export function ProductCard({
         </div>
 
         {/* Star rating */}
-        {product.rating && (
-          <StarRating rating={product.rating} reviewCount={product.review_count} />
-        )}
+        {(product.rating || 0) > 0 ? (
+          <StarRating rating={product.rating as number} reviewCount={product.review_count} />
+        ) : null}
 
         {/* Verdict — editorial summary */}
         <p className="text-sm leading-relaxed text-neutral-300 clamp-3 pl-3 border-l-2 border-data-lime/30">
@@ -326,7 +326,7 @@ export function ProductCard({
           {/* Price row */}
           <div className="flex items-baseline justify-between gap-3">
             <div>
-              {product.price_cents && product.price_cents > 0 ? (
+              {(product.price_cents || 0) > 0 ? (
                 <div className="flex items-baseline gap-2 flex-wrap">
                   <span className="price-current">
                     {formatPrice(product.price_cents, product.currency)}
@@ -390,11 +390,11 @@ export function ProductCard({
               Check Today&apos;s Price on Amazon
               <ArrowRight className="w-4 h-4 flex-shrink-0 ml-1" aria-hidden="true" />
             </a>
-            {product.review_count && product.review_count > 0 && (
+            {(product.review_count || 0) > 0 ? (
               <div className="text-center text-[10px] font-bold text-neutral-500 uppercase tracking-widest">
-                Based on {formatReviewCount(product.review_count)} Amazon reviews
+                Based on {formatReviewCount(product.review_count as number)} Amazon reviews
               </div>
-            )}
+            ) : null}
           </div>
 
           {/* Secondary CTAs (Audit #03-C) */}
