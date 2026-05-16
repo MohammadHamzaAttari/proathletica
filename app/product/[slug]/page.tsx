@@ -7,6 +7,7 @@ import { formatPrice, formatTimestamp } from '@/lib/format';
 import { SITE_NAME } from '@/lib/config';
 import Image from 'next/image';
 import Link from 'next/link';
+import { User, Calendar, FlaskConical } from 'lucide-react';
 
 export const revalidate = 3600;
 
@@ -23,8 +24,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const category = (product.category || 'Fitness Gear').toLowerCase();
   
   return buildMetadata({
-    title: `Is the ${product.short_title || product.title} Worth It? (2026 Review)`,
-    description: `Independent ${category} review: ${product.editorial_summary} Vetted ${brand} specs, price data, and real owner tradeoffs.`,
+    title: `${product.short_title || product.title.split(' ').slice(0, 6).join(' ')} Review (2026): Pros, Cons, Specs & Best Alternative | ${SITE_NAME}`,
+    description: `Hands-on-style review of the ${product.title}. See who it's best for, key tradeoffs, specs, price history, and better alternatives. Updated May 2026.`,
     canonical: `/product/${params.slug}`,
     pinterestImage: `/api/pinterest/${product.asin || product.id}`,
     image: product.image_url || undefined,
@@ -115,6 +116,29 @@ export default async function ProductPage({ params }: { params: { slug: string }
                   {shortTitle}
                 </h1>
                 {product.brand && <p className="text-2xl text-[#3D8BFF] mt-2">{product.brand}</p>}
+              </div>
+
+              {/* Trust Strip (Audit Fix) */}
+              <div className="flex flex-wrap items-center gap-4 border-y border-white/10 py-4 text-[11px] font-bold uppercase tracking-widest text-neutral-400">
+                <span className="flex items-center gap-2 text-white">
+                  <User className="h-4 w-4 text-emerald-400" />
+                  Reviewed by Athletica Lab
+                </span>
+                <span className="hidden sm:inline text-white/20">|</span>
+                <span className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Updated{' '}
+                  {new Date(product.last_scraped_at || product.updated_at || new Date()).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                </span>
+                <span className="hidden sm:inline text-white/20">|</span>
+                <Link href="/methodology" className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
+                  <FlaskConical className="h-4 w-4" />
+                  How we score
+                </Link>
               </div>
 
               {/* Rating block */}

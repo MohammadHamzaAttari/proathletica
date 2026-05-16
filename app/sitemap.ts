@@ -41,9 +41,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // NEW: Individual product pages (addresses Audit Part 2 orphan pages / long-tail SEO)
   const productPages: MetadataRoute.Sitemap = products.map((product) => {
-    const rawSlug = product.slug || product.asin?.toLowerCase() || product.id;
-    // Cap at 60 and clean bleed (Audit #02-H)
-    const slug = rawSlug.length <= 60 ? rawSlug : rawSlug.slice(0, 60).replace(/-[^-]*$/, '');
+    const slug = product.slug || product.asin?.toLowerCase() || product.id;
     return {
       url: `${SITE_URL}/product/${slug}`,
       lastModified: new Date(product.updated_at || product.last_scraped_at || now),

@@ -50,11 +50,10 @@ export function ComparisonTable({
           <thead>
             <tr className="border-b border-white/[0.06] text-2xs font-black uppercase tracking-[0.15em] text-neutral-500">
               <th className="py-4 pr-6 w-12">Rank</th>
-              <th className="py-4 pr-6">Pick</th>
-              <th className="py-4 pr-6">Rating</th>
-              <th className="py-4 pr-8 w-5/12">Verdict</th>
-              <th className="py-4 pr-6">Price</th>
-              <th className="py-4 text-right">Action</th>
+              <th className="py-4 pr-6 w-2/12">Product</th>
+              <th className="py-4 pr-6 w-2/12">Best For</th>
+              <th className="py-4 pr-8 w-4/12">Verdict & Specs</th>
+              <th className="py-4 text-right w-3/12">Price & Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/[0.04]">
@@ -65,62 +64,59 @@ export function ComparisonTable({
 
               return (
                 <tr key={product.id} className="group hover:bg-white/[0.02] transition-colors">
-                  <td className="py-6 pr-6">
+                  <td className="py-6 pr-6 align-top">
                     <div className={`rank-badge ${index === 0 ? 'rank-badge--gold' : ''}`}>
                       #{index + 1}
                     </div>
                   </td>
-                  <td className="py-6 pr-6">
-                    <div className="font-bold text-lg text-offwhite leading-tight">{getLabel(index, product)}</div>
-                    <div className="text-xs text-neutral-500 mt-1.5 line-clamp-1 pr-4">{product.short_title || product.title}</div>
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {(product.best_for_tags || []).slice(0, 2).map((tag) => (
-                        <span key={tag} className="trust-chip trust-chip--amazon">
-                          {tag}
-                        </span>
+                  <td className="py-6 pr-6 align-top">
+                    <div className="font-bold text-lg text-offwhite leading-tight">{product.short_title || product.title.split(' ').slice(0, 4).join(' ')}</div>
+                    <div className="text-xs text-neutral-500 mt-1.5 uppercase tracking-widest font-bold">{getLabel(index, product)}</div>
+                    {product.rating && (
+                      <div className="mt-4 flex items-center gap-1.5">
+                        <Star className="w-3.5 h-3.5 fill-star-gold text-star-gold" />
+                        <span className="text-sm font-black text-offwhite">{product.rating.toFixed(1)}</span>
+                        {product.review_count && <span className="text-[10px] text-neutral-600">({formatReviewCount(product.review_count)})</span>}
+                      </div>
+                    )}
+                  </td>
+                  <td className="py-6 pr-6 align-top">
+                    <div className="flex flex-col gap-3">
+                      {(product.best_for_tags || []).slice(0, 3).map((tag) => (
+                        <div key={tag} className="text-xs font-bold text-[#3D8BFF] leading-snug">
+                          • {tag}
+                        </div>
                       ))}
+                      {(!product.best_for_tags || product.best_for_tags.length === 0) && (
+                        <div className="text-xs font-bold text-[#3D8BFF] leading-snug">• Best in Class</div>
+                      )}
                     </div>
                   </td>
-                  <td className="py-6 pr-6">
-                    {product.rating && (
-                      <div className="flex items-center gap-1.5">
-                        <Star className="w-4 h-4 fill-star-gold text-star-gold" />
-                        <span className="text-xl font-black text-offwhite">{product.rating.toFixed(1)}</span>
-                      </div>
-                    )}
-                    {product.review_count && (
-                      <div className="text-2xs text-neutral-500 mt-1 uppercase tracking-wider">
-                        {formatReviewCount(product.review_count)} REVIEWS
-                      </div>
-                    )}
-                  </td>
-                  <td className="py-6 pr-8 text-sm leading-relaxed text-neutral-300">
-                    <div className="line-clamp-2">{verdict}</div>
+                  <td className="py-6 pr-8 text-sm leading-relaxed text-neutral-300 align-top">
+                    <div className="line-clamp-3">{verdict}</div>
                     {product.pros?.length ? (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {product.pros.slice(0, 1).map((item) => (
-                          <span key={item} className="text-2xs font-bold text-savings-green uppercase tracking-wider flex items-center gap-1">
-                            <span className="text-xs">✓</span> {item}
+                      <div className="mt-5 flex flex-col gap-2">
+                        <div className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Key Specs / Pros</div>
+                        {product.pros.slice(0, 2).map((item) => (
+                          <span key={item} className="text-xs text-neutral-400 flex items-start gap-2">
+                            <span className="text-[#C6FF3D] mt-0.5">✓</span> <span className="flex-1">{item}</span>
                           </span>
                         ))}
                       </div>
                     ) : null}
                   </td>
-                  <td className="py-6 pr-6">
-                    <div className="text-xl font-black text-offwhite">
+                  <td className="py-6 text-right align-top">
+                    <div className="text-3xl font-black text-[#C6FF3D] tracking-tighter">
                       {formatPrice(product.price_cents)}
                     </div>
-                    <div className="text-2xs text-neutral-600 mt-1">as of {timestamp}</div>
-                  </td>
-                  <td className="py-6 text-right">
+                    <div className="text-[10px] text-neutral-500 mt-1 uppercase tracking-widest font-bold">as of {timestamp}</div>
                     <a
                       href={href}
                       target="_blank"
                       rel="sponsored nofollow noopener noreferrer"
-                      className="cta-primary min-h-[2.75rem] px-5 py-2 text-xs"
+                      className="mt-6 inline-flex w-full items-center justify-center rounded-2xl bg-white px-5 py-4 text-xs font-black uppercase tracking-widest text-black hover:bg-neutral-200 transition active:scale-95 shadow-lg"
                     >
                       SEE PRICE
-                      <ArrowRight className="w-3.5 h-3.5" />
                     </a>
                   </td>
                 </tr>

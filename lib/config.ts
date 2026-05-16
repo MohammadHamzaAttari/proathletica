@@ -1,5 +1,5 @@
 export const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || 'ProAthletica';
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://athletica.page').replace(/\/$/, '');
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.athletica.page').replace(/\/$/, '');
 export const SITE_DESCRIPTION =
   process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
   'Independent reviews of the best fitness equipment, powerlifting gear, running shoes, and supplements — hand-picked by competing athletes.';

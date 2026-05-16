@@ -11,6 +11,13 @@ function slugify(value: string) {
  */
 export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
+
+  // Enforce WWW Host (Audit #2 Fix)
+  if (url.hostname === 'athletica.page') {
+    url.hostname = 'www.athletica.page';
+    return NextResponse.redirect(url, 308);
+  }
+
   const slug = url.searchParams.get('slug');
   const page = url.searchParams.get('page');
   const category = url.searchParams.get('category');

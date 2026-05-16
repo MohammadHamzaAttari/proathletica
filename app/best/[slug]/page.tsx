@@ -1,8 +1,9 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { Calendar, Clock, User, FlaskConical } from 'lucide-react';
+import { Calendar, Clock, User, FlaskConical, Star } from 'lucide-react';
 import { ComparisonTable } from '@/components/ComparisonTable';
+import { formatPrice, formatTimestamp } from '@/lib/format';
 import { DisclosureBar } from '@/components/DisclosureBar';
 import { FAQ } from '@/components/FAQ';
 import { Newsletter } from '@/components/Newsletter';
@@ -36,7 +37,7 @@ export async function generateMetadata({
   return buildMetadata({
     title: article.title,
     description: article.excerpt || undefined,
-    canonical: `/best/${article.slug}`,
+    canonical: `/best/${article.slug.replace(/-2026$/, '')}`,
     image: article.hero_image || undefined,
     type: 'article',
     publishedTime: article.published_at || undefined,
@@ -118,16 +119,18 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           {article.excerpt ? (
             <p className="text-lg font-medium leading-relaxed text-neutral-400">{article.excerpt}</p>
           ) : null}
-          <div className="flex flex-wrap items-center gap-6 border-t border-white/5 pt-4 text-[10px] font-bold uppercase tracking-widest text-neutral-500">
+          {/* Trust Strip (Audit Fix) */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 border-y border-white/10 py-4 text-[11px] font-bold uppercase tracking-widest text-neutral-400">
             <Link
               href={`/about#${article.author?.toLowerCase().replace(/\s+/g, '-')}`}
-              className="flex items-center gap-2 hover:text-trust-blue transition-colors"
+              className="flex items-center gap-2 text-white hover:text-emerald-400 transition-colors"
             >
-              <User className="h-3.5 w-3.5" />
-              {article.author}
+              <User className="h-4 w-4 text-emerald-400" />
+              Reviewed by {article.author}
             </Link>
+            <span className="hidden sm:inline text-white/20">|</span>
             <span className="flex items-center gap-2">
-              <Calendar className="h-3.5 w-3.5" />
+              <Calendar className="h-4 w-4" />
               Updated{' '}
               {new Date(article.updated_at).toLocaleDateString('en-US', {
                 month: 'short',
@@ -135,10 +138,16 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                 year: 'numeric',
               })}
             </span>
+            <span className="hidden sm:inline text-white/20">|</span>
             <span className="flex items-center gap-2">
-              <Clock className="h-3.5 w-3.5" />
+              <Clock className="h-4 w-4" />
               {article.read_minutes} min read
             </span>
+            <span className="hidden sm:inline text-white/20">|</span>
+            <Link href="/methodology" className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
+              <FlaskConical className="h-4 w-4" />
+              How we score
+            </Link>
           </div>
           <ShareButtons title={article.title} url={`${SITE_URL}${url}`} />
         </header>
@@ -151,7 +160,40 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           />
         ) : null}
 
-        {quickTake ? (
+        {article.products && article.products.length > 0 ? (
+          <div className="mb-10 rounded-3xl border border-emerald-500/30 bg-[#0A0D12] p-8 flex flex-col sm:flex-row gap-8 items-center shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
+            <div className="flex-1 space-y-4">
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
+                <Star className="w-3.5 h-3.5 fill-emerald-500" /> Our Top Pick
+              </div>
+              <h2 className="text-3xl font-black text-white leading-tight">
+                {article.products[0].short_title || article.products[0].title}
+              </h2>
+              <p className="text-neutral-300 font-medium text-lg leading-relaxed">
+                {article.products[0].custom_blurb || article.products[0].editorial_summary || 'The best overall choice for most people based on our lab testing and owner reviews.'}
+              </p>
+              <div className="text-xs text-neutral-500 uppercase tracking-widest font-bold">
+                Price last checked: {formatTimestamp(article.products[0].last_scraped_at)}
+              </div>
+            </div>
+            <div className="w-full sm:w-auto flex flex-col gap-4">
+               <a
+                href={`/api/track?productId=${article.products[0].asin}&articleSlug=${article.slug}&rank=1`}
+                target="_blank"
+                rel="sponsored nofollow noopener noreferrer"
+                className="rounded-2xl bg-[#C6FF3D] px-8 py-5 text-center font-black uppercase tracking-widest text-black text-sm hover:bg-[#b3f024] transition whitespace-nowrap"
+              >
+                Check Price
+              </a>
+              {article.products.length > 1 && (
+                <div className="text-[11px] font-bold text-center text-neutral-400 tracking-wider">
+                  Secondary option: <span className="text-white">{article.products[1].short_title || article.products[1].title.split(' ').slice(0, 3).join(' ')}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : quickTake ? (
           <div className="mb-10 rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-6">
             <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
               Quick take
