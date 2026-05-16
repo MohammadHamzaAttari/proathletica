@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
+import { GoogleAnalytics } from '@next/third-parties/google';
 import './globals.css';
 import { CookieConsent } from '@/components/CookieConsent';
 import { ExitIntentModal } from '@/components/ExitIntentModal';
@@ -89,6 +90,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             `}
           </Script>
         ) : null}
+        <GoogleAnalytics gaId="G-CJPH6F4RFV" />
       </body>
     </html>
   );
