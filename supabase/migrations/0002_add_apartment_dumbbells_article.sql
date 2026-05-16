@@ -19,8 +19,8 @@ insert into products (
     'https://m.media-amazon.com/images/I/71wE7cKjQhL._AC_SL1500_.jpg',
     'https://www.amazon.com/dp/B08B8TLLQ4?tag=proathletica-20',
     4.7, 5200, 'Best for Small Spaces', 1,
-    array['Extremely compact block design', 'Expandable up to 90 lbs', 'Made in the USA'],
-    array['Cage design can feel restrictive', 'Changing weights requires pulling a pin']
+    '["Extremely compact block design", "Expandable up to 90 lbs", "Made in the USA"]'::jsonb,
+    '["Cage design can feel restrictive", "Changing weights requires pulling a pin"]'::jsonb
   ),
   (
     'B09LMCX555', 'B09LMCX555', 'nordictrack-iselect',
@@ -33,8 +33,8 @@ insert into products (
     'https://m.media-amazon.com/images/I/71ZpTfK07eL._AC_SL1500_.jpg',
     'https://www.amazon.com/dp/B09LMCX555?tag=proathletica-20',
     4.4, 1800, 'Premium Pick', 3,
-    array['Motorized weight changing', 'Alexa voice integration', 'Square plates save space'],
-    array['Requires a power outlet', 'Lower max weight (50 lbs) than competitors']
+    '["Motorized weight changing", "Alexa voice integration", "Square plates save space"]'::jsonb,
+    '["Requires a power outlet", "Lower max weight (50 lbs) than competitors"]'::jsonb
   )
 on conflict (id) do nothing;
 
