@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Dumbbell, Search } from 'lucide-react';
+import { Dumbbell, Search, ChevronDown } from 'lucide-react';
 
 export function Header() {
   return (
@@ -29,12 +29,73 @@ export function Header() {
           role="navigation"
           aria-label="Main navigation"
         >
+          <Link
+            href="/"
+            className="px-3 py-2 rounded-lg text-sm font-semibold tracking-wide text-neutral-400 hover:text-offwhite hover:bg-white/5 transition-all duration-150 focus-ring"
+          >
+            Home
+          </Link>
+
+          {/* Mega Dropdown Hover Hub */}
+          <div className="relative group">
+            <button
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold tracking-wide text-neutral-400 hover:text-offwhite hover:bg-white/5 transition-all duration-150 focus-ring"
+              aria-expanded="false"
+              aria-haspopup="true"
+            >
+              Home Gym Hub <ChevronDown className="w-3.5 h-3.5 text-neutral-500 group-hover:text-offwhite transition-transform" />
+            </button>
+            
+            {/* Dropdown Panel */}
+            <div className="absolute top-full left-0 mt-1 hidden group-hover:grid grid-cols-2 gap-6 bg-[#0B0E14] border border-white/[0.08] p-6 rounded-2xl shadow-2xl w-[480px] z-50 text-left">
+              {/* Column 1 */}
+              <div className="space-y-3.5">
+                <span className="text-[9px] font-black uppercase tracking-widest text-[#C6FF3D] block">
+                  ⚙️ EQUIPMENT BLUEPRINTS
+                </span>
+                <div className="flex flex-col gap-2">
+                  <Link href="/best/adjustable-dumbbells" className="text-xs text-neutral-400 hover:text-white font-semibold transition">
+                    Adjustable Dumbbells Guide
+                  </Link>
+                  <Link href="/categories" className="text-xs text-neutral-400 hover:text-white font-semibold transition">
+                    Best Utility Benches & Gear
+                  </Link>
+                  <Link href="/lifestyle/apartment" className="text-xs text-neutral-400 hover:text-white font-semibold transition">
+                    Apartment Space Solutions
+                  </Link>
+                  <Link href="/lifestyle/budget" className="text-xs text-neutral-400 hover:text-white font-semibold transition">
+                    Under-$500 Gym Challenge
+                  </Link>
+                </div>
+              </div>
+
+              {/* Column 2 */}
+              <div className="space-y-3.5">
+                <span className="text-[9px] font-black uppercase tracking-widest text-[#3D8BFF] block">
+                  🎯 LIFESTYLE SILOS
+                </span>
+                <div className="flex flex-col gap-2">
+                  <Link href="/lifestyle/gamers" className="text-xs text-neutral-400 hover:text-[#C6FF3D] font-semibold transition">
+                    🎮 Focus for Gamers
+                  </Link>
+                  <Link href="/lifestyle/moms" className="text-xs text-neutral-400 hover:text-[#C6FF3D] font-semibold transition">
+                    👶 Quiet Nap-Time Tools
+                  </Link>
+                  <Link href="/lifestyle/pets" className="text-xs text-neutral-400 hover:text-[#C6FF3D] font-semibold transition">
+                    🐕 Pet-Owner Approved
+                  </Link>
+                  <Link href="/methodology" className="text-xs text-neutral-400 hover:text-white font-semibold transition">
+                    🔬 Lab Vetting Process
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {[
-            { href: '/', label: 'Home' },
             { href: '/categories', label: 'Categories' },
             { href: '/methodology', label: 'Methodology' },
             { href: '/about', label: 'About' },
-            { href: '/contact', label: 'Contact' },
           ].map(({ href, label }) => (
             <Link
               key={href}

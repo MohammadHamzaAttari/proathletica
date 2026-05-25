@@ -11,6 +11,7 @@ import { LifestyleHubs } from '@/components/LifestyleHubs';
 import { Newsletter } from '@/components/Newsletter';
 import { getAllProducts, getCategoryList, getPublishedArticles } from '@/lib/db';
 import { itemListSchema, jsonLdProps, organizationSchema, howToSchema } from '@/lib/seo/schema';
+import { RogueAffiliateBanner } from '@/components/RogueAffiliateBanner';
 
 export const revalidate = 3600;
 
@@ -111,9 +112,9 @@ export default async function HomePage() {
 
         <div className="relative mx-auto max-w-6xl px-4 sm:px-8 text-center">
           {/* Trust eyebrow */}
-          <div className="inline-flex items-center gap-2 rounded-pill border border-trust-blue/25 bg-trust-blue/[0.06] px-5 py-2 text-xs font-black tracking-[0.15em] text-trust-blue mb-8">
-            <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
-            INDEPENDENT · DATA-DRIVEN · NO PAID PLACEMENTS
+          <div className="inline-flex items-center gap-2 rounded-pill border border-[#C6FF3D]/25 bg-[#C6FF3D]/[0.06] px-5 py-2 text-xs font-black tracking-[0.15em] text-[#C6FF3D] mb-8">
+            <FlaskConical className="w-3.5 h-3.5 text-[#C6FF3D]" aria-hidden="true" />
+            INDEPENDENT · LAB-TESTED + DATA-VERIFIED · NO PAID PLACEMENTS
           </div>
 
           {/* H1 — primary keyword target */}
@@ -123,7 +124,7 @@ export default async function HomePage() {
           </h1>
 
           <p className="mx-auto mt-6 max-w-2xl text-lg text-neutral-400 leading-relaxed">
-            We analyze <strong className="text-offwhite font-semibold">47,000+ verified customer reviews</strong> across adjustable dumbbells, resistance bands, weight benches, massage guns, and running shoes — then rank what actually works for home gyms, apartments, beginners, and busy moms.
+            We run physical lab durability tests and analyze <strong className="text-offwhite font-semibold">47,000+ verified customer reviews</strong> across adjustable dumbbells, resistance bands, weight benches, massage guns, and running shoes — then rank what actually works for home gyms, apartments, beginners, and busy moms.
           </p>
 
           {/* Primary CTAs */}
@@ -248,6 +249,11 @@ export default async function HomePage() {
       <section className="mx-auto max-w-6xl px-4 sm:px-8 py-16" aria-label="Home gym setup quiz">
         <GymQuiz />
       </section>
+
+      {/* ── ROGUE FITNESS BRAND PARTNER SHOWCASE ── */}
+      <div className="mx-auto max-w-6xl px-4 sm:px-8 pb-16">
+        <RogueAffiliateBanner />
+      </div>
 
       {/* ── TOP PICKS ── */}
       <section

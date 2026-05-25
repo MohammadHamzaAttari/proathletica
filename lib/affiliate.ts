@@ -1,4 +1,4 @@
-import { AMAZON_DOMAIN_BY_COUNTRY, AMAZON_TAGS } from '@/lib/config';
+import { AMAZON_DOMAIN_BY_COUNTRY, AMAZON_TAGS, FORCE_AMAZON_ONLY } from '@/lib/config';
 
 // Strict allowlist — only actual Amazon hostnames and amzn.to shortlinks
 const ALLOWED_AMAZON_HOSTS = /(?:^|\.)amazon\.[a-z.]{2,6}$/i;
@@ -48,3 +48,78 @@ export function regionalizeAmazonUrl(originalUrl: string, country?: string | nul
     return originalUrl;
   }
 }
+
+// ─── Direct Partner Commission Registry (Hybrid Model) ──────────
+export interface PartnerInfo {
+  isPartner: boolean;
+  commissionRate: string;
+  transparencyNote: string;
+  name: string;
+}
+
+const DIRECT_PARTNERS: Record<string, PartnerInfo> = {
+  'rogue fitness': {
+    isPartner: true,
+    name: 'Rogue Fitness',
+    commissionRate: '5%',
+    transparencyNote: 'Official Rogue Fitness Direct Partner (5% Est. Commission)'
+  },
+  'wahoo fitness': {
+    isPartner: true,
+    name: 'Wahoo Fitness',
+    commissionRate: '8%',
+    transparencyNote: 'Official Wahoo Fitness Direct Partner (8% Est. Commission)'
+  },
+  'life fitness': {
+    isPartner: true,
+    name: 'Life Fitness',
+    commissionRate: '8%',
+    transparencyNote: 'Official Life Fitness Direct Partner (8% Est. Commission)'
+  },
+  'gnc': {
+    isPartner: true,
+    name: 'GNC',
+    commissionRate: '15%',
+    transparencyNote: 'Official GNC Supplements Partner (15% Est. Commission)'
+  },
+  'clickbank': {
+    isPartner: true,
+    name: 'ClickBank',
+    commissionRate: '30-75%',
+    transparencyNote: 'Direct Educational App Partner (30-75% Est. Commission)'
+  },
+  'clickbank academy': {
+    isPartner: true,
+    name: 'ClickBank',
+    commissionRate: '30-75%',
+    transparencyNote: 'Direct Educational App Partner (30-75% Est. Commission)'
+  }
+};
+
+/**
+ * Returns partner info if a brand matches one of our premium direct programs.
+ */
+export function getBrandPartnerInfo(brand: string | null | undefined): PartnerInfo {
+  if (FORCE_AMAZON_ONLY) {
+    return { isPartner: false, commissionRate: '3%', transparencyNote: 'Amazon Associate Affiliate (3% Commission)', name: 'Amazon' };
+  }
+  if (!brand) {
+    return { isPartner: false, commissionRate: '3%', transparencyNote: 'Amazon Associate Affiliate (3% Commission)', name: 'Amazon' };
+  }
+  const cleanBrand = brand.toLowerCase().trim();
+  
+  // Exact or prefix match
+  for (const [key, value] of Object.entries(DIRECT_PARTNERS)) {
+    if (cleanBrand.includes(key) || key.includes(cleanBrand)) {
+      return value;
+    }
+  }
+  
+  return {
+    isPartner: false,
+    commissionRate: '3%',
+    transparencyNote: 'Amazon Associate Affiliate (3% Commission)',
+    name: 'Amazon'
+  };
+}
+

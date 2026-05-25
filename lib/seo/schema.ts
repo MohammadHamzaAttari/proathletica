@@ -80,6 +80,12 @@ export function productSchema(product: Product) {
       '@type': 'Brand',
       name: product.brand || product.title.split(' ')[0] || SITE_NAME,
     },
+    isRelatedTo: {
+      '@type': 'Thing',
+      name: (product.category || '').toLowerCase().includes('dumb') 
+        ? 'Home Gym Weight Training Blueprint' 
+        : 'Athletic Muscle Recovery & Ergonomic Fitness',
+    },
     ...(priceStr
       ? {
           offers: {
@@ -87,7 +93,7 @@ export function productSchema(product: Product) {
             url: product.affiliate_url,
             priceCurrency: product.currency || 'USD',
             price: priceStr,
-            priceValidUntil: new Date(Date.now() + 86400000).toISOString().split('T')[0], // +1 day
+            priceValidUntil: `${new Date().getFullYear()}-12-31`, // Dec 31 of current year for stability
             availability: 'https://schema.org/InStock',
             itemCondition: 'https://schema.org/NewCondition',
             seller: {
@@ -116,8 +122,25 @@ export function productSchema(product: Product) {
             author: {
               '@type': 'Organization',
               name: SITE_NAME,
+              url: SITE_URL,
             },
             reviewBody: product.editorial_summary || `Editorial evaluation of the ${product.title} based on technical specs and user data.`,
+            ...(product.pros && product.pros.length > 0
+              ? {
+                  pros: product.pros.slice(0, 3).map((item) => ({
+                    '@type': 'ListItem',
+                    name: item,
+                  })),
+                }
+              : {}),
+            ...(product.cons && product.cons.length > 0
+              ? {
+                  cons: product.cons.slice(0, 3).map((item) => ({
+                    '@type': 'ListItem',
+                    name: item,
+                  })),
+                }
+              : {}),
           },
         }
       : {}),

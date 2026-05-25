@@ -50,5 +50,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     };
   });
 
-  return [...staticPages, ...articlePages, ...categoryPages, ...productPages];
+  // NEW: Lifestyle environmental target silos
+  const lifestylePages: MetadataRoute.Sitemap = ['gamers', 'moms', 'pets', 'apartment', 'budget'].map((slug) => ({
+    url: `${SITE_URL}/lifestyle/${slug}`,
+    lastModified: now,
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...articlePages, ...categoryPages, ...productPages, ...lifestylePages];
 }

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Metadata } from 'next';
 import { Calendar, Clock, User, FlaskConical, Star } from 'lucide-react';
 import { ComparisonTable } from '@/components/ComparisonTable';
@@ -9,6 +10,10 @@ import { FAQ } from '@/components/FAQ';
 import { Newsletter } from '@/components/Newsletter';
 import { ProductGrid } from '@/components/ProductGrid';
 import { ShareButtons } from '@/components/ShareButtons';
+import { VerdictBox } from '@/components/VerdictBox';
+import { QuickVerdictPath } from '@/components/QuickVerdictPath';
+import { FloatingMobileCTA } from '@/components/FloatingMobileCTA';
+import { PinterestFlywheel } from '@/components/PinterestFlywheel';
 import { SITE_URL } from '@/lib/config';
 import { generateArticleSummary } from '@/lib/ai/article-summary';
 import { getArticleBySlug, getPublishedArticles } from '@/lib/db';
@@ -44,6 +49,28 @@ export async function generateMetadata({
     modifiedTime: article.updated_at,
   });
 }
+
+const getLifestyleLinks = (slug: string) => {
+  const s = slug.toLowerCase();
+  if (s.includes('dumb') || s.includes('bell')) {
+    return [
+      { name: "🏠 Small Space Specs", href: "/lifestyle/apartment", color: "hover:border-sky-500/40 text-sky-400" },
+      { name: "👶 Silent Nap Setup", href: "/lifestyle/moms", color: "hover:border-emerald-500/40 text-emerald-400" },
+      { name: "🐶 Pet-Safe Gym", href: "/lifestyle/pets", color: "hover:border-amber-500/40 text-amber-400" }
+    ];
+  }
+  if (s.includes('band') || s.includes('resistance')) {
+    return [
+      { name: "🎮 Gamer Ergonomics", href: "/lifestyle/gamers", color: "hover:border-purple-500/40 text-purple-400" },
+      { name: "🏠 Small Space Specs", href: "/lifestyle/apartment", color: "hover:border-sky-500/40 text-sky-400" },
+      { name: "💰 Max Value Builds", href: "/lifestyle/budget", color: "hover:border-emerald-500/40 text-emerald-400" }
+    ];
+  }
+  return [
+    { name: "🏠 Small Space Specs", href: "/lifestyle/apartment", color: "hover:border-sky-500/40 text-sky-400" },
+    { name: "💰 Max Value Builds", href: "/lifestyle/budget", color: "hover:border-emerald-500/40 text-emerald-400" }
+  ];
+};
 
 export default async function ArticlePage({ params }: { params: { slug: string } }) {
   const [article, allArticles] = await Promise.all([
@@ -87,6 +114,11 @@ export default async function ArticlePage({ params }: { params: { slug: string }
       {/* FIX (Audit #03-A): FTC disclosure above every product page */}
       <DisclosureBar />
 
+      {/* Floating mobile action bar */}
+      {article.products && article.products.length > 0 ? (
+        <FloatingMobileCTA product={article.products[0]} articleSlug={article.slug} />
+      ) : null}
+
       <article className="mx-auto max-w-4xl px-4 py-12 sm:px-8">
         {/* Breadcrumb */}
         <nav
@@ -129,6 +161,11 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               Reviewed by {article.author}
             </Link>
             <span className="hidden sm:inline text-white/20">|</span>
+            <span className="flex items-center gap-2 text-[#C6FF3D]">
+              <FlaskConical className="h-4 w-4 text-[#C6FF3D]" />
+              Lab-Tested & Verified
+            </span>
+            <span className="hidden sm:inline text-white/20">|</span>
             <span className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
               Updated{' '}
@@ -145,7 +182,6 @@ export default async function ArticlePage({ params }: { params: { slug: string }
             </span>
             <span className="hidden sm:inline text-white/20">|</span>
             <Link href="/methodology" className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
-              <FlaskConical className="h-4 w-4" />
               How we score
             </Link>
           </div>
@@ -153,49 +189,27 @@ export default async function ArticlePage({ params }: { params: { slug: string }
         </header>
 
         {article.hero_image ? (
-          <img
-            src={article.hero_image}
-            alt={article.title}
-            className="mb-10 max-h-[500px] w-full rounded-2xl object-cover"
-          />
+          <div className="relative mb-10 h-[280px] sm:h-[450px] w-full overflow-hidden rounded-2xl border border-white/[0.06] bg-black/40">
+            <Image
+              src={article.hero_image}
+              alt={article.title}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 800px, 1200px"
+              className="object-cover"
+            />
+          </div>
         ) : null}
 
         {article.products && article.products.length > 0 ? (
-          <div className="mb-10 rounded-3xl border border-emerald-500/30 bg-[#0A0D12] p-8 flex flex-col sm:flex-row gap-8 items-center shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
-            <div className="flex-1 space-y-4">
-              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
-                <Star className="w-3.5 h-3.5 fill-emerald-500" /> Our Top Pick
-              </div>
-              <h2 className="text-3xl font-black text-white leading-tight">
-                {article.products[0].short_title || article.products[0].title}
-              </h2>
-              <p className="text-neutral-300 font-medium text-lg leading-relaxed">
-                {article.products[0].custom_blurb || article.products[0].editorial_summary || 'The best overall choice for most people based on our lab testing and owner reviews.'}
-              </p>
-              <div className="text-xs text-neutral-500 uppercase tracking-widest font-bold">
-                Price last checked: {formatTimestamp(article.products[0].last_scraped_at)}
-              </div>
-            </div>
-            <div className="w-full sm:w-auto flex flex-col gap-4">
-               <a
-                href={`/api/track?productId=${article.products[0].asin}&articleSlug=${article.slug}&rank=1`}
-                target="_blank"
-                rel="sponsored nofollow noopener noreferrer"
-                className="rounded-2xl bg-[#C6FF3D] px-8 py-5 text-center font-black uppercase tracking-widest text-black text-sm hover:bg-[#b3f024] transition whitespace-nowrap"
-              >
-                Check Price
-              </a>
-              {article.products.length > 1 && (
-                <div className="text-[11px] font-bold text-center text-neutral-400 tracking-wider">
-                  Secondary option: <span className="text-white">{article.products[1].short_title || article.products[1].title.split(' ').slice(0, 3).join(' ')}</span>
-                </div>
-              )}
-            </div>
-          </div>
+          <VerdictBox
+            product={article.products[0]}
+            articleSlug={article.slug}
+            badgeText="BEST OVERALL"
+          />
         ) : quickTake ? (
-          <div className="mb-10 rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-6">
-            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
+          <div className="mb-10 rounded-3xl border border-[#C6FF3D]/20 bg-[#C6FF3D]/5 p-6">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C6FF3D]">
               Quick take
             </div>
             <p className="mt-3 text-lg leading-8 text-neutral-200">{quickTake}</p>
@@ -211,6 +225,9 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
         {article.products.length > 0 ? (
           <section className="space-y-12 border-t border-white/5 pt-16">
+            {/* Quick-Verdict Decision Path Resolver */}
+            <QuickVerdictPath products={article.products} />
+
             <div className="space-y-3 text-center">
               <h2 className="text-3xl font-black uppercase italic tracking-tighter sm:text-4xl">
                 Our top picks
@@ -221,6 +238,33 @@ export default async function ArticlePage({ params }: { params: { slug: string }
             <ProductGrid products={article.products} articleSlug={article.slug} />
           </section>
         ) : null}
+
+        {/* Semantic Silo Connector (Pillar 2/3 Link Network) */}
+        <div className="rounded-2xl border border-white/[0.06] bg-graphite-950 p-6 flex flex-col md:flex-row items-center justify-between gap-5 mt-12 shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-1.5 h-full bg-[#3D8BFF]" />
+          <div className="space-y-1 text-left relative z-10">
+            <span className="text-[9px] font-black uppercase tracking-widest text-[#3D8BFF] bg-[#3D8BFF]/10 px-2.5 py-1 rounded-md border border-[#3D8BFF]/25 inline-flex items-center gap-1">
+              🎮 ENVIRONMENT MATCH MATRIX
+            </span>
+            <h4 className="text-sm font-black uppercase tracking-tight text-white leading-tight mt-1.5">
+              How does this gear integrate with your lifestyle?
+            </h4>
+            <p className="text-xs text-neutral-400">
+              Read our environment checklists covering silent workout limits, small footprint space hacks, and streamer active desks.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2.5 flex-shrink-0 relative z-10 w-full md:w-auto">
+            {getLifestyleLinks(article.slug).map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`flex-1 md:flex-initial text-center text-[10px] font-black uppercase tracking-widest px-4 py-3 border border-white/[0.08] ${link.color} rounded-xl bg-black/40 text-neutral-300 hover:text-white transition active:scale-95`}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
+        </div>
 
         <section className="mt-16 border-t border-white/5 pt-12">
           <div className="rounded-card border border-white/[0.06] bg-graphite-800 p-8 space-y-6">
@@ -243,6 +287,9 @@ export default async function ArticlePage({ params }: { params: { slug: string }
             </div>
           </div>
         </section>
+
+        {/* Pinterest Infographic Cheat-Sheet */}
+        <PinterestFlywheel categoryName={article.category || undefined} />
 
         <section className="mt-16 border-t border-white/5 pt-12">
           <FAQ />

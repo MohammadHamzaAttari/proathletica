@@ -34,3 +34,8 @@ export const AMAZON_DOMAIN_BY_COUNTRY: Record<string, string> = {
 
 export const CACHE_TTL_PRODUCTS = 300;
 export const CACHE_TTL_PAGES = 3600;
+
+// Global Switch: If true, redirects all direct partner links to Amazon counterparts
+// and updates the UI to show Amazon Associates info for fast immediate earnings.
+export const FORCE_AMAZON_ONLY = true;
+

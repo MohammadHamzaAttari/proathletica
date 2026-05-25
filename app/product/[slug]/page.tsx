@@ -5,9 +5,10 @@ import { productSchema, jsonLdProps, breadcrumbSchema } from '@/lib/seo/schema';
 import { DisclosureBar } from '@/components/DisclosureBar';
 import { formatPrice, formatTimestamp } from '@/lib/format';
 import { SITE_NAME } from '@/lib/config';
+import { getBrandPartnerInfo } from '@/lib/affiliate';
 import Image from 'next/image';
 import Link from 'next/link';
-import { User, Calendar, FlaskConical } from 'lucide-react';
+import { User, Calendar, FlaskConical, ArrowRight, Trophy, Sparkles, CheckCircle2 } from 'lucide-react';
 
 export const revalidate = 3600;
 
@@ -40,6 +41,35 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
   const shortTitle = product.short_title || product.title.split(' ').slice(0, 6).join(' ');
   const verdict = product.editorial_summary || 'Strong performance with measurable tradeoffs versus competitors.';
+
+  // Premium Alternative Matcher (Hybrid Affiliate Model)
+  const getPremiumAltId = (p: typeof product) => {
+    const cat = (p.category || '').toLowerCase();
+    const title = (p.title || '').toLowerCase();
+    const cleanId = String(p.id || '').toLowerCase();
+
+    // Prevent matching premium alternatives to themselves
+    if (cleanId.includes('rogue') || cleanId.includes('wahoo') || cleanId.includes('gnc')) {
+      return null;
+    }
+
+    if (cat.includes('bench') || title.includes('bench')) {
+      return 'rogue-adjustable-bench-3';
+    }
+    if (cat.includes('band') || cat.includes('resistance') || title.includes('band')) {
+      return 'rogue-monster-bands';
+    }
+    if (cat.includes('treadmill') || title.includes('treadmill') || cat.includes('run') || title.includes('run')) {
+      return 'wahoo-kickr-run-treadmill';
+    }
+    if (cat.includes('nutrition') || cat.includes('supplement') || cat.includes('recovery') || title.includes('protein') || title.includes('supplement')) {
+      return 'gnc-energy-recovery-stack';
+    }
+    return null;
+  };
+
+  const premiumAltId = getPremiumAltId(product);
+  const premiumAlt = premiumAltId ? await getProductById(premiumAltId) : null;
 
   return (
     <>
@@ -125,6 +155,11 @@ export default async function ProductPage({ params }: { params: { slug: string }
                   Reviewed by Athletica Lab
                 </span>
                 <span className="hidden sm:inline text-white/20">|</span>
+                <span className="flex items-center gap-2 text-[#C6FF3D]">
+                  <FlaskConical className="h-4 w-4 text-[#C6FF3D]" />
+                  Lab-Tested & Verified
+                </span>
+                <span className="hidden sm:inline text-white/20">|</span>
                 <span className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
                   Updated{' '}
@@ -136,7 +171,6 @@ export default async function ProductPage({ params }: { params: { slug: string }
                 </span>
                 <span className="hidden sm:inline text-white/20">|</span>
                 <Link href="/methodology" className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
-                  <FlaskConical className="h-4 w-4" />
                   How we score
                 </Link>
               </div>
@@ -158,9 +192,89 @@ export default async function ProductPage({ params }: { params: { slug: string }
               </div>
 
               {/* Editor's Verdict */}
-              <div className="rounded-3xl border border-[#C6FF3D]/20 bg-[#161B22] p-8 text-lg leading-relaxed">
+              <div className="rounded-3xl border border-[#C6FF3D]/20 bg-[#161B22] p-8 text-lg leading-relaxed shadow-sm">
+                <span className="text-[9px] font-black uppercase tracking-widest text-[#C6FF3D] block mb-2">VERDICT FROM THE LAB</span>
                 {verdict}
               </div>
+
+              {/* 👑 Professional-Grade Premium Upgrade Card */}
+              {premiumAlt && (
+                <section className="relative overflow-hidden rounded-3xl border border-amber-500/30 bg-[#1e1912]/20 p-6 sm:p-8 shadow-[0_0_50px_rgba(245,158,11,0.08)]">
+                  {/* Subtle decorative glow */}
+                  <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/[0.04] rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+                  
+                  <div className="relative z-10 flex flex-col md:flex-row gap-6 items-start">
+                    <div className="flex-1 space-y-4">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-amber-500 border border-amber-500/20">
+                          <Trophy className="w-3 h-3" /> PREMIUM UPGRADE PICK
+                        </span>
+                        <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">
+                          {getBrandPartnerInfo(premiumAlt.brand).transparencyNote}
+                        </span>
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <h3 className="text-xl font-black uppercase tracking-tight text-white flex items-center gap-1.5">
+                          {premiumAlt.brand} <span className="text-amber-500">—</span> {premiumAlt.short_title || premiumAlt.title}
+                        </h3>
+                        <p className="text-sm text-neutral-400 leading-relaxed">
+                          {premiumAlt.editorial_summary}
+                        </p>
+                      </div>
+
+                      {/* Micro Spec-to-Spec Comparison */}
+                      <div className="grid grid-cols-2 gap-3 py-3 border-y border-white/5 text-xs">
+                        <div>
+                          <span className="text-[9px] font-black uppercase tracking-widest text-neutral-500 block mb-1">Standard Option</span>
+                          <span className="text-neutral-300 font-semibold">{shortTitle}</span>
+                          <span className="text-neutral-500 block text-[10px] mt-0.5">Budget-focused import model</span>
+                        </div>
+                        <div>
+                          <span className="text-[9px] font-black uppercase tracking-widest text-amber-500 block mb-1">Premium Upgrade</span>
+                          <span className="text-amber-500 font-black">{premiumAlt.short_title || premiumAlt.title}</span>
+                          <span className="text-neutral-400 block text-[10px] mt-0.5">Commercial-grade, custom components</span>
+                        </div>
+                      </div>
+
+                      {/* Why Upgrade? Bullet Points */}
+                      <div className="space-y-2">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-neutral-500 block">Why it&apos;s worth the investment:</span>
+                        <ul className="grid sm:grid-cols-2 gap-2 text-xs text-neutral-300">
+                          {(premiumAlt.pros || []).slice(0, 4).map((pro, idx) => (
+                            <li key={idx} className="flex items-start gap-1.5">
+                              <CheckCircle2 className="w-4.5 h-4.5 text-amber-500 flex-shrink-0 mt-0.5" />
+                              <span>{pro}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* Pricing & Call to Action */}
+                    <div className="w-full md:w-auto md:border-l border-white/5 md:pl-6 flex flex-col justify-center items-center gap-3 self-stretch min-w-[200px]">
+                      <div className="text-center">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-neutral-500 block">Est. Price</span>
+                        <span className="text-3xl font-black text-white">{formatPrice(premiumAlt.price_cents)}</span>
+                        <span className="text-[10px] text-amber-500 font-bold uppercase tracking-widest block mt-0.5">DIRECT DEAL ENABLED</span>
+                      </div>
+
+                      <a
+                        href={`/api/track?productId=${encodeURIComponent(premiumAlt.id)}&articleSlug=product-review-${encodeURIComponent(product.id)}&rank=1`}
+                        target="_blank"
+                        rel="sponsored nofollow noopener noreferrer"
+                        className="group relative flex w-full items-center justify-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 px-6 py-3.5 text-center text-xs font-black uppercase tracking-widest text-black transition duration-300 shadow-lg"
+                      >
+                        ACQUIRE PREMIUM <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                      </a>
+
+                      <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-widest text-center">
+                        Secure checkout via partner site
+                      </span>
+                    </div>
+                  </div>
+                </section>
+              )}
 
               {/* Pros / Cons (visually distinct) */}
               <div className="grid md:grid-cols-2 gap-6">
