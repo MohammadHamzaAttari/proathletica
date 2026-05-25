@@ -34,12 +34,22 @@ export async function GET(request: NextRequest) {
   if (productId) {
     const product = await getProductById(productId);
     if (product) {
+      // Verify product URL is safe (Amazon-only)
+      if (!isSafeAmazonUrl(product.affiliate_url)) {
+        console.error(`[SECURITY] Product ${productId} has invalid affiliate URL: ${product.affiliate_url}`);
+        return NextResponse.json({ error: 'Invalid affiliate URL for product.' }, { status: 400 });
+      }
       destination = regionalizeAmazonUrl(product.affiliate_url, country);
     }
   }
 
-  // FIX (Audit #05-12): only allow safe Amazon URLs via the ?url= param
-  if (!destination && rawUrl && isSafeAmazonUrl(rawUrl)) {
+  // FIX (Audit #05-12): ONLY allow safe Amazon URLs via the ?url= param
+  // Non-Amazon platforms are completely rejected
+  if (!destination && rawUrl) {
+    if (!isSafeAmazonUrl(rawUrl)) {
+      console.error(`[SECURITY] Non-Amazon URL rejected in track: ${rawUrl}`);
+      return NextResponse.json({ error: 'Non-Amazon URLs are not supported.' }, { status: 400 });
+    }
     destination = regionalizeAmazonUrl(rawUrl, country);
   }
 
