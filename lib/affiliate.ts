@@ -52,7 +52,16 @@ export function regionalizeAmazonUrl(originalUrl: string, country?: string | nul
   const asin = extractAsin(originalUrl);
   const cc = (country || 'US').toUpperCase();
   const domain = AMAZON_DOMAIN_BY_COUNTRY[cc] || 'amazon.com';
-  const tag = (AMAZON_TAGS as Record<string, string>)[cc] || AMAZON_TAGS.US;
+  
+  // Try to extract and preserve the existing tag from the database
+  let existingTag = null;
+  try {
+    const parsed = new URL(originalUrl);
+    existingTag = parsed.searchParams.get('tag');
+  } catch {}
+
+  // Use the database tag if it exists. Otherwise, fall back to the env/config tag.
+  const tag = existingTag || (AMAZON_TAGS as Record<string, string>)[cc] || AMAZON_TAGS.US;
 
   if (asin) {
     return `https://www.${domain}/dp/${asin}?tag=${encodeURIComponent(tag)}&linkCode=ll1&language=en_US`;
