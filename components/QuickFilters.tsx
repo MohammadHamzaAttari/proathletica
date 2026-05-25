@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const FILTERS = [
   { id: 'all', label: 'All Picks', icon: '📊' },
@@ -12,14 +12,20 @@ const FILTERS = [
 ];
 
 interface QuickFiltersProps {
+  value?: string;
   onFilterChange?: (filter: string) => void;
 }
 
-export function QuickFilters({ onFilterChange }: QuickFiltersProps) {
-  const [activeFilter, setActiveFilter] = useState('all');
+export function QuickFilters({ value, onFilterChange }: QuickFiltersProps) {
+  const [activeFilter, setActiveFilter] = useState(value ?? 'all');
+
+  useEffect(() => {
+    if (value === undefined) return;
+    setActiveFilter(value);
+  }, [value]);
 
   const handleFilter = (id: string) => {
-    setActiveFilter(id);
+    if (value === undefined) setActiveFilter(id);
     onFilterChange?.(id);
   };
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { Product } from '@/lib/types';
 import { ProductCard } from '@/components/ProductCard';
 import { StickyCompareBar } from './StickyCompareBar';
@@ -101,33 +101,38 @@ export function ProductGrid({
   articleSlug,
   isLoading = false,
   emptyFilterLabel,
+  selectedIds,
+  onSelectedIdsChange,
+  showCompareBar = true,
 }: {
   products: EnhancedProduct[];
   articleSlug: string;
   isLoading?: boolean;
   emptyFilterLabel?: string;
+  selectedIds?: string[];
+  onSelectedIdsChange?: (value: string[] | ((prev: string[]) => string[])) => void;
+  showCompareBar?: boolean;
 }) {
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const selectedProducts = products.filter(p => selectedIds.has(p.id));
+  const [internalSelectedIds, setInternalSelectedIds] = useState<string[]>([]);
+  const effectiveSelectedIds = selectedIds ?? internalSelectedIds;
+  const setSelectedIds = onSelectedIdsChange ?? setInternalSelectedIds;
+
+  const selectedIdSet = useMemo(() => new Set(effectiveSelectedIds), [effectiveSelectedIds]);
+  const selectedProducts = products.filter(p => selectedIdSet.has(p.id));
 
   const toggleCompare = (productId: string, selected: boolean) => {
     setSelectedIds(prev => {
-      const next = new Set(prev);
+      const prevIds = Array.isArray(prev) ? prev : [];
       if (selected) {
-        next.add(productId);
-        // Cap at 4 — remove oldest if exceeded
-        if (next.size > 4) {
-          const first = Array.from(next)[0];
-          next.delete(first);
-        }
-      } else {
-        next.delete(productId);
+        const without = prevIds.filter((id) => id !== productId);
+        const next = [...without, productId];
+        return next.length > 4 ? next.slice(next.length - 4) : next;
       }
-      return next;
+      return prevIds.filter((id) => id !== productId);
     });
   };
 
-  const clearCompare = () => setSelectedIds(new Set());
+  const clearCompare = () => setSelectedIds([]);
 
   /* ── Stagger animation delay: 60ms per card, max 360ms ── */
   const staggerDelay = (index: number) => Math.min(index * 60, 360);
@@ -159,7 +164,7 @@ export function ProductGrid({
                 rank={index}
                 articleSlug={articleSlug}
                 onCompareToggle={toggleCompare}
-                isSelected={selectedIds.has(product.id)}
+                isSelected={selectedIdSet.has(product.id)}
                 animationDelay={staggerDelay(index)}
               />
             </div>
@@ -168,11 +173,13 @@ export function ProductGrid({
       </div>
 
       {/* Compare bar — portal-level sticky overlay */}
-      <StickyCompareBar
-        selectedProducts={selectedProducts}
-        onRemove={(id) => toggleCompare(id, false)}
-        onClear={clearCompare}
-      />
+      {showCompareBar && (
+        <StickyCompareBar
+          selectedProducts={selectedProducts}
+          onRemove={(id) => toggleCompare(id, false)}
+          onClear={clearCompare}
+        />
+      )}
     </>
   );
 }

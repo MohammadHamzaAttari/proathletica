@@ -1,9 +1,10 @@
 'use client';
 
-import { useMemo, useTransition } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ComparisonTable } from '@/components/ComparisonTable';
 import { ProductGrid } from '@/components/ProductGrid';
+import { StickyCompareBar } from '@/components/StickyCompareBar';
 import type { Product } from '@/lib/types';
 import { SlidersHorizontal, X } from 'lucide-react';
 
@@ -88,6 +89,11 @@ export function HomepageFilters({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const pageSize = 12;
+  const rawPage = Number.parseInt(searchParams.get('page') || '1', 10);
+  const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
 
   const activeFilter = (searchParams.get('focus') as FilterKey) || initialFilter || 'all';
   const activeFilterMeta = FILTERS.find(f => f.key === activeFilter);
@@ -99,6 +105,17 @@ export function HomepageFilters({
     } else {
       params.set('focus', nextFilter);
     }
+    params.delete('page');
+    const query = params.toString();
+    startTransition(() => {
+      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    });
+  };
+
+  const setPage = (nextPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (nextPage <= 1) params.delete('page');
+    else params.set('page', String(nextPage));
     const query = params.toString();
     startTransition(() => {
       router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
@@ -109,6 +126,18 @@ export function HomepageFilters({
     const filter = FILTERS.find(f => f.key === activeFilter);
     return products.filter(p => (filter ? filter.match(p) : true));
   }, [activeFilter, products]);
+
+  const total = filteredProducts.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, total);
+  const pageItems = filteredProducts.slice(startIndex, endIndex);
+
+  const selectedProducts = useMemo(
+    () => filteredProducts.filter((p) => selectedIds.includes(p.id)),
+    [filteredProducts, selectedIds]
+  );
 
   return (
     <div className="space-y-8">
@@ -174,10 +203,10 @@ export function HomepageFilters({
               Showing
             </span>
             <span className="text-sm font-black text-data-lime tabular-nums">
-              {isPending ? '...' : filteredProducts.length}
+              {isPending ? '...' : total ? `${startIndex + 1}–${endIndex}` : '0'}
             </span>
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">
-              of {products.length} picks
+              of {filteredProducts.length} picks
             </span>
           </div>
           <div className="h-px flex-1 bg-white/[0.06]" />
@@ -196,11 +225,44 @@ export function HomepageFilters({
 
         {/* Product Cards */}
         <ProductGrid
-          products={filteredProducts}
+          products={pageItems}
           articleSlug={articleSlug}
           isLoading={isPending}
+          selectedIds={selectedIds}
+          onSelectedIdsChange={setSelectedIds}
+          showCompareBar={false}
         />
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-3">
+            <button
+              onClick={() => setPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage <= 1 || isPending}
+              className="cta-secondary w-auto px-5 text-xs disabled:opacity-50"
+            >
+              Prev
+            </button>
+            <div className="text-xs font-black uppercase tracking-[0.2em] text-neutral-500">
+              Page <span className="text-offwhite tabular-nums">{currentPage}</span> /{' '}
+              <span className="text-neutral-400 tabular-nums">{totalPages}</span>
+            </div>
+            <button
+              onClick={() => setPage(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage >= totalPages || isPending}
+              className="cta-secondary w-auto px-5 text-xs disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
+
+      <StickyCompareBar
+        selectedProducts={selectedProducts}
+        onRemove={(id) => setSelectedIds((prev) => prev.filter((x) => x !== id))}
+        onClear={() => setSelectedIds([])}
+      />
     </div>
   );
 }
