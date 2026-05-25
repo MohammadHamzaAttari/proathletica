@@ -101,17 +101,32 @@ export function ProductGrid({
   articleSlug,
   isLoading = false,
   emptyFilterLabel,
+  rankOffset = 0,
+  selectedIds: controlledSelectedIds,
+  onSelectedIdsChange,
+  showCompareBar = true,
 }: {
   products: EnhancedProduct[];
   articleSlug: string;
   isLoading?: boolean;
   emptyFilterLabel?: string;
+  rankOffset?: number;
+  selectedIds?: Set<string>;
+  onSelectedIdsChange?: (next: Set<string>) => void;
+  showCompareBar?: boolean;
 }) {
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [internalSelectedIds, setInternalSelectedIds] = useState<Set<string>>(new Set());
+  const selectedIds = controlledSelectedIds ?? internalSelectedIds;
   const selectedProducts = products.filter(p => selectedIds.has(p.id));
 
+  const updateSelectedIds = (nextOrUpdater: Set<string> | ((prev: Set<string>) => Set<string>)) => {
+    const next = typeof nextOrUpdater === 'function' ? nextOrUpdater(selectedIds) : nextOrUpdater;
+    if (onSelectedIdsChange) onSelectedIdsChange(next);
+    else setInternalSelectedIds(next);
+  };
+
   const toggleCompare = (productId: string, selected: boolean) => {
-    setSelectedIds(prev => {
+    updateSelectedIds((prev) => {
       const next = new Set(prev);
       if (selected) {
         next.add(productId);
@@ -127,7 +142,7 @@ export function ProductGrid({
     });
   };
 
-  const clearCompare = () => setSelectedIds(new Set());
+  const clearCompare = () => updateSelectedIds(new Set());
 
   /* ── Stagger animation delay: 60ms per card, max 360ms ── */
   const staggerDelay = (index: number) => Math.min(index * 60, 360);
@@ -156,7 +171,7 @@ export function ProductGrid({
             <div key={product.id} role="listitem" className="h-full">
               <ProductCard
                 product={product}
-                rank={index}
+                rank={rankOffset + index}
                 articleSlug={articleSlug}
                 onCompareToggle={toggleCompare}
                 isSelected={selectedIds.has(product.id)}
@@ -168,11 +183,13 @@ export function ProductGrid({
       </div>
 
       {/* Compare bar — portal-level sticky overlay */}
-      <StickyCompareBar
-        selectedProducts={selectedProducts}
-        onRemove={(id) => toggleCompare(id, false)}
-        onClear={clearCompare}
-      />
+      {showCompareBar && (
+        <StickyCompareBar
+          selectedProducts={selectedProducts}
+          onRemove={(id) => toggleCompare(id, false)}
+          onClear={clearCompare}
+        />
+      )}
     </>
   );
 }
