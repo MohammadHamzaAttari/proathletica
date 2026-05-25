@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, useTransition, useCallback } from 'react';
+import { useMemo, useState, useTransition, useCallback } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { ComparisonTable } from '@/components/ComparisonTable';
@@ -17,6 +17,37 @@ type FilterKey =
   | 'heavy-lifters'
   | 'smart-equipment'
   | 'compact-gear';
+
+/**
+ * Helper: build a searchable text blob from product fields.
+ * Memoized callers should use this consistently.
+ */
+function productBlob(p: Product): string {
+  return [
+    p.short_title,
+    p.title,
+    p.raw_description,
+    p.editorial_summary,
+    p.description,
+    p.brand,
+    p.category,
+    ...(p.best_for_tags || []),
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+}
+
+/**
+ * Helper: test if blob contains ANY of the given phrases as whole-word or
+ * word-start matches. Uses word boundaries so "app" doesn't match "apple".
+ */
+function hasWord(blob: string, words: string[]): boolean {
+  return words.some((w) => {
+    const escaped = w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(`\\b${escaped}`, 'i').test(blob);
+  });
+}
 
 const FILTERS: Array<{
   key: FilterKey;
@@ -35,48 +66,119 @@ const FILTERS: Array<{
   {
     key: 'small-apartments',
     label: 'Apartments',
-    hint: 'Sub-30 sq ft',
+    hint: 'Compact & portable',
     icon: '🏠',
-    match: (p) =>
-      /compact|foldable|small footprint|space-saving/i.test(
-        [p.short_title, p.title, p.raw_description, p.editorial_summary, ...(p.best_for_tags || [])]
-          .filter(Boolean).join(' ')
-      ),
+    match: (p) => {
+      const blob = productBlob(p);
+      // Broad but precise: compact/folding/portable/small/home-friendly
+      return hasWord(blob, [
+        'compact',
+        'foldable',
+        'folding',
+        'fold',
+        'portable',
+        'lightweight',
+        'small footprint',
+        'space-saving',
+        'space saving',
+        'under desk',
+        'travel',
+        'stowable',
+        'easy storage',
+        'quiet',
+        'silent',
+      ]);
+    },
   },
   {
     key: 'budget',
     label: 'Budget',
-    hint: 'Under $200',
+    hint: 'Under $100',
     icon: '💰',
-    match: (p) =>
-      /budget|value|affordable|entry|starter/i.test(
-        [p.short_title, p.title, p.editorial_summary, ...(p.best_for_tags || [])]
-          .filter(Boolean).join(' ')
-      ) || (p.price_cents || 0) <= 20000,
+    match: (p) => {
+      // PRIMARY: price-based — under $100 is a true budget filter
+      if (p.price_cents && p.price_cents > 0 && p.price_cents <= 10000) return true;
+      // SECONDARY: explicit budget/value keywords in title or tags only (not summaries)
+      const titleBlob = [
+        p.short_title,
+        p.title,
+        ...(p.best_for_tags || []),
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+      return hasWord(titleBlob, ['budget', 'affordable', 'entry level', 'starter']);
+    },
   },
   {
     key: 'heavy-lifters',
     label: 'Heavy Load',
-    hint: 'Garage proof',
+    hint: 'Garage & pro',
     icon: '🏋️',
-    match: (p) =>
-      /heavy|garage|high load|durable|steel|pro/i.test(
-        [p.short_title, p.title, p.raw_description, p.editorial_summary, ...(p.best_for_tags || [])]
-          .filter(Boolean).join(' ')
-      ),
+    match: (p) => {
+      const blob = productBlob(p);
+      // Precise: avoid matching "pro" in brand names or "durable" in generic copy
+      return (
+        hasWord(blob, [
+          'heavy duty',
+          'heavy-duty',
+          'heavyweight',
+          'power rack',
+          'powerlifting',
+          'olympic bar',
+          'garage gym',
+          'squat rack',
+          'commercial grade',
+          'commercial-grade',
+          'power cage',
+        ]) ||
+        // Category-based match for heavy lifting categories
+        /(powerlifting|weightlifting|crossfit|strength)/i.test(p.category || '') ||
+        // High weight capacity is a strong signal
+        /\b\d{3,}\s*lb/i.test(blob)
+      );
+    },
   },
   {
     key: 'smart-equipment',
     label: 'Smart Gear',
-    hint: 'Connected app',
+    hint: 'App & Bluetooth',
     icon: '📱',
-    match: (p) =>
-      /smart|app|bluetooth|connected/i.test(
-        [p.short_title, p.title, p.raw_description, p.editorial_summary, ...(p.best_for_tags || [])]
-          .filter(Boolean).join(' ')
-      ),
+    match: (p) => {
+      const blob = productBlob(p);
+      // Precise: require actual smart/connected features
+      return hasWord(blob, [
+        'smart',
+        'bluetooth',
+        'wifi-enabled',
+        'app-connected',
+        'app controlled',
+        'app-controlled',
+        'voice control',
+        'heart rate monitor',
+        'fitness tracker',
+        'garmin',
+        'wahoo',
+        'connected fitness',
+        'digital display',
+        'led display',
+        'lcd display',
+        'peloton',
+      ]);
+    },
   },
 ];
+
+/**
+ * Clean a raw tag slug for display in the UI.
+ * Converts "boxing-&-mma" → "Boxing & MMA", "home-gym" → "Home Gym"
+ */
+function cleanTagName(tag: string): string {
+  return tag
+    .replace(/-&-/g, ' & ')
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
 export function HomepageFilters({
   products,
@@ -109,14 +211,9 @@ export function HomepageFilters({
   const activeFilterMeta = FILTERS.find(f => f.key === activeFilter);
 
   /**
-   * FIX: Build the URL from current live searchParams snapshot.
-   * We read searchParams inside the callback so we always operate
-   * on the latest URL state, even during rapid successive clicks.
+   * Build URL from live browser search params to avoid stale reads.
    */
   const updateParams = useCallback((updates: Record<string, string | null>, resetPage = true) => {
-    // Read a FRESH snapshot of current URL search params.
-    // `searchParams` from the hook can be stale within the same
-    // render batch when multiple updates fire quickly.
     const current = new URLSearchParams(
       typeof window !== 'undefined' ? window.location.search : searchParams.toString()
     );
@@ -129,11 +226,8 @@ export function HomepageFilters({
       }
     });
 
-    // Normalize tag/tags param names
     if (updates.tags !== undefined) current.delete('tag');
 
-    // FIX: Always remove the page param when any non-page filter changes
-    // so the user lands on page 1 with fresh results.
     if (resetPage) {
       current.delete('page');
     }
@@ -195,19 +289,7 @@ export function HomepageFilters({
       if (brandFilter !== 'all' && product.brand !== brandFilter) return false;
       if (hasTags && !tagFilters.some((tag) => (product.best_for_tags || []).includes(tag))) return false;
       if (query) {
-        const blob = [
-          product.title,
-          product.short_title,
-          product.editorial_summary,
-          product.raw_description,
-          product.description,
-          product.brand,
-          product.category,
-          ...(product.best_for_tags || []),
-        ]
-          .filter(Boolean)
-          .join(' ')
-          .toLowerCase();
+        const blob = productBlob(product).toLowerCase();
         if (!blob.includes(query)) return false;
       }
       const priceCents = product.price_cents ?? null;
@@ -263,14 +345,7 @@ export function HomepageFilters({
   const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
 
   /**
-   * FIX: Derive current page entirely from URL params.
-   * Clamp to valid range so stale/out-of-range values are handled gracefully.
-   * Removed the `pageOverride` state that caused a race condition:
-   *   - When filters changed, updateParams deleted `page` from the URL
-   *     but pageOverride kept its old value (e.g. 3).
-   *   - resolvedPage = pageOverride ?? pageParam resolved to the stale 3
-   *     instead of falling back to 1.
-   * Now there is a single source of truth: the URL.
+   * Single source of truth: URL page param, clamped to valid range.
    */
   const currentPage = Math.min(Math.max(1, pageParam), totalPages);
 
@@ -293,7 +368,7 @@ export function HomepageFilters({
     activeFilterMeta?.label,
     categoryFilter !== 'all' ? categoryFilter : null,
     brandFilter !== 'all' ? brandFilter : null,
-    tagFilters.length > 0 ? tagFilters.join(', ') : null,
+    tagFilters.length > 0 ? tagFilters.map(cleanTagName).join(', ') : null,
     searchQuery ? `"${searchQuery}"` : null,
   ]
     .filter(Boolean)
@@ -508,13 +583,14 @@ export function HomepageFilters({
             <div className="flex flex-wrap gap-2">
               {tagOptions.map((tag) => {
                 const isActive = tagFilters.includes(tag);
+                const display = cleanTagName(tag);
                 return (
                   <button
                     key={tag}
                     onClick={() => toggleTag(tag)}
                     className={`rounded-pill border px-4 py-1.5 text-[11px] font-black uppercase tracking-widest transition-colors ${isActive ? 'border-data-lime bg-data-lime/15 text-data-lime' : 'border-white/[0.08] text-neutral-400 hover:border-white/20 hover:text-offwhite'}`}
                   >
-                    {tag}
+                    {display}
                   </button>
                 );
               })}

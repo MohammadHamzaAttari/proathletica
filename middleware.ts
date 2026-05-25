@@ -8,6 +8,11 @@ function slugify(value: string) {
  * FIX (Audit #02-A #5): legacy ?slug= / ?category= / ?page= query-param routes
  * redirect to canonical SSR paths with 308 Permanent redirects, preventing
  * duplicate-content indexing.
+ *
+ * FIX: Only redirect ?category= when it's the SOLE meaningful param.
+ * If other filter params exist (focus, brand, sort, tags, q, etc.),
+ * the user is actively using the homepage filter panel — do NOT redirect
+ * away from the homepage or all their filters will be lost.
  */
 export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
@@ -42,11 +47,26 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 308);
   }
 
-  // Redirect ?category=X → /category/slug
+  // FIX: Only redirect ?category=X → /category/X when category is the ONLY
+  // meaningful param. If the user has active homepage filters (focus, brand,
+  // sort, tags, q, minPrice, maxPrice, minRating, pageSize, page), they are
+  // using the filter panel and must stay on the homepage.
   if (url.pathname === '/' && category) {
-    url.pathname = `/category/${slugify(category)}`;
-    url.search = '';
-    return NextResponse.redirect(url, 308);
+    const otherFilterParams = [
+      'focus', 'brand', 'sort', 'tags', 'tag', 'q',
+      'minPrice', 'maxPrice', 'minRating', 'pageSize', 'page',
+    ];
+    const hasOtherFilters = otherFilterParams.some(
+      (param) => url.searchParams.has(param)
+    );
+
+    if (!hasOtherFilters) {
+      // Solo category param → redirect to dedicated category page
+      url.pathname = `/category/${slugify(category)}`;
+      url.search = '';
+      return NextResponse.redirect(url, 308);
+    }
+    // Otherwise: stay on homepage with category as an in-page filter
   }
 
   if (url.pathname === '/categories' && category) {
