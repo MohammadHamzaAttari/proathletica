@@ -6,8 +6,7 @@ import { DisclosureBar } from '@/components/DisclosureBar';
 import { BuyerGuide } from '@/components/BuyerGuide';
 import { FAQ } from '@/components/FAQ';
 import { Newsletter } from '@/components/Newsletter';
-import { ProductGrid } from '@/components/ProductGrid';
-import { QuickFilters } from '@/components/QuickFilters';
+import { CategoryProductList } from '@/components/CategoryProductList';
 import { slugToTitle } from '@/lib/format';
 import { getCategoryList, getProductsByCategory } from '@/lib/db';
 import { buildMetadata } from '@/lib/seo/metadata';
@@ -77,14 +76,11 @@ export default async function CategoryPage({ params }: { params: { slug: string 
           </Link>
         </header>
 
-        {/* Quick filters (Problem 5 fix) */}
-        <QuickFilters />
-
         {/* Comparison + Grid */}
         <ComparisonTable products={products} articleSlug={`category-${params.slug}`} title={`${name} comparison`} />
         
         <div className="mt-16">
-          <ProductGrid products={products} articleSlug={`category-${params.slug}`} />
+          <CategoryProductList products={products} articleSlug={`category-${params.slug}`} />
         </div>
 
         {/* Buying guide + trust content */}
