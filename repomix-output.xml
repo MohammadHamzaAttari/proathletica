@@ -141,6 +141,7 @@ public/
 supabase/
   migrations/
     0001_init.sql
+    0002_add_apartment_dumbbells_article.sql
 .env.example
 .gitignore
 CHANGES.md
@@ -1881,46 +1882,6 @@ const nextConfig = {
 export default nextConfig;
 </file>
 
-<file path="package.json">
-{
-  "name": "proathletica-next",
-  "version": "3.1.0",
-  "private": true,
-  "description": "ProAthletica — Next.js 14 + Supabase affiliate content platform.",
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@supabase/ssr": "^0.5.2",
-    "@supabase/supabase-js": "^2.45.4",
-    "lucide-react": "^0.452.0",
-    "next": "14.2.15",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "resend": "^4.0.0"
-  },
-  "devDependencies": {
-    "@types/node": "^20.16.11",
-    "@types/react": "^18.3.11",
-    "@types/react-dom": "^18.3.0",
-    "@tailwindcss/typography": "^0.5.15",
-    "autoprefixer": "^10.4.20",
-    "eslint": "^8.57.1",
-    "eslint-config-next": "14.2.15",
-    "postcss": "^8.4.47",
-    "tailwindcss": "^3.4.13",
-    "typescript": "^5.6.3"
-  },
-  "engines": {
-    "node": ">=18.18.0"
-  }
-}
-</file>
-
 <file path="postcss.config.mjs">
 export default {
   plugins: {
@@ -2654,45 +2615,6 @@ export async function generateArticleSummary(input: ArticleSummaryInput): Promis
 export { OPENROUTER_FREE_MODEL };
 </file>
 
-<file path="lib/config.ts">
-export const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || 'ProAthletica';
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://athletica.page').replace(/\/$/, '');
-export const SITE_DESCRIPTION =
-  process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
-  'Independent reviews of the best fitness equipment, powerlifting gear, running shoes, and supplements — hand-picked by competing athletes.';
-
-export const CONTACT_EMAIL = process.env.NEWSLETTER_FROM_EMAIL || 'hello@athletica.page';
-export const NEWSLETTER_FROM_NAME = process.env.NEWSLETTER_FROM_NAME || SITE_NAME;
-export const PINTEREST_DOMAIN_VERIFY = (process.env.PINTEREST_DOMAIN_VERIFY?.startsWith('YOUR_REAL_') ? '' : process.env.PINTEREST_DOMAIN_VERIFY) || '';
-
-export const DEFAULT_AUTHOR = 'Athletica Lab';
-
-export const AMAZON_TAGS = {
-  US: process.env.AMAZON_AFFILIATE_TAG_US || 'proathletica-20',
-  UK: process.env.AMAZON_AFFILIATE_TAG_UK || 'proathletica-21',
-  CA: process.env.AMAZON_AFFILIATE_TAG_CA || 'proathletica-20',
-  DE: process.env.AMAZON_AFFILIATE_TAG_DE || 'proathletica-21',
-  AU: process.env.AMAZON_AFFILIATE_TAG_AU || 'proathletica-21',
-} as const;
-
-export const AMAZON_DOMAIN_BY_COUNTRY: Record<string, string> = {
-  US: 'amazon.com',
-  UK: 'amazon.co.uk',
-  GB: 'amazon.co.uk',
-  CA: 'amazon.ca',
-  DE: 'amazon.de',
-  AU: 'amazon.com.au',
-  FR: 'amazon.fr',
-  IT: 'amazon.it',
-  ES: 'amazon.es',
-  IN: 'amazon.in',
-  JP: 'amazon.co.jp',
-};
-
-export const CACHE_TTL_PRODUCTS = 300;
-export const CACHE_TTL_PAGES = 3600;
-</file>
-
 <file path="public/llms.txt">
 # ProAthletica (athletica.page)
 
@@ -2720,6 +2642,76 @@ We use a proprietary 100-point scoring system based on:
 ## Contact
 Email: hello@athletica.page
 Pinterest: https://pinterest.com/proathletica
+</file>
+
+<file path="supabase/migrations/0002_add_apartment_dumbbells_article.sql">
+-- ============================================================
+-- Migration: Add Best Adjustable Dumbbells for Small Apartments
+-- ============================================================
+
+-- 1. Insert new products
+insert into products (
+  id, asin, slug, category, brand, title, short_title, description, keyword,
+  price_cents, currency, image_url, affiliate_url,
+  rating, review_count, badge, rank, pros, cons
+) values
+  (
+    'B08B8TLLQ4', 'B08B8TLLQ4', 'powerblock-elite-exp',
+    'Home Gym', 'PowerBlock',
+    'PowerBlock Elite EXP Adjustable Dumbbells',
+    'PowerBlock Elite EXP',
+    'The classic block design makes these the most compact adjustable dumbbells on the market. They sit flush against walls and never roll away, making them perfect for tiny apartments.',
+    'compact adjustable dumbbells',
+    35000, 'USD',
+    'https://m.media-amazon.com/images/I/71wE7cKjQhL._AC_SL1500_.jpg',
+    'https://www.amazon.com/dp/B08B8TLLQ4?tag=proathletica-20',
+    4.7, 5200, 'Best for Small Spaces', 1,
+    '["Extremely compact block design", "Expandable up to 90 lbs", "Made in the USA"]'::jsonb,
+    '["Cage design can feel restrictive", "Changing weights requires pulling a pin"]'::jsonb
+  ),
+  (
+    'B09LMCX555', 'B09LMCX555', 'nordictrack-iselect',
+    'Home Gym', 'NordicTrack',
+    'NordicTrack iSelect Voice-Controlled Adjustable Dumbbells',
+    'NordicTrack iSelect',
+    'These high-tech dumbbells use a motorized dial and Alexa voice control to change weights instantly. The square plates mean they take up very little horizontal floor space.',
+    'smart adjustable dumbbells',
+    42900, 'USD',
+    'https://m.media-amazon.com/images/I/71ZpTfK07eL._AC_SL1500_.jpg',
+    'https://www.amazon.com/dp/B09LMCX555?tag=proathletica-20',
+    4.4, 1800, 'Premium Pick', 3,
+    '["Motorized weight changing", "Alexa voice integration", "Square plates save space"]'::jsonb,
+    '["Requires a power outlet", "Lower max weight (50 lbs) than competitors"]'::jsonb
+  )
+on conflict (id) do nothing;
+
+-- 2. Insert the article
+insert into articles (
+  id, slug, title, excerpt, content_html, category, cluster,
+  author, read_minutes, published_at, hero_image
+) values (
+  gen_random_uuid(),
+  'best-adjustable-dumbbells-small-apartments',
+  'Best Adjustable Dumbbells for Small Apartments 2026',
+  'Living in a tiny apartment shouldn’t stop you from lifting heavy. We tested the most compact, space-saving adjustable dumbbells that replace an entire rack of weights.',
+  '<h2>Why size matters in a small apartment</h2><p>When you live in 500 square feet, every inch counts. You do not have the luxury of a full power rack or a 10-foot row of hex dumbbells. You need a system that condenses 30 pairs of dumbbells into less than 3 square feet of space.</p><h2>What to look for</h2><ul><li><strong>Footprint:</strong> Look for square or block-shaped plates. Round plates tend to take up more horizontal space and can roll away.</li><li><strong>Max Weight:</strong> Make sure the dumbbells can grow with you. A 50lb max is fine for beginners, but advanced lifters need 90lbs+.</li><li><strong>Noise:</strong> Metal-on-metal clanking will make your downstairs neighbors hate you. Look for urethane-coated plates or tight-locking mechanisms.</li></ul><p>Here are our data-verified recommendations for the best adjustable dumbbells if you are tight on space.</p>',
+  'Home Gym', 'home-gym', 'Athletica Lab', 6, now(),
+  'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=1200'
+) on conflict (slug) do nothing;
+
+-- 3. Link products to the article
+insert into article_products (article_id, product_id, position, custom_blurb)
+select a.id, p.id, x.position, x.custom_blurb
+from articles a
+join (values
+  ('B08B8TLLQ4', 1, 'The absolute king of space-saving. The flat edges mean you can store them flush against a wall or under a bed.'),
+  ('B001ARYU58', 2, 'The industry standard. Slightly longer footprint than the PowerBlocks, but offers a more traditional dumbbell feel.'),
+  ('B09LMCX555', 3, 'Perfect for apartments since the square plates keep the footprint minimal, and the digital dial makes changing weights completely silent.')
+) as x(product_id, position, custom_blurb) on true
+join products p on p.id = x.product_id
+where a.slug = 'best-adjustable-dumbbells-small-apartments'
+on conflict (article_id, product_id) do update 
+  set position = excluded.position, custom_blurb = excluded.custom_blurb;
 </file>
 
 <file path=".env.example">
@@ -2765,75 +2757,45 @@ REVALIDATE_SECRET=CHANGE_ME_TO_A_LONG_RANDOM_STRING
 OPENROUTER_API_KEY=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
 </file>
 
-<file path="middleware.ts">
-import { NextRequest, NextResponse } from 'next/server';
-
-function slugify(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+<file path="package.json">
+{
+  "name": "proathletica-next",
+  "version": "3.1.0",
+  "private": true,
+  "description": "ProAthletica — Next.js 14 + Supabase affiliate content platform.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@next/third-parties": "^16.2.6",
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.45.4",
+    "lucide-react": "^0.452.0",
+    "next": "14.2.15",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "resend": "^4.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.15",
+    "@types/node": "^20.16.11",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "14.2.15",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  }
 }
-
-/**
- * FIX (Audit #02-A #5): legacy ?slug= / ?category= / ?page= query-param routes
- * redirect to canonical SSR paths with 308 Permanent redirects, preventing
- * duplicate-content indexing.
- */
-export function middleware(request: NextRequest) {
-  const url = request.nextUrl.clone();
-  const slug = url.searchParams.get('slug');
-  const page = url.searchParams.get('page');
-  const category = url.searchParams.get('category');
-  const highlightId = url.searchParams.get('highlightId');
-
-  // Redirect ?slug=X → /best/X
-  if (url.pathname === '/' && slug) {
-    url.pathname = `/best/${slug}`;
-    url.search = '';
-    if (highlightId) url.searchParams.set('highlightId', highlightId);
-    return NextResponse.redirect(url, 308);
-  }
-
-  // Redirect ?page=about|contact|... → /about|/contact|...
-  if (
-    url.pathname === '/' &&
-    page &&
-    ['about', 'contact', 'privacy', 'terms', 'disclosure'].includes(page)
-  ) {
-    url.pathname = `/${page}`;
-    url.search = '';
-    return NextResponse.redirect(url, 308);
-  }
-
-  // Redirect ?category=X → /category/slug
-  if (url.pathname === '/' && category) {
-    url.pathname = `/category/${slugify(category)}`;
-    url.search = '';
-    return NextResponse.redirect(url, 308);
-  }
-
-  if (url.pathname === '/categories' && category) {
-    url.pathname = `/category/${slugify(category)}`;
-    url.search = '';
-    return NextResponse.redirect(url, 308);
-  }
-
-  // Strip ?refresh= params (prevent indexing of cache-busting URLs)
-  if (url.searchParams.has('refresh')) {
-    url.searchParams.delete('refresh');
-    return NextResponse.redirect(url, 308);
-  }
-
-  // Redirect /best/*-2026 → /best/* (Audit #02-F)
-  if (url.pathname.startsWith('/best/') && url.pathname.endsWith('-2026')) {
-    url.pathname = url.pathname.replace(/-2026$/, '');
-    return NextResponse.redirect(url, 308);
-  }
-
-  return NextResponse.next();
-}
-
-export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.svg|manifest.json).*)'],
-};
 </file>
 
 <file path="README.md">
@@ -3330,65 +3292,6 @@ export default function DisclosurePage() {
       </div>
     </article>
   );
-}
-</file>
-
-<file path="app/sitemap.ts">
-import type { MetadataRoute } from 'next';
-import { SITE_URL } from '@/lib/config';
-import { getAllProducts, getCategoryList, getPublishedArticles } from '@/lib/db';
-
-export const revalidate = 3600;
-
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [articles, categories, products] = await Promise.all([
-    getPublishedArticles().catch(() => []),
-    getCategoryList().catch(() => []),
-    getAllProducts().catch(() => []),
-  ]);
-
-  const now = new Date();
-
-  const staticPages: MetadataRoute.Sitemap = [
-    { url: `${SITE_URL}/`, lastModified: now, changeFrequency: 'daily' as const, priority: 1 },
-    { url: `${SITE_URL}/about`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.6 },
-    { url: `${SITE_URL}/categories`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.7 },
-    { url: `${SITE_URL}/contact`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.5 },
-    { url: `${SITE_URL}/privacy`, lastModified: now, changeFrequency: 'yearly' as const, priority: 0.3 },
-    { url: `${SITE_URL}/terms`, lastModified: now, changeFrequency: 'yearly' as const, priority: 0.3 },
-    { url: `${SITE_URL}/disclosure`, lastModified: now, changeFrequency: 'yearly' as const, priority: 0.4 },
-    { url: `${SITE_URL}/data-deletion-request`, lastModified: now, changeFrequency: 'yearly' as const, priority: 0.3 },
-    { url: `${SITE_URL}/methodology`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.6 },
-  ];
-
-  const articlePages: MetadataRoute.Sitemap = articles.map((article) => ({
-    url: `${SITE_URL}/best/${article.slug.replace(/-2026$/, '')}`,
-    lastModified: new Date(article.updated_at),
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
-  }));
-
-  const categoryPages: MetadataRoute.Sitemap = categories.map((category) => ({
-    url: `${SITE_URL}/category/${category.slug}`,
-    lastModified: now,
-    changeFrequency: 'weekly' as const,
-    priority: 0.75,
-  }));
-
-  // NEW: Individual product pages (addresses Audit Part 2 orphan pages / long-tail SEO)
-  const productPages: MetadataRoute.Sitemap = products.map((product) => {
-    const rawSlug = product.slug || product.asin?.toLowerCase() || product.id;
-    // Cap at 60 and clean bleed (Audit #02-H)
-    const slug = rawSlug.length <= 60 ? rawSlug : rawSlug.slice(0, 60).replace(/-[^-]*$/, '');
-    return {
-      url: `${SITE_URL}/product/${slug}`,
-      lastModified: new Date(product.updated_at || product.last_scraped_at || now),
-      changeFrequency: 'weekly' as const,
-      priority: 0.65,
-    };
-  });
-
-  return [...staticPages, ...articlePages, ...categoryPages, ...productPages];
 }
 </file>
 
@@ -4748,6 +4651,45 @@ export function jsonLdProps(data: object | object[]) {
 }
 </file>
 
+<file path="lib/config.ts">
+export const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || 'ProAthletica';
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.athletica.page').replace(/\/$/, '');
+export const SITE_DESCRIPTION =
+  process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
+  'Independent reviews of the best fitness equipment, powerlifting gear, running shoes, and supplements — hand-picked by competing athletes.';
+
+export const CONTACT_EMAIL = process.env.NEWSLETTER_FROM_EMAIL || 'hello@athletica.page';
+export const NEWSLETTER_FROM_NAME = process.env.NEWSLETTER_FROM_NAME || SITE_NAME;
+export const PINTEREST_DOMAIN_VERIFY = (process.env.PINTEREST_DOMAIN_VERIFY?.startsWith('YOUR_REAL_') ? '' : process.env.PINTEREST_DOMAIN_VERIFY) || '';
+
+export const DEFAULT_AUTHOR = 'Athletica Lab';
+
+export const AMAZON_TAGS = {
+  US: process.env.AMAZON_AFFILIATE_TAG_US || 'proathletica-20',
+  UK: process.env.AMAZON_AFFILIATE_TAG_UK || 'proathletica-21',
+  CA: process.env.AMAZON_AFFILIATE_TAG_CA || 'proathletica-20',
+  DE: process.env.AMAZON_AFFILIATE_TAG_DE || 'proathletica-21',
+  AU: process.env.AMAZON_AFFILIATE_TAG_AU || 'proathletica-21',
+} as const;
+
+export const AMAZON_DOMAIN_BY_COUNTRY: Record<string, string> = {
+  US: 'amazon.com',
+  UK: 'amazon.co.uk',
+  GB: 'amazon.co.uk',
+  CA: 'amazon.ca',
+  DE: 'amazon.de',
+  AU: 'amazon.com.au',
+  FR: 'amazon.fr',
+  IT: 'amazon.it',
+  ES: 'amazon.es',
+  IN: 'amazon.in',
+  JP: 'amazon.co.jp',
+};
+
+export const CACHE_TTL_PRODUCTS = 300;
+export const CACHE_TTL_PAGES = 3600;
+</file>
+
 <file path="lib/format.ts">
 export function formatPrice(cents: number | null | undefined, currency = 'USD'): string {
   if (cents == null || cents <= 0) return 'Check Price';
@@ -5613,6 +5555,84 @@ export function hydrateProduct<T extends ProductSource>(product: T, rank = 0): T
 }
 </file>
 
+<file path="middleware.ts">
+import { NextRequest, NextResponse } from 'next/server';
+
+function slugify(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+/**
+ * FIX (Audit #02-A #5): legacy ?slug= / ?category= / ?page= query-param routes
+ * redirect to canonical SSR paths with 308 Permanent redirects, preventing
+ * duplicate-content indexing.
+ */
+export function middleware(request: NextRequest) {
+  const url = request.nextUrl.clone();
+
+  // Enforce WWW Host (Audit #2 Fix)
+  if (url.hostname === 'athletica.page') {
+    url.hostname = 'www.athletica.page';
+    return NextResponse.redirect(url, 308);
+  }
+
+  const slug = url.searchParams.get('slug');
+  const page = url.searchParams.get('page');
+  const category = url.searchParams.get('category');
+  const highlightId = url.searchParams.get('highlightId');
+
+  // Redirect ?slug=X → /best/X
+  if (url.pathname === '/' && slug) {
+    url.pathname = `/best/${slug}`;
+    url.search = '';
+    if (highlightId) url.searchParams.set('highlightId', highlightId);
+    return NextResponse.redirect(url, 308);
+  }
+
+  // Redirect ?page=about|contact|... → /about|/contact|...
+  if (
+    url.pathname === '/' &&
+    page &&
+    ['about', 'contact', 'privacy', 'terms', 'disclosure'].includes(page)
+  ) {
+    url.pathname = `/${page}`;
+    url.search = '';
+    return NextResponse.redirect(url, 308);
+  }
+
+  // Redirect ?category=X → /category/slug
+  if (url.pathname === '/' && category) {
+    url.pathname = `/category/${slugify(category)}`;
+    url.search = '';
+    return NextResponse.redirect(url, 308);
+  }
+
+  if (url.pathname === '/categories' && category) {
+    url.pathname = `/category/${slugify(category)}`;
+    url.search = '';
+    return NextResponse.redirect(url, 308);
+  }
+
+  // Strip ?refresh= params (prevent indexing of cache-busting URLs)
+  if (url.searchParams.has('refresh')) {
+    url.searchParams.delete('refresh');
+    return NextResponse.redirect(url, 308);
+  }
+
+  // Redirect /best/*-2026 → /best/* (Audit #02-F)
+  if (url.pathname.startsWith('/best/') && url.pathname.endsWith('-2026')) {
+    url.pathname = url.pathname.replace(/-2026$/, '');
+    return NextResponse.redirect(url, 308);
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|favicon.svg|manifest.json).*)'],
+};
+</file>
+
 <file path="tailwind.config.ts">
 import type { Config } from 'tailwindcss';
 import typography from '@tailwindcss/typography';
@@ -6312,6 +6332,63 @@ export default config;
 }
 </file>
 
+<file path="app/sitemap.ts">
+import type { MetadataRoute } from 'next';
+import { SITE_URL } from '@/lib/config';
+import { getAllProducts, getCategoryList, getPublishedArticles } from '@/lib/db';
+
+export const revalidate = 3600;
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const [articles, categories, products] = await Promise.all([
+    getPublishedArticles().catch(() => []),
+    getCategoryList().catch(() => []),
+    getAllProducts().catch(() => []),
+  ]);
+
+  const now = new Date();
+
+  const staticPages: MetadataRoute.Sitemap = [
+    { url: `${SITE_URL}/`, lastModified: now, changeFrequency: 'daily' as const, priority: 1 },
+    { url: `${SITE_URL}/about`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.6 },
+    { url: `${SITE_URL}/categories`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.7 },
+    { url: `${SITE_URL}/contact`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.5 },
+    { url: `${SITE_URL}/privacy`, lastModified: now, changeFrequency: 'yearly' as const, priority: 0.3 },
+    { url: `${SITE_URL}/terms`, lastModified: now, changeFrequency: 'yearly' as const, priority: 0.3 },
+    { url: `${SITE_URL}/disclosure`, lastModified: now, changeFrequency: 'yearly' as const, priority: 0.4 },
+    { url: `${SITE_URL}/data-deletion-request`, lastModified: now, changeFrequency: 'yearly' as const, priority: 0.3 },
+    { url: `${SITE_URL}/methodology`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.6 },
+  ];
+
+  const articlePages: MetadataRoute.Sitemap = articles.map((article) => ({
+    url: `${SITE_URL}/best/${article.slug.replace(/-2026$/, '')}`,
+    lastModified: new Date(article.updated_at),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }));
+
+  const categoryPages: MetadataRoute.Sitemap = categories.map((category) => ({
+    url: `${SITE_URL}/category/${category.slug}`,
+    lastModified: now,
+    changeFrequency: 'weekly' as const,
+    priority: 0.75,
+  }));
+
+  // NEW: Individual product pages (addresses Audit Part 2 orphan pages / long-tail SEO)
+  const productPages: MetadataRoute.Sitemap = products.map((product) => {
+    const slug = product.slug || product.asin?.toLowerCase() || product.id;
+    return {
+      url: `${SITE_URL}/product/${slug}`,
+      lastModified: new Date(product.updated_at || product.last_scraped_at || now),
+      changeFrequency: 'weekly' as const,
+      priority: 0.65,
+    };
+  });
+
+  return [...staticPages, ...articlePages, ...categoryPages, ...productPages];
+}
+</file>
+
 <file path="components/Header.tsx">
 import Link from 'next/link';
 import { Dumbbell, Search } from 'lucide-react';
@@ -6420,396 +6497,6 @@ export function Header() {
         ))}
       </nav>
     </header>
-  );
-}
-</file>
-
-<file path="components/HomepageFilters.tsx">
-'use client';
-
-import { useMemo, useTransition } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { ComparisonTable } from '@/components/ComparisonTable';
-import { ProductGrid } from '@/components/ProductGrid';
-import type { Product } from '@/lib/types';
-import { SlidersHorizontal, X } from 'lucide-react';
-
-type FilterKey =
-  | 'all'
-  | 'small-apartments'
-  | 'budget'
-  | 'heavy-lifters'
-  | 'smart-equipment'
-  | 'compact-gear';
-
-const FILTERS: Array<{
-  key: FilterKey;
-  label: string;
-  hint: string;
-  icon: string;
-  match: (product: Product) => boolean;
-}> = [
-  {
-    key: 'all',
-    label: 'All Picks',
-    hint: 'Full ranked list',
-    icon: '⚡',
-    match: () => true,
-  },
-  {
-    key: 'small-apartments',
-    label: 'Apartments',
-    hint: 'Sub-30 sq ft',
-    icon: '🏠',
-    match: (p) =>
-      /compact|foldable|small footprint|space-saving/i.test(
-        [p.short_title, p.title, p.raw_description, p.editorial_summary, ...(p.best_for_tags || [])]
-          .filter(Boolean).join(' ')
-      ),
-  },
-  {
-    key: 'budget',
-    label: 'Budget',
-    hint: 'Under $200',
-    icon: '💰',
-    match: (p) =>
-      /budget|value|affordable|entry|starter/i.test(
-        [p.short_title, p.title, p.editorial_summary, ...(p.best_for_tags || [])]
-          .filter(Boolean).join(' ')
-      ) || (p.price_cents || 0) <= 20000,
-  },
-  {
-    key: 'heavy-lifters',
-    label: 'Heavy Load',
-    hint: 'Garage proof',
-    icon: '🏋️',
-    match: (p) =>
-      /heavy|garage|high load|durable|steel|pro/i.test(
-        [p.short_title, p.title, p.raw_description, p.editorial_summary, ...(p.best_for_tags || [])]
-          .filter(Boolean).join(' ')
-      ),
-  },
-  {
-    key: 'smart-equipment',
-    label: 'Smart Gear',
-    hint: 'Connected app',
-    icon: '📱',
-    match: (p) =>
-      /smart|app|bluetooth|connected/i.test(
-        [p.short_title, p.title, p.raw_description, p.editorial_summary, ...(p.best_for_tags || [])]
-          .filter(Boolean).join(' ')
-      ),
-  },
-];
-
-export function HomepageFilters({
-  products,
-  articleSlug,
-  initialFilter = 'all',
-}: {
-  products: Product[];
-  articleSlug: string;
-  initialFilter?: FilterKey;
-}) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
-
-  const activeFilter = (searchParams.get('focus') as FilterKey) || initialFilter || 'all';
-  const activeFilterMeta = FILTERS.find(f => f.key === activeFilter);
-
-  const setFilter = (nextFilter: FilterKey) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (nextFilter === 'all') {
-      params.delete('focus');
-    } else {
-      params.set('focus', nextFilter);
-    }
-    const query = params.toString();
-    startTransition(() => {
-      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
-    });
-  };
-
-  const filteredProducts = useMemo(() => {
-    const filter = FILTERS.find(f => f.key === activeFilter);
-    return products.filter(p => (filter ? filter.match(p) : true));
-  }, [activeFilter, products]);
-
-  return (
-    <div className="space-y-8">
-
-      {/* ── FILTER TABS ── */}
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-neutral-500">
-            <SlidersHorizontal className="w-3 h-3" />
-            Filter by training focus
-          </div>
-          {activeFilter !== 'all' && (
-            <button
-              onClick={() => setFilter('all')}
-              className="text-xs font-bold text-trust-blue hover:text-white transition-colors flex items-center gap-1"
-            >
-              <X className="w-3 h-3" /> Reset
-            </button>
-          )}
-        </div>
-        
-        <div
-          role="tablist"
-          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2"
-        >
-          {FILTERS.map((filter) => {
-            const isActive = activeFilter === filter.key;
-            return (
-              <button
-                key={filter.key}
-                role="tab"
-                aria-selected={isActive}
-                onClick={() => setFilter(filter.key)}
-                className={`group flex flex-col items-start p-4 rounded-inner border transition-all duration-200 ${
-                  isActive 
-                    ? 'border-data-lime bg-data-lime/10 shadow-[0_0_20px_rgba(198,255,61,0.08)]' 
-                    : 'border-white/[0.06] bg-graphite-800 hover:border-white/20'
-                }`}
-              >
-                <div className="flex items-center justify-between w-full mb-1">
-                  <span className={`text-xl transition-transform ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} aria-hidden="true">{filter.icon}</span>
-                  {isActive && <div className="w-1.5 h-1.5 rounded-full bg-data-lime animate-pulse" />}
-                </div>
-                <div className={`text-xs font-black uppercase tracking-tight ${isActive ? 'text-data-lime' : 'text-offwhite'}`}>
-                  {filter.label}
-                </div>
-                <div className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mt-0.5 whitespace-nowrap">
-                  {filter.hint}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ── RESULTS ── */}
-      <div className="space-y-8 animate-cardIn">
-        {/* Results Metadata */}
-        <div className="flex items-center gap-4">
-          <div className="h-px flex-1 bg-white/[0.06]" />
-          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/[0.06] bg-white/[0.02]">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">
-              Showing
-            </span>
-            <span className="text-sm font-black text-data-lime tabular-nums">
-              {isPending ? '...' : filteredProducts.length}
-            </span>
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">
-              of {products.length} picks
-            </span>
-          </div>
-          <div className="h-px flex-1 bg-white/[0.06]" />
-        </div>
-
-        {/* At a glance Comparison */}
-        {filteredProducts.length > 1 && (
-          <div className="space-y-4">
-            <ComparisonTable
-              products={filteredProducts}
-              articleSlug={articleSlug}
-              title={`${activeFilterMeta?.key === 'all' ? 'All Ranked' : activeFilterMeta?.label || 'Top'} Gear Compared`}
-            />
-          </div>
-        )}
-
-        {/* Product Cards */}
-        <ProductGrid
-          products={filteredProducts}
-          articleSlug={articleSlug}
-          isLoading={isPending}
-        />
-      </div>
-    </div>
-  );
-}
-</file>
-
-<file path="components/ProductGrid.tsx">
-'use client';
-
-import { useState } from 'react';
-import type { Product } from '@/lib/types';
-import { ProductCard } from '@/components/ProductCard';
-import { StickyCompareBar } from './StickyCompareBar';
-
-type EnhancedProduct = Product & {
-  short_title?: string | null;
-  editorial_summary?: string | null;
-  position?: number;
-  custom_blurb?: string | null;
-};
-
-/* ─────────────────────────────────────────────
-   SKELETON CARD — shown during hydration
-───────────────────────────────────────────── */
-function SkeletonCard() {
-  return (
-    <div
-      className="overflow-hidden rounded-[1.5rem] border border-white/[0.06] bg-[#161B22]"
-      aria-hidden="true"
-      role="presentation"
-    >
-      {/* Image skeleton */}
-      <div className="skeleton" style={{ aspectRatio: '4/3' }} />
-
-      {/* Body skeleton */}
-      <div className="p-5 space-y-4">
-        {/* Trust strip */}
-        <div className="flex gap-2">
-          <div className="skeleton h-5 w-16 rounded" />
-          <div className="skeleton h-5 w-12 rounded" />
-        </div>
-
-        {/* Title */}
-        <div className="space-y-2">
-          <div className="skeleton h-4 w-3/4 rounded" />
-          <div className="skeleton h-4 w-1/2 rounded" />
-        </div>
-
-        {/* Stars */}
-        <div className="skeleton h-4 w-32 rounded" />
-
-        {/* Verdict */}
-        <div className="space-y-1.5">
-          <div className="skeleton h-3 w-full rounded" />
-          <div className="skeleton h-3 w-full rounded" />
-          <div className="skeleton h-3 w-2/3 rounded" />
-        </div>
-
-        {/* Pros/cons box */}
-        <div className="rounded-[0.875rem] border border-white/[0.04] bg-black/20 p-3.5 space-y-2">
-          <div className="skeleton h-3 w-20 rounded" />
-          <div className="skeleton h-3 w-full rounded" />
-          <div className="skeleton h-3 w-5/6 rounded" />
-        </div>
-
-        {/* Price + CTA */}
-        <div className="pt-3 border-t border-white/[0.06] space-y-3">
-          <div className="skeleton h-8 w-32 rounded" />
-          <div className="skeleton h-[3.25rem] w-full rounded-[0.875rem]" />
-          <div className="skeleton h-[2.75rem] w-full rounded-[0.75rem]" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   EMPTY STATE
-───────────────────────────────────────────── */
-function EmptyState({ filterLabel }: { filterLabel?: string }) {
-  return (
-    <div className="col-span-full py-20 flex flex-col items-center gap-4 text-center">
-      <div className="w-16 h-16 rounded-2xl border border-dashed border-white/10 flex items-center justify-center">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-             className="text-neutral-600" aria-hidden="true">
-          <circle cx="11" cy="11" r="8"/>
-          <path d="m21 21-4.35-4.35"/>
-        </svg>
-      </div>
-      <div>
-        <p className="font-bold text-neutral-300">No products found</p>
-        <p className="text-sm text-neutral-500 mt-1">
-          {filterLabel
-            ? `No products match "${filterLabel}" yet. Try a different filter.`
-            : 'Products are loading. Check back soon.'}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   PRODUCT GRID COMPONENT
-───────────────────────────────────────────── */
-export function ProductGrid({
-  products,
-  articleSlug,
-  isLoading = false,
-  emptyFilterLabel,
-}: {
-  products: EnhancedProduct[];
-  articleSlug: string;
-  isLoading?: boolean;
-  emptyFilterLabel?: string;
-}) {
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const selectedProducts = products.filter(p => selectedIds.has(p.id));
-
-  const toggleCompare = (productId: string, selected: boolean) => {
-    setSelectedIds(prev => {
-      const next = new Set(prev);
-      if (selected) {
-        next.add(productId);
-        // Cap at 4 — remove oldest if exceeded
-        if (next.size > 4) {
-          const first = Array.from(next)[0];
-          next.delete(first);
-        }
-      } else {
-        next.delete(productId);
-      }
-      return next;
-    });
-  };
-
-  const clearCompare = () => setSelectedIds(new Set());
-
-  /* ── Stagger animation delay: 60ms per card, max 360ms ── */
-  const staggerDelay = (index: number) => Math.min(index * 60, 360);
-
-  return (
-    <>
-      {/* Grid */}
-      <div
-        className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 items-stretch"
-        role="list"
-        aria-label="Product recommendations"
-        aria-live="polite"
-        aria-busy={isLoading}
-      >
-        {isLoading ? (
-          /* Skeleton placeholders */
-          Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} role="listitem">
-              <SkeletonCard />
-            </div>
-          ))
-        ) : products.length === 0 ? (
-          <EmptyState filterLabel={emptyFilterLabel} />
-        ) : (
-          products.map((product, index) => (
-            <div key={product.id} role="listitem" className="h-full">
-              <ProductCard
-                product={product}
-                rank={index}
-                articleSlug={articleSlug}
-                onCompareToggle={toggleCompare}
-                isSelected={selectedIds.has(product.id)}
-                animationDelay={staggerDelay(index)}
-              />
-            </div>
-          ))
-        )}
-      </div>
-
-      {/* Compare bar — portal-level sticky overlay */}
-      <StickyCompareBar
-        selectedProducts={selectedProducts}
-        onRemove={(id) => toggleCompare(id, false)}
-        onClear={clearCompare}
-      />
-    </>
   );
 }
 </file>
@@ -7003,296 +6690,872 @@ export function bustProductsCache() { revalidateTag('products'); }
 export function bustArticlesCache() { revalidateTag('articles'); }
 </file>
 
-<file path="app/product/[slug]/page.tsx">
-import { notFound } from 'next/navigation';
-import { getProductById, getAllProducts } from '@/lib/db';
-import { buildMetadata } from '@/lib/seo/metadata';
-import { productSchema, jsonLdProps, breadcrumbSchema } from '@/lib/seo/schema';
-import { DisclosureBar } from '@/components/DisclosureBar';
-import { formatPrice, formatTimestamp } from '@/lib/format';
-import { SITE_NAME } from '@/lib/config';
-import Image from 'next/image';
-import Link from 'next/link';
+<file path="components/HomepageFilters.tsx">
+'use client';
 
-export const revalidate = 3600;
+import { useEffect, useMemo, useState, useTransition } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { ComparisonTable } from '@/components/ComparisonTable';
+import { ProductGrid } from '@/components/ProductGrid';
+import { StickyCompareBar } from '@/components/StickyCompareBar';
+import type { Product } from '@/lib/types';
+import { trackEvent } from '@/lib/analytics';
+import { SlidersHorizontal, X } from 'lucide-react';
 
-export async function generateStaticParams() {
-  const products = await getAllProducts();
-  return products.map((p) => ({ slug: p.slug || p.asin || p.id }));
-}
+type FilterKey =
+  | 'all'
+  | 'small-apartments'
+  | 'budget'
+  | 'heavy-lifters'
+  | 'smart-equipment'
+  | 'compact-gear';
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const product = await getProductById(params.slug);
-  if (!product) return buildMetadata({ title: 'Product Not Found', noindex: true });
-  
-  const brand = product.brand || 'This';
-  const category = (product.category || 'Fitness Gear').toLowerCase();
-  
-  return buildMetadata({
-    title: `Is the ${product.short_title || product.title} Worth It? (2026 Review)`,
-    description: `Independent ${category} review: ${product.editorial_summary} Vetted ${brand} specs, price data, and real owner tradeoffs.`,
-    canonical: `/product/${params.slug}`,
-    pinterestImage: `/api/pinterest/${product.asin || product.id}`,
-    image: product.image_url || undefined,
-    priceAmount: product.price_cents ? product.price_cents / 100 : undefined,
-    priceCurrency: product.currency || "USD",
-  });
-}
+const FILTERS: Array<{
+  key: FilterKey;
+  label: string;
+  hint: string;
+  icon: string;
+  match: (product: Product) => boolean;
+}> = [
+  {
+    key: 'all',
+    label: 'All Picks',
+    hint: 'Full ranked list',
+    icon: '⚡',
+    match: () => true,
+  },
+  {
+    key: 'small-apartments',
+    label: 'Apartments',
+    hint: 'Sub-30 sq ft',
+    icon: '🏠',
+    match: (p) =>
+      /compact|foldable|small footprint|space-saving/i.test(
+        [p.short_title, p.title, p.raw_description, p.editorial_summary, ...(p.best_for_tags || [])]
+          .filter(Boolean).join(' ')
+      ),
+  },
+  {
+    key: 'budget',
+    label: 'Budget',
+    hint: 'Under $200',
+    icon: '💰',
+    match: (p) =>
+      /budget|value|affordable|entry|starter/i.test(
+        [p.short_title, p.title, p.editorial_summary, ...(p.best_for_tags || [])]
+          .filter(Boolean).join(' ')
+      ) || (p.price_cents || 0) <= 20000,
+  },
+  {
+    key: 'heavy-lifters',
+    label: 'Heavy Load',
+    hint: 'Garage proof',
+    icon: '🏋️',
+    match: (p) =>
+      /heavy|garage|high load|durable|steel|pro/i.test(
+        [p.short_title, p.title, p.raw_description, p.editorial_summary, ...(p.best_for_tags || [])]
+          .filter(Boolean).join(' ')
+      ),
+  },
+  {
+    key: 'smart-equipment',
+    label: 'Smart Gear',
+    hint: 'Connected app',
+    icon: '📱',
+    match: (p) =>
+      /smart|app|bluetooth|connected/i.test(
+        [p.short_title, p.title, p.raw_description, p.editorial_summary, ...(p.best_for_tags || [])]
+          .filter(Boolean).join(' ')
+      ),
+  },
+];
 
-export default async function ProductPage({ params }: { params: { slug: string } }) {
-  const product = await getProductById(params.slug);
-  if (!product) notFound();
+export function HomepageFilters({
+  products,
+  articleSlug,
+  initialFilter = 'all',
+}: {
+  products: Product[];
+  articleSlug: string;
+  initialFilter?: FilterKey;
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [pageOverride, setPageOverride] = useState<number | null>(null);
 
-  const shortTitle = product.short_title || product.title.split(' ').slice(0, 6).join(' ');
-  const verdict = product.editorial_summary || 'Strong performance with measurable tradeoffs versus competitors.';
+  console.log('[HomepageFilters] Rendered with searchParams:', searchParams.toString(), 'pageOverride:', pageOverride);
+
+  const activeFilter = (searchParams.get('focus') as FilterKey) || initialFilter || 'all';
+  const searchQuery = (searchParams.get('q') || '').trim();
+  const categoryFilter = searchParams.get('category') || 'all';
+  const brandFilter = searchParams.get('brand') || 'all';
+  const tagParam = searchParams.get('tags') || searchParams.get('tag') || '';
+  const tagFilters = tagParam.split(',').map((value) => value.trim()).filter(Boolean);
+  const sortBy = searchParams.get('sort') || 'rank';
+  const pageSize = Math.max(6, Math.min(24, Number.parseInt(searchParams.get('pageSize') || '9', 10) || 9));
+  const pageParam = Number.parseInt(searchParams.get('page') || '1', 10) || 1;
+  const minPrice = Number.parseInt(searchParams.get('minPrice') || '', 10);
+  const maxPrice = Number.parseInt(searchParams.get('maxPrice') || '', 10);
+  const minRating = Number.parseFloat(searchParams.get('minRating') || '');
+  const activeFilterMeta = FILTERS.find(f => f.key === activeFilter);
+
+  const updateParams = (updates: Record<string, string | null>, resetPage = true) => {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === null || value === '' || value === 'all') {
+        params.delete(key);
+      } else {
+        params.set(key, value);
+      }
+    });
+    if (updates.tags !== undefined) params.delete('tag');
+    if (resetPage) params.delete('page');
+    const query = params.toString();
+    const newUrl = query ? `${pathname}?${query}` : pathname;
+    console.log('[DEBUG] updateParams:', { updates, resetPage, newUrl, currentQuery: searchParams.toString() });
+    startTransition(() => {
+      router.replace(newUrl, { scroll: false });
+    });
+  };
+
+  const setFilter = (nextFilter: FilterKey) => {
+    updateParams({ focus: nextFilter === 'all' ? null : nextFilter });
+    trackEvent('homepage_filter', { action: 'focus', value: nextFilter });
+  };
+
+  useEffect(() => {
+    setPageOverride(null);
+  }, [pageParam]);
+
+  const setPage = (nextPage: number) => {
+    const safePage = Math.max(1, nextPage);
+    console.log('[DEBUG] setPage called:', { nextPage, safePage, currentPage });
+    setPageOverride(safePage);
+    updateParams({ page: safePage === 1 ? null : String(safePage) }, false);
+    trackEvent('homepage_filter', { action: 'pagination', value: safePage });
+  };
+
+  const categoryOptions = useMemo(() => {
+    const unique = new Set<string>();
+    products.forEach((product) => {
+      if (product.category) unique.add(product.category);
+    });
+    return Array.from(unique).sort((a, b) => a.localeCompare(b));
+  }, [products]);
+
+  const brandOptions = useMemo(() => {
+    const unique = new Set<string>();
+    products.forEach((product) => {
+      if (product.brand) unique.add(product.brand);
+    });
+    return Array.from(unique).sort((a, b) => a.localeCompare(b));
+  }, [products]);
+
+  const tagOptions = useMemo(() => {
+    const unique = new Set<string>();
+    products.forEach((product) => {
+      (product.best_for_tags || []).forEach((tag) => unique.add(tag));
+    });
+    return Array.from(unique).sort((a, b) => a.localeCompare(b));
+  }, [products]);
+
+  const filteredProducts = useMemo(() => {
+    const filter = FILTERS.find(f => f.key === activeFilter);
+    const query = searchQuery.toLowerCase();
+    const minPriceCents = Number.isFinite(minPrice) ? minPrice * 100 : null;
+    const maxPriceCents = Number.isFinite(maxPrice) ? maxPrice * 100 : null;
+    const ratingFloor = Number.isFinite(minRating) ? minRating : null;
+    const hasTags = tagFilters.length > 0;
+
+    return products.filter((product) => {
+      if (filter && !filter.match(product)) return false;
+      if (categoryFilter !== 'all' && product.category !== categoryFilter) return false;
+      if (brandFilter !== 'all' && product.brand !== brandFilter) return false;
+      if (hasTags && !tagFilters.some((tag) => (product.best_for_tags || []).includes(tag))) return false;
+
+      if (query) {
+        const blob = [
+          product.title,
+          product.short_title,
+          product.editorial_summary,
+          product.raw_description,
+          product.description,
+          product.brand,
+          product.category,
+          ...(product.best_for_tags || []),
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
+        if (!blob.includes(query)) return false;
+      }
+
+      const priceCents = product.price_cents ?? null;
+      if (minPriceCents !== null && (!priceCents || priceCents < minPriceCents)) return false;
+      if (maxPriceCents !== null && (!priceCents || priceCents > maxPriceCents)) return false;
+
+      if (ratingFloor !== null && (!product.rating || product.rating < ratingFloor)) return false;
+
+      return true;
+    });
+  }, [activeFilter, brandFilter, categoryFilter, maxPrice, minPrice, minRating, products, searchQuery, tagFilters]);
+
+  const sortedProducts = useMemo(() => {
+    const sorted = [...filteredProducts];
+    const byRank = (a: Product, b: Product) => (a.rank || 0) - (b.rank || 0);
+    const byPriceAsc = (a: Product, b: Product) => {
+      const aPrice = a.price_cents ?? Number.MAX_SAFE_INTEGER;
+      const bPrice = b.price_cents ?? Number.MAX_SAFE_INTEGER;
+      return aPrice - bPrice;
+    };
+    const byPriceDesc = (a: Product, b: Product) => {
+      const aPrice = a.price_cents ?? 0;
+      const bPrice = b.price_cents ?? 0;
+      return bPrice - aPrice;
+    };
+    const byRating = (a: Product, b: Product) => (b.rating || 0) - (a.rating || 0);
+    const byReviews = (a: Product, b: Product) => (b.review_count || 0) - (a.review_count || 0);
+    const byUpdated = (a: Product, b: Product) =>
+      new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+
+    switch (sortBy) {
+      case 'price-asc':
+        sorted.sort(byPriceAsc);
+        break;
+      case 'price-desc':
+        sorted.sort(byPriceDesc);
+        break;
+      case 'rating-desc':
+        sorted.sort(byRating);
+        break;
+      case 'reviews-desc':
+        sorted.sort(byReviews);
+        break;
+      case 'newest':
+        sorted.sort(byUpdated);
+        break;
+      default:
+        sorted.sort(byRank);
+        break;
+    }
+
+    return sorted;
+  }, [filteredProducts, sortBy]);
+
+  const totalResults = sortedProducts.length;
+  const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
+  const resolvedPage = pageOverride ?? pageParam;
+  const currentPage = Math.min(Math.max(1, resolvedPage), totalPages);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalResults);
+  const pagedProducts = sortedProducts.slice(startIndex, endIndex);
+  const rangeStart = totalResults === 0 ? 0 : startIndex + 1;
+  const rangeEnd = totalResults === 0 ? 0 : endIndex;
+
+  const paginationPages = useMemo(() => {
+    const windowSize = 5;
+    let start = Math.max(1, currentPage - 2);
+    let end = Math.min(totalPages, start + windowSize - 1);
+    start = Math.max(1, end - windowSize + 1);
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  }, [currentPage, totalPages]);
+
+  const activeFilterLabel = [
+    activeFilterMeta?.label,
+    categoryFilter !== 'all' ? categoryFilter : null,
+    brandFilter !== 'all' ? brandFilter : null,
+    tagFilters.length > 0 ? tagFilters.join(', ') : null,
+    searchQuery ? `"${searchQuery}"` : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
+  const selectedProducts = useMemo(
+    () => products.filter((product) => selectedIds.has(product.id)),
+    [products, selectedIds]
+  );
+
+  const updateSelection = (next: Set<string>) => {
+    setSelectedIds(new Set(next));
+  };
+
+  const toggleTag = (tag: string) => {
+    const nextTags = new Set(tagFilters);
+    if (nextTags.has(tag)) nextTags.delete(tag);
+    else nextTags.add(tag);
+    updateParams({ tags: Array.from(nextTags).join(',') });
+    trackEvent('homepage_filter', { action: 'tag', value: tag, selected: nextTags.has(tag) });
+  };
 
   return (
-    <>
-      <script {...jsonLdProps(productSchema(product))} />
-      <DisclosureBar />
+    <div className="space-y-8">
 
-      <div className="bg-[#0E1116]">
-        {/* Sticky mobile CTA (Problem 10 fix) */}
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#0E1116] border-t border-white/10 p-4 md:hidden">
-          <a
-            href={`/api/track?productId=${product.asin}`}
-            target="_blank"
-            rel="sponsored nofollow noopener noreferrer"
-            className="block w-full rounded-2xl bg-[#FF6B1A] py-4 text-center font-black uppercase tracking-widest text-black text-sm active:scale-95 transition"
-          >
-            SEE TODAY&apos;S PRICE ON AMAZON — {formatPrice(product.price_cents)}
-          </a>
-        </div>
-
-        <div className="mx-auto max-w-6xl px-6 py-12">
-          <nav className="mb-8 flex items-center gap-2 text-xs uppercase tracking-widest text-neutral-500">
-            <Link href="/" className="hover:text-offwhite">Home</Link>
-            <span>/</span>
-            <Link href="/categories" className="hover:text-offwhite">Categories</Link>
-            <span>/</span>
-            <span className="text-[#3D8BFF]">{product.category}</span>
-          </nav>
-
-          <div className="flex flex-col lg:flex-row gap-12">
-            {/* Gallery / Image */}
-            <div className="lg:w-5/12">
-              <div className="sticky top-8">
-                <div className="aspect-square bg-white rounded-3xl p-10 mb-8 shadow-inner">
-                  {product.image_url ? (
-                    <Image
-                      src={product.image_url.replace('UL320', 'SL800')}
-                      alt={shortTitle}
-                      width={800}
-                      height={800}
-                      className="object-contain w-full h-full"
-                      unoptimized
-                      priority
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-neutral-300 text-6xl font-black opacity-10">PA</div>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-4 bg-[#161B22] rounded-3xl p-6">
-                  <div className="flex-1">
-                    <div className="text-xs text-neutral-400">CURRENT PRICE</div>
-                    <div className="text-4xl font-black text-[#C6FF3D]">{formatPrice(product.price_cents)}</div>
-                    <div className="text-xs text-neutral-500">as of {formatTimestamp(product.last_scraped_at)}</div>
-                  </div>
-                  <a
-                    href={`/api/track?productId=${product.asin}`}
-                    target="_blank"
-                    rel="sponsored nofollow noopener noreferrer"
-                    className="rounded-2xl bg-[#FF6B1A] px-10 py-4 font-black uppercase tracking-widest text-black text-sm hover:bg-[#ff8a4d]"
-                  >
-                    BUY ON AMAZON
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* Content */}
-            <div className="lg:w-7/12 space-y-10">
-              <div>
-                <div className="inline-flex rounded-full bg-emerald-500/10 px-5 py-1 text-xs font-black tracking-widest text-emerald-400">
-                  {product.category.toUpperCase()}
-                </div>
-                <h1 className="mt-4 text-5xl font-black tracking-tighter text-offwhite leading-none">
-                  {shortTitle}
-                </h1>
-                {product.brand && <p className="text-2xl text-[#3D8BFF] mt-2">{product.brand}</p>}
-              </div>
-
-              {/* Rating block */}
-              <div className="flex items-center gap-10">
-                {product.rating && (
-                  <div>
-                    <div className="text-6xl font-black text-offwhite">{product.rating}</div>
-                    <div className="text-xs uppercase tracking-widest text-neutral-400 -mt-1">AVERAGE RATING</div>
-                  </div>
-                )}
-                {product.review_count && (
-                  <div>
-                    <div className="text-6xl font-black text-offwhite">{Math.round(product.review_count / 1000)}K</div>
-                    <div className="text-xs uppercase tracking-widest text-neutral-400 -mt-1">REVIEWS ANALYZED</div>
-                  </div>
-                )}
-              </div>
-
-              {/* Editor's Verdict */}
-              <div className="rounded-3xl border border-[#C6FF3D]/20 bg-[#161B22] p-8 text-lg leading-relaxed">
-                {verdict}
-              </div>
-
-              {/* Pros / Cons (visually distinct) */}
-              <div className="grid md:grid-cols-2 gap-6">
-                {(product.pros && product.pros.length > 0) ? (
-                  <div className="rounded-3xl bg-[#C6FF3D]/5 border border-[#C6FF3D]/30 p-8">
-                    <div className="uppercase text-xs font-black tracking-[0.125em] text-[#C6FF3D] mb-6">PROS</div>
-                    <ul className="space-y-4">
-                      {product.pros.map((pro, i) => (
-                        <li key={i} className="flex gap-3 text-neutral-200">
-                          <span className="text-[#C6FF3D] mt-0.5">✓</span>
-                          {pro}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : (
-                  <div className="rounded-3xl bg-[#C6FF3D]/5 border border-[#C6FF3D]/30 p-8">
-                    <div className="uppercase text-xs font-black tracking-[0.125em] text-[#C6FF3D] mb-6">PROS</div>
-                    <ul className="space-y-4 text-neutral-200">
-                      <li className="flex gap-3">✓ Strong customer satisfaction signals</li>
-                      <li className="flex gap-3">✓ Competitive price-to-performance</li>
-                    </ul>
-                  </div>
-                )}
-
-                <div className="rounded-3xl bg-neutral-900/80 border border-white/10 p-8">
-                  <div className="uppercase text-xs font-black tracking-[0.125em] text-neutral-400 mb-6">CONSIDERATIONS</div>
-                  <ul className="space-y-4 text-neutral-300">
-                    {(product.cons && product.cons.length > 0) ? (
-                      product.cons.map((con, i) => (
-                        <li key={i} className="flex gap-3">⚠ {con}</li>
-                      ))
-                    ) : (
-                      <>
-                        <li className="flex gap-3">⚠ May be bulky for very small spaces</li>
-                        <li className="flex gap-3">⚠ Check latest price before buying</li>
-                      </>
-                    )}
-                  </ul>
-                </div>
-              </div>
-
-              <div className="text-xs text-neutral-500 border-t border-white/10 pt-8">
-                Last updated {formatTimestamp(product.last_scraped_at)}. 
-                Data pulled from verified customer reviews and technical specifications. 
-                See full <Link href="/methodology" className="text-[#3D8BFF] hover:underline">methodology</Link>.
-              </div>
-            </div>
+      {/* ── FILTER TABS ── */}
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-neutral-500">
+            <SlidersHorizontal className="w-3 h-3" />
+            Filter by training focus
           </div>
+          {activeFilter !== 'all' && (
+            <button
+              onClick={() => setFilter('all')}
+              className="text-xs font-bold text-trust-blue hover:text-white transition-colors flex items-center gap-1"
+            >
+              <X className="w-3 h-3" /> Reset
+            </button>
+          )}
+        </div>
+        
+        <div
+          role="tablist"
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2"
+        >
+          {FILTERS.map((filter) => {
+            const isActive = activeFilter === filter.key;
+            return (
+              <button
+                key={filter.key}
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setFilter(filter.key)}
+                className={`group flex flex-col items-start p-4 rounded-inner border transition-all duration-200 ${
+                  isActive 
+                    ? 'border-data-lime bg-data-lime/10 shadow-[0_0_20px_rgba(198,255,61,0.08)]' 
+                    : 'border-white/[0.06] bg-graphite-800 hover:border-white/20'
+                }`}
+              >
+                <div className="flex items-center justify-between w-full mb-1">
+                  <span className={`text-xl transition-transform ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} aria-hidden="true">{filter.icon}</span>
+                  {isActive && <div className="w-1.5 h-1.5 rounded-full bg-data-lime animate-pulse" />}
+                </div>
+                <div className={`text-xs font-black uppercase tracking-tight ${isActive ? 'text-data-lime' : 'text-offwhite'}`}>
+                  {filter.label}
+                </div>
+                <div className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mt-0.5 whitespace-nowrap">
+                  {filter.hint}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
-    </>
+
+      {/* ── ADVANCED FILTERS ── */}
+      <div className="rounded-card border border-white/[0.06] bg-graphite-800/60 p-5 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-neutral-500">Advanced filters</div>
+          {(searchQuery || categoryFilter !== 'all' || brandFilter !== 'all' || tagFilters.length > 0 || Number.isFinite(minPrice)
+            || Number.isFinite(maxPrice) || Number.isFinite(minRating) || sortBy !== 'rank') && (
+            <button
+              onClick={() => {
+                updateParams({ q: null, category: null, brand: null, tags: null, minPrice: null, maxPrice: null, minRating: null, sort: null });
+                trackEvent('homepage_filter', { action: 'clear_all' });
+              }}
+              className="text-xs font-bold text-trust-blue hover:text-white transition-colors flex items-center gap-1"
+            >
+              <X className="w-3 h-3" /> Clear all
+            </button>
+          )}
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
+            Search
+            <input
+              type="search"
+              placeholder="Search gear, brands, tags"
+              value={searchQuery}
+              onChange={(event) => updateParams({ q: event.target.value })}
+              onBlur={(event) => {
+                if (event.target.value.trim()) {
+                  trackEvent('homepage_filter', { action: 'search', value: event.target.value.trim() });
+                }
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && searchQuery.trim()) {
+                  trackEvent('homepage_filter', { action: 'search', value: searchQuery.trim() });
+                }
+              }}
+              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none"
+            />
+          </label>
+
+          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
+            Category
+            <select
+              value={categoryFilter}
+              onChange={(event) => {
+                updateParams({ category: event.target.value });
+                trackEvent('homepage_filter', { action: 'category', value: event.target.value });
+              }}
+              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite focus:border-data-lime/60 focus:outline-none"
+            >
+              <option value="all">All categories</option>
+              {categoryOptions.map((category) => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
+          </label>
+
+          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
+            Brand
+            <select
+              value={brandFilter}
+              onChange={(event) => {
+                updateParams({ brand: event.target.value });
+                trackEvent('homepage_filter', { action: 'brand', value: event.target.value });
+              }}
+              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite focus:border-data-lime/60 focus:outline-none"
+            >
+              <option value="all">All brands</option>
+              {brandOptions.map((brand) => (
+                <option key={brand} value={brand}>{brand}</option>
+              ))}
+            </select>
+          </label>
+
+          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
+            Min price
+            <input
+              type="number"
+              min={0}
+              placeholder="0"
+              value={Number.isFinite(minPrice) ? String(minPrice) : ''}
+              onChange={(event) => {
+                updateParams({ minPrice: event.target.value });
+                trackEvent('homepage_filter', { action: 'min_price', value: event.target.value || '0' });
+              }}
+              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none"
+            />
+          </label>
+
+          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
+            Max price
+            <input
+              type="number"
+              min={0}
+              placeholder="600"
+              value={Number.isFinite(maxPrice) ? String(maxPrice) : ''}
+              onChange={(event) => {
+                updateParams({ maxPrice: event.target.value });
+                trackEvent('homepage_filter', { action: 'max_price', value: event.target.value || '0' });
+              }}
+              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none"
+            />
+          </label>
+
+          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
+            Min rating
+            <select
+              value={Number.isFinite(minRating) ? String(minRating) : 'all'}
+              onChange={(event) => {
+                updateParams({ minRating: event.target.value === 'all' ? null : event.target.value });
+                trackEvent('homepage_filter', { action: 'min_rating', value: event.target.value });
+              }}
+              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite focus:border-data-lime/60 focus:outline-none"
+            >
+              <option value="all">Any rating</option>
+              <option value="4.8">4.8+ stars</option>
+              <option value="4.6">4.6+ stars</option>
+              <option value="4.4">4.4+ stars</option>
+              <option value="4.2">4.2+ stars</option>
+            </select>
+          </label>
+        </div>
+
+        {tagOptions.length > 0 && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-widest text-neutral-500">Best for tags</span>
+              {tagFilters.length > 0 && (
+                <button
+                  onClick={() => {
+                    updateParams({ tags: null });
+                    trackEvent('homepage_filter', { action: 'tags_clear' });
+                  }}
+                  className="text-xs font-bold text-trust-blue hover:text-white transition-colors"
+                >
+                  Clear tags
+                </button>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {tagOptions.map((tag) => {
+                const isActive = tagFilters.includes(tag);
+                return (
+                  <button
+                    key={tag}
+                    onClick={() => toggleTag(tag)}
+                    className={`rounded-pill border px-4 py-1.5 text-[11px] font-black uppercase tracking-widest transition-colors ${isActive ? 'border-data-lime bg-data-lime/15 text-data-lime' : 'border-white/[0.08] text-neutral-400 hover:border-white/20 hover:text-offwhite'}`}
+                  >
+                    {tag}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
+            Sort by
+            <select
+              value={sortBy}
+              onChange={(event) => {
+                updateParams({ sort: event.target.value });
+                trackEvent('homepage_filter', { action: 'sort', value: event.target.value });
+              }}
+              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite focus:border-data-lime/60 focus:outline-none"
+            >
+              <option value="rank">Editor rank</option>
+              <option value="price-asc">Price: low to high</option>
+              <option value="price-desc">Price: high to low</option>
+              <option value="rating-desc">Highest rated</option>
+              <option value="reviews-desc">Most reviewed</option>
+              <option value="newest">Recently updated</option>
+            </select>
+          </label>
+
+          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
+            Results per page
+            <select
+              value={String(pageSize)}
+              onChange={(event) => {
+                updateParams({ pageSize: event.target.value });
+                trackEvent('homepage_filter', { action: 'page_size', value: event.target.value });
+              }}
+              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite focus:border-data-lime/60 focus:outline-none"
+            >
+              <option value="6">6</option>
+              <option value="9">9</option>
+              <option value="12">12</option>
+              <option value="18">18</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      {/* ── RESULTS ── */}
+      <div className="space-y-8 animate-cardIn">
+        {/* Results Metadata */}
+        <div className="flex items-center gap-4">
+          <div className="h-px flex-1 bg-white/[0.06]" />
+          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/[0.06] bg-white/[0.02]">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">
+              Showing
+            </span>
+            <span className="text-sm font-black text-data-lime tabular-nums">
+              {isPending ? '...' : totalResults}
+            </span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">
+              of {products.length} picks
+            </span>
+          </div>
+          <div className="h-px flex-1 bg-white/[0.06]" />
+        </div>
+
+        {/* At a glance Comparison */}
+        {filteredProducts.length > 1 && (
+          <div className="space-y-4">
+            <ComparisonTable
+              products={filteredProducts}
+              articleSlug={articleSlug}
+              title={`${activeFilterMeta?.key === 'all' ? 'All Ranked' : activeFilterMeta?.label || 'Top'} Gear Compared`}
+            />
+          </div>
+        )}
+
+        {/* Product Cards */}
+        <ProductGrid
+          products={pagedProducts}
+          articleSlug={articleSlug}
+          isLoading={isPending}
+          emptyFilterLabel={activeFilterLabel || activeFilterMeta?.label}
+          rankOffset={startIndex}
+          selectedIds={selectedIds}
+          onSelectedIdsChange={updateSelection}
+          showCompareBar={false}
+        />
+
+        <StickyCompareBar
+          selectedProducts={selectedProducts}
+          onRemove={(id) => {
+            const next = new Set(selectedIds);
+            next.delete(id);
+            updateSelection(next);
+          }}
+          onClear={() => updateSelection(new Set())}
+        />
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="relative z-[55] pointer-events-auto flex flex-wrap items-center justify-between gap-3 rounded-pill border border-white/[0.06] bg-graphite-900/60 px-4 py-3">
+            <div className="text-xs font-bold uppercase tracking-widest text-neutral-500">
+              Showing {rangeStart}-{rangeEnd} of {totalResults}
+            </div>
+            <div className="pointer-events-auto flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setPage(currentPage - 1)}
+                disabled={currentPage <= 1}
+                className="h-9 px-3 rounded-pill border border-white/[0.08] text-xs font-bold uppercase tracking-widest text-neutral-400 disabled:opacity-40 disabled:cursor-not-allowed hover:border-white/20 hover:text-offwhite"
+              >
+                Prev
+              </button>
+              <div className="flex items-center gap-1">
+                {paginationPages[0] > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setPage(1)}
+                      className="h-9 w-9 rounded-full border border-white/[0.08] text-xs font-bold text-neutral-400 hover:border-white/20 hover:text-offwhite"
+                    >
+                      1
+                    </button>
+                    <span className="text-xs font-bold text-neutral-500 px-1">...</span>
+                  </>
+                )}
+                {paginationPages.map((pageNumber) => {
+                  const isActive = pageNumber === currentPage;
+                  return (
+                    <button
+                      type="button"
+                      key={pageNumber}
+                      onClick={() => setPage(pageNumber)}
+                      className={`h-9 w-9 rounded-full border text-xs font-bold ${isActive ? 'border-data-lime bg-data-lime/15 text-data-lime' : 'border-white/[0.08] text-neutral-400 hover:border-white/20 hover:text-offwhite'}`}
+                    >
+                      {pageNumber}
+                    </button>
+                  );
+                })}
+                {paginationPages[paginationPages.length - 1] < totalPages && (
+                  <>
+                    <span className="text-xs font-bold text-neutral-500 px-1">...</span>
+                    <button
+                      type="button"
+                      onClick={() => setPage(totalPages)}
+                      className="h-9 w-9 rounded-full border border-white/[0.08] text-xs font-bold text-neutral-400 hover:border-white/20 hover:text-offwhite"
+                    >
+                      {totalPages}
+                    </button>
+                  </>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => setPage(currentPage + 1)}
+                disabled={currentPage >= totalPages}
+                className="h-9 px-3 rounded-pill border border-white/[0.08] text-xs font-bold uppercase tracking-widest text-neutral-400 disabled:opacity-40 disabled:cursor-not-allowed hover:border-white/20 hover:text-offwhite"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 </file>
 
-<file path="app/layout.tsx">
-import type { Metadata, Viewport } from 'next';
-import Script from 'next/script';
-import './globals.css';
-import { CookieConsent } from '@/components/CookieConsent';
-import { ExitIntentModal } from '@/components/ExitIntentModal';
-import { Footer } from '@/components/Footer';
-import { Header } from '@/components/Header';
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, PINTEREST_DOMAIN_VERIFY } from '@/lib/config';
-import { jsonLdProps, organizationSchema, websiteSchema } from '@/lib/seo/schema';
+<file path="components/ProductGrid.tsx">
+'use client';
 
-/**
- * FIX (Audit #02-A): global metadata uses Next.js Metadata API — server-rendered.
- * Per-page titles/descriptions override these via generateMetadata() in each page.
- * FIX (Audit #02-A #5): canonical is set per-page via alternates.canonical.
- * FIX (Audit #02-H): Pinterest domain verification rendered in <head> server-side.
- */
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: {
-    default: `${SITE_NAME} | Best Fitness Gear 2026 — Tested & Reviewed`,
-    template: '%s',
-  },
-  description: SITE_DESCRIPTION,
-  applicationName: SITE_NAME,
-  authors: [{ name: SITE_NAME }],
-  referrer: 'strict-origin-when-cross-origin',
-  robots: { index: true, follow: true, 'max-image-preview': 'large' },
-  alternates: { canonical: SITE_URL },
-  openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    url: SITE_URL,
-    siteName: SITE_NAME,
-    title: `${SITE_NAME} | Expert Fitness Gear Reviews 2026`,
-    description: SITE_DESCRIPTION,
-    images: [{ url: `${SITE_URL}/opengraph-image`, width: 1200, height: 630, alt: SITE_NAME }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: `${SITE_NAME} | Expert Fitness Gear Reviews 2026`,
-    description: SITE_DESCRIPTION,
-    images: [`${SITE_URL}/opengraph-image`],
-  },
-  icons: {
-    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
-  },
-  manifest: '/manifest.json',
-  // FIX (Audit #02-H): Pinterest domain verification — replace env var value in Vercel
-  ...(PINTEREST_DOMAIN_VERIFY ? { other: { 'p:domain_verify': PINTEREST_DOMAIN_VERIFY } } : {}),
+import { useState } from 'react';
+import type { Product } from '@/lib/types';
+import { ProductCard } from '@/components/ProductCard';
+import { StickyCompareBar } from './StickyCompareBar';
+
+type EnhancedProduct = Product & {
+  short_title?: string | null;
+  editorial_summary?: string | null;
+  position?: number;
+  custom_blurb?: string | null;
 };
 
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  themeColor: '#0A0D12',
-  colorScheme: 'dark',
-  // FIX (Audit #01-E): viewport-fit=cover for iPhone notch areas
-  viewportFit: 'cover',
-};
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+/* ─────────────────────────────────────────────
+   SKELETON CARD — shown during hydration
+───────────────────────────────────────────── */
+function SkeletonCard() {
   return (
-    <html lang="en">
-      <head>
-        {/* FIX: Organization + WebSite schema in <head> for all pages */}
-        <script {...jsonLdProps([organizationSchema(), websiteSchema()])} />
-        {/* FIX (Audit #01-5): Preconnect to Amazon for faster product image resolution */}
-        <link rel="preconnect" href="https://m.media-amazon.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://www.amazon.com" crossOrigin="anonymous" />
-      </head>
-      <body className="min-h-screen bg-[#0A0D12] font-sans text-neutral-100 antialiased">
-        <Header />
-        <main>{children}</main>
-        <Footer />
-        <CookieConsent />
-        <ExitIntentModal />
+    <div
+      className="overflow-hidden rounded-[1.5rem] border border-white/[0.06] bg-[#161B22]"
+      aria-hidden="true"
+      role="presentation"
+    >
+      {/* Image skeleton */}
+      <div className="skeleton" style={{ aspectRatio: '4/3' }} />
 
-        {/* FIX (Audit #06-B): Pinterest tag — only loads when configured */}
-        {process.env.NEXT_PUBLIC_PINTEREST_TAG_ID ? (
-          <Script id="pinterest-tag" strategy="lazyOnload">
-            {`
-              !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var
-              n=window.pintrk;n.queue=[],n.version="3.0";var
-              t=document.createElement("script");t.async=!0,t.src=e;var
-              r=document.getElementsByTagName("script")[0];
-              r.parentNode.insertBefore(t,r)}}("https://s.pinimg.com/ct/core.js");
-              pintrk('load', '${process.env.NEXT_PUBLIC_PINTEREST_TAG_ID}');
-              pintrk('page');
-            `}
-          </Script>
-        ) : null}
-      </body>
-    </html>
+      {/* Body skeleton */}
+      <div className="p-5 space-y-4">
+        {/* Trust strip */}
+        <div className="flex gap-2">
+          <div className="skeleton h-5 w-16 rounded" />
+          <div className="skeleton h-5 w-12 rounded" />
+        </div>
+
+        {/* Title */}
+        <div className="space-y-2">
+          <div className="skeleton h-4 w-3/4 rounded" />
+          <div className="skeleton h-4 w-1/2 rounded" />
+        </div>
+
+        {/* Stars */}
+        <div className="skeleton h-4 w-32 rounded" />
+
+        {/* Verdict */}
+        <div className="space-y-1.5">
+          <div className="skeleton h-3 w-full rounded" />
+          <div className="skeleton h-3 w-full rounded" />
+          <div className="skeleton h-3 w-2/3 rounded" />
+        </div>
+
+        {/* Pros/cons box */}
+        <div className="rounded-[0.875rem] border border-white/[0.04] bg-black/20 p-3.5 space-y-2">
+          <div className="skeleton h-3 w-20 rounded" />
+          <div className="skeleton h-3 w-full rounded" />
+          <div className="skeleton h-3 w-5/6 rounded" />
+        </div>
+
+        {/* Price + CTA */}
+        <div className="pt-3 border-t border-white/[0.06] space-y-3">
+          <div className="skeleton h-8 w-32 rounded" />
+          <div className="skeleton h-[3.25rem] w-full rounded-[0.875rem]" />
+          <div className="skeleton h-[2.75rem] w-full rounded-[0.75rem]" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   EMPTY STATE
+───────────────────────────────────────────── */
+function EmptyState({ filterLabel }: { filterLabel?: string }) {
+  return (
+    <div className="col-span-full py-20 flex flex-col items-center gap-4 text-center">
+      <div className="w-16 h-16 rounded-2xl border border-dashed border-white/10 flex items-center justify-center">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+             className="text-neutral-600" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+      </div>
+      <div>
+        <p className="font-bold text-neutral-300">No products found</p>
+        <p className="text-sm text-neutral-500 mt-1">
+          {filterLabel
+            ? `No products match "${filterLabel}" yet. Try a different filter.`
+            : 'Products are loading. Check back soon.'}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   PRODUCT GRID COMPONENT
+───────────────────────────────────────────── */
+export function ProductGrid({
+  products,
+  articleSlug,
+  isLoading = false,
+  emptyFilterLabel,
+  rankOffset = 0,
+  selectedIds: controlledSelectedIds,
+  onSelectedIdsChange,
+  showCompareBar = true,
+}: {
+  products: EnhancedProduct[];
+  articleSlug: string;
+  isLoading?: boolean;
+  emptyFilterLabel?: string;
+  rankOffset?: number;
+  selectedIds?: Set<string>;
+  onSelectedIdsChange?: (next: Set<string>) => void;
+  showCompareBar?: boolean;
+}) {
+  const [internalSelectedIds, setInternalSelectedIds] = useState<Set<string>>(new Set());
+  const selectedIds = controlledSelectedIds ?? internalSelectedIds;
+  const selectedProducts = products.filter(p => selectedIds.has(p.id));
+
+  const updateSelectedIds = (nextOrUpdater: Set<string> | ((prev: Set<string>) => Set<string>)) => {
+    const next = typeof nextOrUpdater === 'function' ? nextOrUpdater(selectedIds) : nextOrUpdater;
+    if (onSelectedIdsChange) onSelectedIdsChange(next);
+    else setInternalSelectedIds(next);
+  };
+
+  const toggleCompare = (productId: string, selected: boolean) => {
+    updateSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (selected) {
+        next.add(productId);
+        // Cap at 4 — remove oldest if exceeded
+        if (next.size > 4) {
+          const first = Array.from(next)[0];
+          next.delete(first);
+        }
+      } else {
+        next.delete(productId);
+      }
+      return next;
+    });
+  };
+
+  const clearCompare = () => updateSelectedIds(new Set());
+
+  /* ── Stagger animation delay: 60ms per card, max 360ms ── */
+  const staggerDelay = (index: number) => Math.min(index * 60, 360);
+
+  return (
+    <>
+      {/* Grid */}
+      <div
+        className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 items-stretch"
+        role="list"
+        aria-label="Product recommendations"
+        aria-live="polite"
+        aria-busy={isLoading}
+      >
+        {isLoading ? (
+          /* Skeleton placeholders */
+          Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} role="listitem">
+              <SkeletonCard />
+            </div>
+          ))
+        ) : products.length === 0 ? (
+          <EmptyState filterLabel={emptyFilterLabel} />
+        ) : (
+          products.map((product, index) => (
+            <div key={product.id} role="listitem" className="h-full">
+              <ProductCard
+                product={product}
+                rank={rankOffset + index}
+                articleSlug={articleSlug}
+                onCompareToggle={toggleCompare}
+                isSelected={selectedIds.has(product.id)}
+                animationDelay={staggerDelay(index)}
+              />
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Compare bar — portal-level sticky overlay */}
+      {showCompareBar && (
+        <StickyCompareBar
+          selectedProducts={selectedProducts}
+          onRemove={(id) => toggleCompare(id, false)}
+          onClear={clearCompare}
+        />
+      )}
+    </>
   );
 }
 </file>
@@ -7719,254 +7982,6 @@ where a.slug = 'best-home-gym-equipment-2026'
 on conflict (article_id, product_id) do nothing;
 </file>
 
-<file path="app/best/[slug]/page.tsx">
-import { notFound } from 'next/navigation';
-import Link from 'next/link';
-import type { Metadata } from 'next';
-import { Calendar, Clock, User, FlaskConical } from 'lucide-react';
-import { ComparisonTable } from '@/components/ComparisonTable';
-import { DisclosureBar } from '@/components/DisclosureBar';
-import { FAQ } from '@/components/FAQ';
-import { Newsletter } from '@/components/Newsletter';
-import { ProductGrid } from '@/components/ProductGrid';
-import { ShareButtons } from '@/components/ShareButtons';
-import { SITE_URL } from '@/lib/config';
-import { generateArticleSummary } from '@/lib/ai/article-summary';
-import { getArticleBySlug, getPublishedArticles } from '@/lib/db';
-import { buildMetadata } from '@/lib/seo/metadata';
-import { articleSchema, breadcrumbSchema, itemListSchema, jsonLdProps } from '@/lib/seo/schema';
-
-export const revalidate = 3600;
-
-export async function generateStaticParams() {
-  const articles = await getPublishedArticles();
-  return articles.map((article) => ({ slug: article.slug.replace(/-2026$/, '') }));
-}
-
-/**
- * FIX (Audit #02-A): every article now gets unique SSR metadata —
- * title, description, canonical, OG image, and published/modified dates.
- * Pinterest and other crawlers see the real per-article tags.
- */
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}): Promise<Metadata> {
-  const article = await getArticleBySlug(params.slug);
-  if (!article) return buildMetadata({ title: 'Not Found', noindex: true });
-  return buildMetadata({
-    title: article.title,
-    description: article.excerpt || undefined,
-    canonical: `/best/${article.slug}`,
-    image: article.hero_image || undefined,
-    type: 'article',
-    publishedTime: article.published_at || undefined,
-    modifiedTime: article.updated_at,
-  });
-}
-
-export default async function ArticlePage({ params }: { params: { slug: string } }) {
-  const [article, allArticles] = await Promise.all([
-    getArticleBySlug(params.slug),
-    getPublishedArticles(),
-  ]);
-
-  if (!article) notFound();
-
-  const relatedArticles = allArticles
-    .filter((candidate) => candidate.slug !== article.slug)
-    .filter(
-      (candidate) =>
-        candidate.cluster === article.cluster || candidate.category === article.category
-    )
-    .slice(0, 3);
-
-  const quickTake = await generateArticleSummary({
-    title: article.title,
-    excerpt: article.excerpt,
-    content_html: article.content_html,
-  });
-
-  const url = `/best/${article.slug}`;
-  const breadcrumbs = [
-    { name: 'Home', url: '/' },
-    { name: 'Buyer Guides', url: '/' },
-    { name: article.title, url },
-  ];
-
-  return (
-    <>
-      <script
-        {...jsonLdProps([
-          articleSchema(article, url),
-          breadcrumbSchema(breadcrumbs),
-          ...(article.products.length > 0 ? [itemListSchema(article.products, url)] : []),
-        ])}
-      />
-
-      {/* FIX (Audit #03-A): FTC disclosure above every product page */}
-      <DisclosureBar />
-
-      <article className="mx-auto max-w-4xl px-4 py-12 sm:px-8">
-        {/* Breadcrumb */}
-        <nav
-          className="mb-6 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-neutral-500"
-          aria-label="Breadcrumb"
-        >
-          {breadcrumbs.map((crumb, index) => (
-            <span key={crumb.name} className="flex items-center gap-2">
-              {index < breadcrumbs.length - 1 ? (
-                <Link href={crumb.url} className="hover:text-emerald-400">
-                  {crumb.name}
-                </Link>
-              ) : (
-                <span className="text-neutral-300">{crumb.name}</span>
-              )}
-              {index < breadcrumbs.length - 1 ? <span>/</span> : null}
-            </span>
-          ))}
-        </nav>
-
-        <header className="mb-10 space-y-6">
-          {article.cluster ? (
-            <span className="inline-block rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-400">
-              {article.cluster}
-            </span>
-          ) : null}
-          <h1 className="text-3xl font-black uppercase italic leading-[1.05] tracking-tighter sm:text-5xl lg:text-6xl">
-            {article.title}
-          </h1>
-          {article.excerpt ? (
-            <p className="text-lg font-medium leading-relaxed text-neutral-400">{article.excerpt}</p>
-          ) : null}
-          <div className="flex flex-wrap items-center gap-6 border-t border-white/5 pt-4 text-[10px] font-bold uppercase tracking-widest text-neutral-500">
-            <Link
-              href={`/about#${article.author?.toLowerCase().replace(/\s+/g, '-')}`}
-              className="flex items-center gap-2 hover:text-trust-blue transition-colors"
-            >
-              <User className="h-3.5 w-3.5" />
-              {article.author}
-            </Link>
-            <span className="flex items-center gap-2">
-              <Calendar className="h-3.5 w-3.5" />
-              Updated{' '}
-              {new Date(article.updated_at).toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-              })}
-            </span>
-            <span className="flex items-center gap-2">
-              <Clock className="h-3.5 w-3.5" />
-              {article.read_minutes} min read
-            </span>
-          </div>
-          <ShareButtons title={article.title} url={`${SITE_URL}${url}`} />
-        </header>
-
-        {article.hero_image ? (
-          <img
-            src={article.hero_image}
-            alt={article.title}
-            className="mb-10 max-h-[500px] w-full rounded-2xl object-cover"
-          />
-        ) : null}
-
-        {quickTake ? (
-          <div className="mb-10 rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-6">
-            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
-              Quick take
-            </div>
-            <p className="mt-3 text-lg leading-8 text-neutral-200">{quickTake}</p>
-          </div>
-        ) : null}
-
-        {article.content_html ? (
-          <div
-            className="prose prose-invert mb-12 max-w-none text-neutral-300 prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tight prose-headings:text-white prose-h2:mb-6 prose-h2:mt-12 prose-h2:text-3xl prose-h3:mt-8 prose-h3:text-xl prose-p:mb-6 prose-a:text-emerald-400 prose-strong:text-white"
-            dangerouslySetInnerHTML={{ __html: article.content_html }}
-          />
-        ) : null}
-
-        {article.products.length > 0 ? (
-          <section className="space-y-12 border-t border-white/5 pt-16">
-            <div className="space-y-3 text-center">
-              <h2 className="text-3xl font-black uppercase italic tracking-tighter sm:text-4xl">
-                Our top picks
-              </h2>
-              <p className="text-sm font-medium text-neutral-500">Independently vetted by the lab.</p>
-            </div>
-            <ComparisonTable products={article.products} articleSlug={article.slug} title="Comparison at a glance" />
-            <ProductGrid products={article.products} articleSlug={article.slug} />
-          </section>
-        ) : null}
-
-        <section className="mt-16 border-t border-white/5 pt-12">
-          <div className="rounded-card border border-white/[0.06] bg-graphite-800 p-8 space-y-6">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-trust-blue/10 text-trust-blue">
-                <FlaskConical className="w-5 h-5" />
-              </div>
-              <h3 className="text-xl font-black uppercase tracking-tight text-white">Editorial Methodology</h3>
-            </div>
-            <p className="text-sm leading-relaxed text-neutral-400">
-              ProAthletica rankings are independently vetted by our editorial board. We analyze thousands of data points — including real customer reviews and technical specs — to give you an honest score. No brand pays for a higher ranking.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 pt-2">
-              <Link href="/methodology" className="text-sm font-bold text-trust-blue hover:text-white transition-colors underline underline-offset-4">
-                Read our full scoring protocol →
-              </Link>
-              <Link href="/disclosure" className="text-sm font-bold text-neutral-500 hover:text-white transition-colors underline underline-offset-4">
-                Affiliate Disclosure →
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-16 border-t border-white/5 pt-12">
-          <FAQ />
-        </section>
-
-        {relatedArticles.length > 0 ? (
-          <section className="mt-16 border-t border-white/5 pt-12">
-            <div className="mb-6">
-              <h2 className="text-2xl font-black uppercase italic tracking-tight text-white">
-                Related guides
-              </h2>
-              <p className="mt-2 text-sm text-neutral-400">
-                Continue exploring the same training cluster.
-              </p>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-3">
-              {relatedArticles.map((candidate) => (
-                <Link
-                  key={candidate.id}
-                  href={`/best/${candidate.slug}`}
-                  className="rounded-2xl border border-white/5 bg-neutral-900/30 p-5 hover:border-emerald-500/30"
-                >
-                  <div className="text-sm font-black uppercase tracking-wide text-emerald-400">
-                    {candidate.cluster || candidate.category || 'Guide'}
-                  </div>
-                  <div className="mt-2 text-base font-black text-white">{candidate.title}</div>
-                  {candidate.excerpt ? (
-                    <p className="mt-2 text-sm text-neutral-400">{candidate.excerpt}</p>
-                  ) : null}
-                </Link>
-              ))}
-            </div>
-          </section>
-        ) : null}
-
-        <section className="mt-16 border-t border-white/5 pt-12">
-          <Newsletter source={`article:${article.slug}`} />
-        </section>
-      </article>
-    </>
-  );
-}
-</file>
-
 <file path="app/methodology/page.tsx">
 import Link from 'next/link';
 import { FlaskConical, ShieldCheck, Target, TrendingUp, Users, Zap } from 'lucide-react';
@@ -8095,6 +8110,326 @@ export default function MethodologyPage() {
         </div>
       </div>
     </article>
+  );
+}
+</file>
+
+<file path="app/product/[slug]/page.tsx">
+import { notFound } from 'next/navigation';
+import { getProductById, getAllProducts } from '@/lib/db';
+import { buildMetadata } from '@/lib/seo/metadata';
+import { productSchema, jsonLdProps, breadcrumbSchema } from '@/lib/seo/schema';
+import { DisclosureBar } from '@/components/DisclosureBar';
+import { formatPrice, formatTimestamp } from '@/lib/format';
+import { SITE_NAME } from '@/lib/config';
+import Image from 'next/image';
+import Link from 'next/link';
+import { User, Calendar, FlaskConical } from 'lucide-react';
+
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const products = await getAllProducts();
+  return products.map((p) => ({ slug: p.slug || p.asin || p.id }));
+}
+
+export async function generateMetadata({ params }: { params: { slug: string } }) {
+  const product = await getProductById(params.slug);
+  if (!product) return buildMetadata({ title: 'Product Not Found', noindex: true });
+  
+  const brand = product.brand || 'This';
+  const category = (product.category || 'Fitness Gear').toLowerCase();
+  
+  return buildMetadata({
+    title: `${product.short_title || product.title.split(' ').slice(0, 6).join(' ')} Review (2026): Pros, Cons, Specs & Best Alternative | ${SITE_NAME}`,
+    description: `Hands-on-style review of the ${product.title}. See who it's best for, key tradeoffs, specs, price history, and better alternatives. Updated May 2026.`,
+    canonical: `/product/${params.slug}`,
+    pinterestImage: `/api/pinterest/${product.asin || product.id}`,
+    image: product.image_url || undefined,
+    priceAmount: product.price_cents ? product.price_cents / 100 : undefined,
+    priceCurrency: product.currency || "USD",
+  });
+}
+
+export default async function ProductPage({ params }: { params: { slug: string } }) {
+  const product = await getProductById(params.slug);
+  if (!product) notFound();
+
+  const shortTitle = product.short_title || product.title.split(' ').slice(0, 6).join(' ');
+  const verdict = product.editorial_summary || 'Strong performance with measurable tradeoffs versus competitors.';
+
+  return (
+    <>
+      <script {...jsonLdProps(productSchema(product))} />
+      <DisclosureBar />
+
+      <div className="bg-[#0E1116]">
+        {/* Sticky mobile CTA (Problem 10 fix) */}
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#0E1116] border-t border-white/10 p-4 md:hidden">
+          <a
+            href={`/api/track?productId=${product.asin}`}
+            target="_blank"
+            rel="sponsored nofollow noopener noreferrer"
+            className="block w-full rounded-2xl bg-[#FF6B1A] py-4 text-center font-black uppercase tracking-widest text-black text-sm active:scale-95 transition"
+          >
+            SEE TODAY&apos;S PRICE ON AMAZON — {formatPrice(product.price_cents)}
+          </a>
+        </div>
+
+        <div className="mx-auto max-w-6xl px-6 py-12">
+          <nav className="mb-8 flex items-center gap-2 text-xs uppercase tracking-widest text-neutral-500">
+            <Link href="/" className="hover:text-offwhite">Home</Link>
+            <span>/</span>
+            <Link href="/categories" className="hover:text-offwhite">Categories</Link>
+            <span>/</span>
+            <span className="text-[#3D8BFF]">{product.category}</span>
+          </nav>
+
+          <div className="flex flex-col lg:flex-row gap-12">
+            {/* Gallery / Image */}
+            <div className="lg:w-5/12">
+              <div className="sticky top-8">
+                <div className="aspect-square bg-white rounded-3xl p-10 mb-8 shadow-inner">
+                  {product.image_url ? (
+                    <Image
+                      src={product.image_url.replace('UL320', 'SL800')}
+                      alt={shortTitle}
+                      width={800}
+                      height={800}
+                      className="object-contain w-full h-full"
+                      unoptimized
+                      priority
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-neutral-300 text-6xl font-black opacity-10">PA</div>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-4 bg-[#161B22] rounded-3xl p-6">
+                  <div className="flex-1">
+                    <div className="text-xs text-neutral-400">CURRENT PRICE</div>
+                    <div className="text-4xl font-black text-[#C6FF3D]">{formatPrice(product.price_cents)}</div>
+                    <div className="text-xs text-neutral-500">as of {formatTimestamp(product.last_scraped_at)}</div>
+                  </div>
+                  <a
+                    href={`/api/track?productId=${product.asin}`}
+                    target="_blank"
+                    rel="sponsored nofollow noopener noreferrer"
+                    className="rounded-2xl bg-[#FF6B1A] px-10 py-4 font-black uppercase tracking-widest text-black text-sm hover:bg-[#ff8a4d]"
+                  >
+                    BUY ON AMAZON
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="lg:w-7/12 space-y-10">
+              <div>
+                <div className="inline-flex rounded-full bg-emerald-500/10 px-5 py-1 text-xs font-black tracking-widest text-emerald-400">
+                  {product.category.toUpperCase()}
+                </div>
+                <h1 className="mt-4 text-5xl font-black tracking-tighter text-offwhite leading-none">
+                  {shortTitle}
+                </h1>
+                {product.brand && <p className="text-2xl text-[#3D8BFF] mt-2">{product.brand}</p>}
+              </div>
+
+              {/* Trust Strip (Audit Fix) */}
+              <div className="flex flex-wrap items-center gap-4 border-y border-white/10 py-4 text-[11px] font-bold uppercase tracking-widest text-neutral-400">
+                <span className="flex items-center gap-2 text-white">
+                  <User className="h-4 w-4 text-emerald-400" />
+                  Reviewed by Athletica Lab
+                </span>
+                <span className="hidden sm:inline text-white/20">|</span>
+                <span className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Updated{' '}
+                  {new Date(product.last_scraped_at || product.updated_at || new Date()).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                </span>
+                <span className="hidden sm:inline text-white/20">|</span>
+                <Link href="/methodology" className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
+                  <FlaskConical className="h-4 w-4" />
+                  How we score
+                </Link>
+              </div>
+
+              {/* Rating block */}
+              <div className="flex items-center gap-10">
+                {product.rating && (
+                  <div>
+                    <div className="text-6xl font-black text-offwhite">{product.rating}</div>
+                    <div className="text-xs uppercase tracking-widest text-neutral-400 -mt-1">AVERAGE RATING</div>
+                  </div>
+                )}
+                {product.review_count && (
+                  <div>
+                    <div className="text-6xl font-black text-offwhite">{Math.round(product.review_count / 1000)}K</div>
+                    <div className="text-xs uppercase tracking-widest text-neutral-400 -mt-1">REVIEWS ANALYZED</div>
+                  </div>
+                )}
+              </div>
+
+              {/* Editor's Verdict */}
+              <div className="rounded-3xl border border-[#C6FF3D]/20 bg-[#161B22] p-8 text-lg leading-relaxed">
+                {verdict}
+              </div>
+
+              {/* Pros / Cons (visually distinct) */}
+              <div className="grid md:grid-cols-2 gap-6">
+                {(product.pros && product.pros.length > 0) ? (
+                  <div className="rounded-3xl bg-[#C6FF3D]/5 border border-[#C6FF3D]/30 p-8">
+                    <div className="uppercase text-xs font-black tracking-[0.125em] text-[#C6FF3D] mb-6">PROS</div>
+                    <ul className="space-y-4">
+                      {product.pros.map((pro, i) => (
+                        <li key={i} className="flex gap-3 text-neutral-200">
+                          <span className="text-[#C6FF3D] mt-0.5">✓</span>
+                          {pro}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <div className="rounded-3xl bg-[#C6FF3D]/5 border border-[#C6FF3D]/30 p-8">
+                    <div className="uppercase text-xs font-black tracking-[0.125em] text-[#C6FF3D] mb-6">PROS</div>
+                    <ul className="space-y-4 text-neutral-200">
+                      <li className="flex gap-3">✓ Strong customer satisfaction signals</li>
+                      <li className="flex gap-3">✓ Competitive price-to-performance</li>
+                    </ul>
+                  </div>
+                )}
+
+                <div className="rounded-3xl bg-neutral-900/80 border border-white/10 p-8">
+                  <div className="uppercase text-xs font-black tracking-[0.125em] text-neutral-400 mb-6">CONSIDERATIONS</div>
+                  <ul className="space-y-4 text-neutral-300">
+                    {(product.cons && product.cons.length > 0) ? (
+                      product.cons.map((con, i) => (
+                        <li key={i} className="flex gap-3">⚠ {con}</li>
+                      ))
+                    ) : (
+                      <>
+                        <li className="flex gap-3">⚠ May be bulky for very small spaces</li>
+                        <li className="flex gap-3">⚠ Check latest price before buying</li>
+                      </>
+                    )}
+                  </ul>
+                </div>
+              </div>
+
+              <div className="text-xs text-neutral-500 border-t border-white/10 pt-8">
+                Last updated {formatTimestamp(product.last_scraped_at)}. 
+                Data pulled from verified customer reviews and technical specifications. 
+                See full <Link href="/methodology" className="text-[#3D8BFF] hover:underline">methodology</Link>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+</file>
+
+<file path="app/layout.tsx">
+import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
+import { GoogleAnalytics } from '@next/third-parties/google';
+import './globals.css';
+import { CookieConsent } from '@/components/CookieConsent';
+import { ExitIntentModal } from '@/components/ExitIntentModal';
+import { Footer } from '@/components/Footer';
+import { Header } from '@/components/Header';
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, PINTEREST_DOMAIN_VERIFY } from '@/lib/config';
+import { jsonLdProps, organizationSchema, websiteSchema } from '@/lib/seo/schema';
+
+/**
+ * FIX (Audit #02-A): global metadata uses Next.js Metadata API — server-rendered.
+ * Per-page titles/descriptions override these via generateMetadata() in each page.
+ * FIX (Audit #02-A #5): canonical is set per-page via alternates.canonical.
+ * FIX (Audit #02-H): Pinterest domain verification rendered in <head> server-side.
+ */
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: `${SITE_NAME} | Best Fitness Gear 2026 — Tested & Reviewed`,
+    template: '%s',
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  authors: [{ name: SITE_NAME }],
+  referrer: 'strict-origin-when-cross-origin',
+  robots: { index: true, follow: true, 'max-image-preview': 'large' },
+  alternates: { canonical: SITE_URL },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} | Expert Fitness Gear Reviews 2026`,
+    description: SITE_DESCRIPTION,
+    images: [{ url: `${SITE_URL}/opengraph-image`, width: 1200, height: 630, alt: SITE_NAME }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${SITE_NAME} | Expert Fitness Gear Reviews 2026`,
+    description: SITE_DESCRIPTION,
+    images: [`${SITE_URL}/opengraph-image`],
+  },
+  icons: {
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+  },
+  manifest: '/manifest.json',
+  // FIX (Audit #02-H): Pinterest domain verification — replace env var value in Vercel
+  ...(PINTEREST_DOMAIN_VERIFY ? { other: { 'p:domain_verify': PINTEREST_DOMAIN_VERIFY } } : {}),
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#0A0D12',
+  colorScheme: 'dark',
+  // FIX (Audit #01-E): viewport-fit=cover for iPhone notch areas
+  viewportFit: 'cover',
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <head>
+        {/* FIX: Organization + WebSite schema in <head> for all pages */}
+        <script {...jsonLdProps([organizationSchema(), websiteSchema()])} />
+        {/* FIX (Audit #01-5): Preconnect to Amazon for faster product image resolution */}
+        <link rel="preconnect" href="https://m.media-amazon.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://www.amazon.com" crossOrigin="anonymous" />
+      </head>
+      <body className="min-h-screen bg-[#0A0D12] font-sans text-neutral-100 antialiased">
+        <Header />
+        <main>{children}</main>
+        <Footer />
+        <CookieConsent />
+        <ExitIntentModal />
+
+        {/* FIX (Audit #06-B): Pinterest tag — only loads when configured */}
+        {process.env.NEXT_PUBLIC_PINTEREST_TAG_ID ? (
+          <Script id="pinterest-tag" strategy="lazyOnload">
+            {`
+              !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var
+              n=window.pintrk;n.queue=[],n.version="3.0";var
+              t=document.createElement("script");t.async=!0,t.src=e;var
+              r=document.getElementsByTagName("script")[0];
+              r.parentNode.insertBefore(t,r)}}("https://s.pinimg.com/ct/core.js");
+              pintrk('load', '${process.env.NEXT_PUBLIC_PINTEREST_TAG_ID}');
+              pintrk('page');
+            `}
+          </Script>
+        ) : null}
+        <GoogleAnalytics gaId="G-CJPH6F4RFV" />
+      </body>
+    </html>
   );
 }
 </file>
@@ -8283,6 +8618,296 @@ export default function AboutPage() {
 }
 </file>
 
+<file path="app/best/[slug]/page.tsx">
+import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import type { Metadata } from 'next';
+import { Calendar, Clock, User, FlaskConical, Star } from 'lucide-react';
+import { ComparisonTable } from '@/components/ComparisonTable';
+import { formatPrice, formatTimestamp } from '@/lib/format';
+import { DisclosureBar } from '@/components/DisclosureBar';
+import { FAQ } from '@/components/FAQ';
+import { Newsletter } from '@/components/Newsletter';
+import { ProductGrid } from '@/components/ProductGrid';
+import { ShareButtons } from '@/components/ShareButtons';
+import { SITE_URL } from '@/lib/config';
+import { generateArticleSummary } from '@/lib/ai/article-summary';
+import { getArticleBySlug, getPublishedArticles } from '@/lib/db';
+import { buildMetadata } from '@/lib/seo/metadata';
+import { articleSchema, breadcrumbSchema, itemListSchema, jsonLdProps } from '@/lib/seo/schema';
+
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const articles = await getPublishedArticles();
+  return articles.map((article) => ({ slug: article.slug.replace(/-2026$/, '') }));
+}
+
+/**
+ * FIX (Audit #02-A): every article now gets unique SSR metadata —
+ * title, description, canonical, OG image, and published/modified dates.
+ * Pinterest and other crawlers see the real per-article tags.
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const article = await getArticleBySlug(params.slug);
+  if (!article) return buildMetadata({ title: 'Not Found', noindex: true });
+  return buildMetadata({
+    title: article.title,
+    description: article.excerpt || undefined,
+    canonical: `/best/${article.slug.replace(/-2026$/, '')}`,
+    image: article.hero_image || undefined,
+    type: 'article',
+    publishedTime: article.published_at || undefined,
+    modifiedTime: article.updated_at,
+  });
+}
+
+export default async function ArticlePage({ params }: { params: { slug: string } }) {
+  const [article, allArticles] = await Promise.all([
+    getArticleBySlug(params.slug),
+    getPublishedArticles(),
+  ]);
+
+  if (!article) notFound();
+
+  const relatedArticles = allArticles
+    .filter((candidate) => candidate.slug !== article.slug)
+    .filter(
+      (candidate) =>
+        candidate.cluster === article.cluster || candidate.category === article.category
+    )
+    .slice(0, 3);
+
+  const quickTake = await generateArticleSummary({
+    title: article.title,
+    excerpt: article.excerpt,
+    content_html: article.content_html,
+  });
+
+  const url = `/best/${article.slug}`;
+  const breadcrumbs = [
+    { name: 'Home', url: '/' },
+    { name: 'Buyer Guides', url: '/' },
+    { name: article.title, url },
+  ];
+
+  return (
+    <>
+      <script
+        {...jsonLdProps([
+          articleSchema(article, url),
+          breadcrumbSchema(breadcrumbs),
+          ...(article.products.length > 0 ? [itemListSchema(article.products, url)] : []),
+        ])}
+      />
+
+      {/* FIX (Audit #03-A): FTC disclosure above every product page */}
+      <DisclosureBar />
+
+      <article className="mx-auto max-w-4xl px-4 py-12 sm:px-8">
+        {/* Breadcrumb */}
+        <nav
+          className="mb-6 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-neutral-500"
+          aria-label="Breadcrumb"
+        >
+          {breadcrumbs.map((crumb, index) => (
+            <span key={crumb.name} className="flex items-center gap-2">
+              {index < breadcrumbs.length - 1 ? (
+                <Link href={crumb.url} className="hover:text-emerald-400">
+                  {crumb.name}
+                </Link>
+              ) : (
+                <span className="text-neutral-300">{crumb.name}</span>
+              )}
+              {index < breadcrumbs.length - 1 ? <span>/</span> : null}
+            </span>
+          ))}
+        </nav>
+
+        <header className="mb-10 space-y-6">
+          {article.cluster ? (
+            <span className="inline-block rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-400">
+              {article.cluster}
+            </span>
+          ) : null}
+          <h1 className="text-3xl font-black uppercase italic leading-[1.05] tracking-tighter sm:text-5xl lg:text-6xl">
+            {article.title}
+          </h1>
+          {article.excerpt ? (
+            <p className="text-lg font-medium leading-relaxed text-neutral-400">{article.excerpt}</p>
+          ) : null}
+          {/* Trust Strip (Audit Fix) */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 border-y border-white/10 py-4 text-[11px] font-bold uppercase tracking-widest text-neutral-400">
+            <Link
+              href={`/about#${article.author?.toLowerCase().replace(/\s+/g, '-')}`}
+              className="flex items-center gap-2 text-white hover:text-emerald-400 transition-colors"
+            >
+              <User className="h-4 w-4 text-emerald-400" />
+              Reviewed by {article.author}
+            </Link>
+            <span className="hidden sm:inline text-white/20">|</span>
+            <span className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Updated{' '}
+              {new Date(article.updated_at).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })}
+            </span>
+            <span className="hidden sm:inline text-white/20">|</span>
+            <span className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              {article.read_minutes} min read
+            </span>
+            <span className="hidden sm:inline text-white/20">|</span>
+            <Link href="/methodology" className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
+              <FlaskConical className="h-4 w-4" />
+              How we score
+            </Link>
+          </div>
+          <ShareButtons title={article.title} url={`${SITE_URL}${url}`} />
+        </header>
+
+        {article.hero_image ? (
+          <img
+            src={article.hero_image}
+            alt={article.title}
+            className="mb-10 max-h-[500px] w-full rounded-2xl object-cover"
+          />
+        ) : null}
+
+        {article.products && article.products.length > 0 ? (
+          <div className="mb-10 rounded-3xl border border-emerald-500/30 bg-[#0A0D12] p-8 flex flex-col sm:flex-row gap-8 items-center shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
+            <div className="flex-1 space-y-4">
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
+                <Star className="w-3.5 h-3.5 fill-emerald-500" /> Our Top Pick
+              </div>
+              <h2 className="text-3xl font-black text-white leading-tight">
+                {article.products[0].short_title || article.products[0].title}
+              </h2>
+              <p className="text-neutral-300 font-medium text-lg leading-relaxed">
+                {article.products[0].custom_blurb || article.products[0].editorial_summary || 'The best overall choice for most people based on our lab testing and owner reviews.'}
+              </p>
+              <div className="text-xs text-neutral-500 uppercase tracking-widest font-bold">
+                Price last checked: {formatTimestamp(article.products[0].last_scraped_at)}
+              </div>
+            </div>
+            <div className="w-full sm:w-auto flex flex-col gap-4">
+               <a
+                href={`/api/track?productId=${article.products[0].asin}&articleSlug=${article.slug}&rank=1`}
+                target="_blank"
+                rel="sponsored nofollow noopener noreferrer"
+                className="rounded-2xl bg-[#C6FF3D] px-8 py-5 text-center font-black uppercase tracking-widest text-black text-sm hover:bg-[#b3f024] transition whitespace-nowrap"
+              >
+                Check Price
+              </a>
+              {article.products.length > 1 && (
+                <div className="text-[11px] font-bold text-center text-neutral-400 tracking-wider">
+                  Secondary option: <span className="text-white">{article.products[1].short_title || article.products[1].title.split(' ').slice(0, 3).join(' ')}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : quickTake ? (
+          <div className="mb-10 rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-6">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
+              Quick take
+            </div>
+            <p className="mt-3 text-lg leading-8 text-neutral-200">{quickTake}</p>
+          </div>
+        ) : null}
+
+        {article.content_html ? (
+          <div
+            className="prose prose-invert mb-12 max-w-none text-neutral-300 prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tight prose-headings:text-white prose-h2:mb-6 prose-h2:mt-12 prose-h2:text-3xl prose-h3:mt-8 prose-h3:text-xl prose-p:mb-6 prose-a:text-emerald-400 prose-strong:text-white"
+            dangerouslySetInnerHTML={{ __html: article.content_html }}
+          />
+        ) : null}
+
+        {article.products.length > 0 ? (
+          <section className="space-y-12 border-t border-white/5 pt-16">
+            <div className="space-y-3 text-center">
+              <h2 className="text-3xl font-black uppercase italic tracking-tighter sm:text-4xl">
+                Our top picks
+              </h2>
+              <p className="text-sm font-medium text-neutral-500">Independently vetted by the lab.</p>
+            </div>
+            <ComparisonTable products={article.products} articleSlug={article.slug} title="Comparison at a glance" />
+            <ProductGrid products={article.products} articleSlug={article.slug} />
+          </section>
+        ) : null}
+
+        <section className="mt-16 border-t border-white/5 pt-12">
+          <div className="rounded-card border border-white/[0.06] bg-graphite-800 p-8 space-y-6">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-trust-blue/10 text-trust-blue">
+                <FlaskConical className="w-5 h-5" />
+              </div>
+              <h3 className="text-xl font-black uppercase tracking-tight text-white">Editorial Methodology</h3>
+            </div>
+            <p className="text-sm leading-relaxed text-neutral-400">
+              ProAthletica rankings are independently vetted by our editorial board. We analyze thousands of data points — including real customer reviews and technical specs — to give you an honest score. No brand pays for a higher ranking.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 pt-2">
+              <Link href="/methodology" className="text-sm font-bold text-trust-blue hover:text-white transition-colors underline underline-offset-4">
+                Read our full scoring protocol →
+              </Link>
+              <Link href="/disclosure" className="text-sm font-bold text-neutral-500 hover:text-white transition-colors underline underline-offset-4">
+                Affiliate Disclosure →
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-16 border-t border-white/5 pt-12">
+          <FAQ />
+        </section>
+
+        {relatedArticles.length > 0 ? (
+          <section className="mt-16 border-t border-white/5 pt-12">
+            <div className="mb-6">
+              <h2 className="text-2xl font-black uppercase italic tracking-tight text-white">
+                Related guides
+              </h2>
+              <p className="mt-2 text-sm text-neutral-400">
+                Continue exploring the same training cluster.
+              </p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {relatedArticles.map((candidate) => (
+                <Link
+                  key={candidate.id}
+                  href={`/best/${candidate.slug}`}
+                  className="rounded-2xl border border-white/5 bg-neutral-900/30 p-5 hover:border-emerald-500/30"
+                >
+                  <div className="text-sm font-black uppercase tracking-wide text-emerald-400">
+                    {candidate.cluster || candidate.category || 'Guide'}
+                  </div>
+                  <div className="mt-2 text-base font-black text-white">{candidate.title}</div>
+                  {candidate.excerpt ? (
+                    <p className="mt-2 text-sm text-neutral-400">{candidate.excerpt}</p>
+                  ) : null}
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        <section className="mt-16 border-t border-white/5 pt-12">
+          <Newsletter source={`article:${article.slug}`} />
+        </section>
+      </article>
+    </>
+  );
+}
+</file>
+
 <file path="components/ComparisonTable.tsx">
 import { formatPrice, formatReviewCount, formatTimestamp } from '@/lib/format';
 import type { Product } from '@/lib/types';
@@ -8336,11 +8961,10 @@ export function ComparisonTable({
           <thead>
             <tr className="border-b border-white/[0.06] text-2xs font-black uppercase tracking-[0.15em] text-neutral-500">
               <th className="py-4 pr-6 w-12">Rank</th>
-              <th className="py-4 pr-6">Pick</th>
-              <th className="py-4 pr-6">Rating</th>
-              <th className="py-4 pr-8 w-5/12">Verdict</th>
-              <th className="py-4 pr-6">Price</th>
-              <th className="py-4 text-right">Action</th>
+              <th className="py-4 pr-6 w-2/12">Product</th>
+              <th className="py-4 pr-6 w-2/12">Best For</th>
+              <th className="py-4 pr-8 w-4/12">Verdict & Specs</th>
+              <th className="py-4 text-right w-3/12">Price & Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/[0.04]">
@@ -8351,62 +8975,59 @@ export function ComparisonTable({
 
               return (
                 <tr key={product.id} className="group hover:bg-white/[0.02] transition-colors">
-                  <td className="py-6 pr-6">
+                  <td className="py-6 pr-6 align-top">
                     <div className={`rank-badge ${index === 0 ? 'rank-badge--gold' : ''}`}>
                       #{index + 1}
                     </div>
                   </td>
-                  <td className="py-6 pr-6">
-                    <div className="font-bold text-lg text-offwhite leading-tight">{getLabel(index, product)}</div>
-                    <div className="text-xs text-neutral-500 mt-1.5 line-clamp-1 pr-4">{product.short_title || product.title}</div>
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {(product.best_for_tags || []).slice(0, 2).map((tag) => (
-                        <span key={tag} className="trust-chip trust-chip--amazon">
-                          {tag}
-                        </span>
+                  <td className="py-6 pr-6 align-top">
+                    <div className="font-bold text-lg text-offwhite leading-tight">{product.short_title || product.title.split(' ').slice(0, 4).join(' ')}</div>
+                    <div className="text-xs text-neutral-500 mt-1.5 uppercase tracking-widest font-bold">{getLabel(index, product)}</div>
+                    {product.rating && (
+                      <div className="mt-4 flex items-center gap-1.5">
+                        <Star className="w-3.5 h-3.5 fill-star-gold text-star-gold" />
+                        <span className="text-sm font-black text-offwhite">{product.rating.toFixed(1)}</span>
+                        {product.review_count && <span className="text-[10px] text-neutral-600">({formatReviewCount(product.review_count)})</span>}
+                      </div>
+                    )}
+                  </td>
+                  <td className="py-6 pr-6 align-top">
+                    <div className="flex flex-col gap-3">
+                      {(product.best_for_tags || []).slice(0, 3).map((tag) => (
+                        <div key={tag} className="text-xs font-bold text-[#3D8BFF] leading-snug">
+                          • {tag}
+                        </div>
                       ))}
+                      {(!product.best_for_tags || product.best_for_tags.length === 0) && (
+                        <div className="text-xs font-bold text-[#3D8BFF] leading-snug">• Best in Class</div>
+                      )}
                     </div>
                   </td>
-                  <td className="py-6 pr-6">
-                    {product.rating && (
-                      <div className="flex items-center gap-1.5">
-                        <Star className="w-4 h-4 fill-star-gold text-star-gold" />
-                        <span className="text-xl font-black text-offwhite">{product.rating.toFixed(1)}</span>
-                      </div>
-                    )}
-                    {product.review_count && (
-                      <div className="text-2xs text-neutral-500 mt-1 uppercase tracking-wider">
-                        {formatReviewCount(product.review_count)} REVIEWS
-                      </div>
-                    )}
-                  </td>
-                  <td className="py-6 pr-8 text-sm leading-relaxed text-neutral-300">
-                    <div className="line-clamp-2">{verdict}</div>
+                  <td className="py-6 pr-8 text-sm leading-relaxed text-neutral-300 align-top">
+                    <div className="line-clamp-3">{verdict}</div>
                     {product.pros?.length ? (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {product.pros.slice(0, 1).map((item) => (
-                          <span key={item} className="text-2xs font-bold text-savings-green uppercase tracking-wider flex items-center gap-1">
-                            <span className="text-xs">✓</span> {item}
+                      <div className="mt-5 flex flex-col gap-2">
+                        <div className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Key Specs / Pros</div>
+                        {product.pros.slice(0, 2).map((item) => (
+                          <span key={item} className="text-xs text-neutral-400 flex items-start gap-2">
+                            <span className="text-[#C6FF3D] mt-0.5">✓</span> <span className="flex-1">{item}</span>
                           </span>
                         ))}
                       </div>
                     ) : null}
                   </td>
-                  <td className="py-6 pr-6">
-                    <div className="text-xl font-black text-offwhite">
+                  <td className="py-6 text-right align-top">
+                    <div className="text-3xl font-black text-[#C6FF3D] tracking-tighter">
                       {formatPrice(product.price_cents)}
                     </div>
-                    <div className="text-2xs text-neutral-600 mt-1">as of {timestamp}</div>
-                  </td>
-                  <td className="py-6 text-right">
+                    <div className="text-[10px] text-neutral-500 mt-1 uppercase tracking-widest font-bold">as of {timestamp}</div>
                     <a
                       href={href}
                       target="_blank"
                       rel="sponsored nofollow noopener noreferrer"
-                      className="cta-primary min-h-[2.75rem] px-5 py-2 text-xs"
+                      className="mt-6 inline-flex w-full items-center justify-center rounded-2xl bg-white px-5 py-4 text-xs font-black uppercase tracking-widest text-black hover:bg-neutral-200 transition active:scale-95 shadow-lg"
                     >
                       SEE PRICE
-                      <ArrowRight className="w-3.5 h-3.5" />
                     </a>
                   </td>
                 </tr>

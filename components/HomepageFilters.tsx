@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition, useCallback } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+
 import { ComparisonTable } from '@/components/ComparisonTable';
 import { ProductGrid } from '@/components/ProductGrid';
 import { StickyCompareBar } from '@/components/StickyCompareBar';
@@ -91,9 +92,6 @@ export function HomepageFilters({
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [pageOverride, setPageOverride] = useState<number | null>(null);
-
-  console.log('[HomepageFilters] Rendered with searchParams:', searchParams.toString(), 'pageOverride:', pageOverride);
 
   const activeFilter = (searchParams.get('focus') as FilterKey) || initialFilter || 'all';
   const searchQuery = (searchParams.get('q') || '').trim();
@@ -103,47 +101,61 @@ export function HomepageFilters({
   const tagFilters = tagParam.split(',').map((value) => value.trim()).filter(Boolean);
   const sortBy = searchParams.get('sort') || 'rank';
   const pageSize = Math.max(6, Math.min(24, Number.parseInt(searchParams.get('pageSize') || '9', 10) || 9));
-  const pageParam = Number.parseInt(searchParams.get('page') || '1', 10) || 1;
+  const pageParam = Math.max(1, Number.parseInt(searchParams.get('page') || '1', 10) || 1);
   const minPrice = Number.parseInt(searchParams.get('minPrice') || '', 10);
   const maxPrice = Number.parseInt(searchParams.get('maxPrice') || '', 10);
   const minRating = Number.parseFloat(searchParams.get('minRating') || '');
+
   const activeFilterMeta = FILTERS.find(f => f.key === activeFilter);
 
-  const updateParams = (updates: Record<string, string | null>, resetPage = true) => {
-    const params = new URLSearchParams(searchParams.toString());
+  /**
+   * FIX: Build the URL from current live searchParams snapshot.
+   * We read searchParams inside the callback so we always operate
+   * on the latest URL state, even during rapid successive clicks.
+   */
+  const updateParams = useCallback((updates: Record<string, string | null>, resetPage = true) => {
+    // Read a FRESH snapshot of current URL search params.
+    // `searchParams` from the hook can be stale within the same
+    // render batch when multiple updates fire quickly.
+    const current = new URLSearchParams(
+      typeof window !== 'undefined' ? window.location.search : searchParams.toString()
+    );
+
     Object.entries(updates).forEach(([key, value]) => {
       if (value === null || value === '' || value === 'all') {
-        params.delete(key);
+        current.delete(key);
       } else {
-        params.set(key, value);
+        current.set(key, value);
       }
     });
-    if (updates.tags !== undefined) params.delete('tag');
-    if (resetPage) params.delete('page');
-    const query = params.toString();
+
+    // Normalize tag/tags param names
+    if (updates.tags !== undefined) current.delete('tag');
+
+    // FIX: Always remove the page param when any non-page filter changes
+    // so the user lands on page 1 with fresh results.
+    if (resetPage) {
+      current.delete('page');
+    }
+
+    const query = current.toString();
     const newUrl = query ? `${pathname}?${query}` : pathname;
-    console.log('[DEBUG] updateParams:', { updates, resetPage, newUrl, currentQuery: searchParams.toString() });
+
     startTransition(() => {
       router.replace(newUrl, { scroll: false });
     });
-  };
+  }, [pathname, router, searchParams]);
 
   const setFilter = (nextFilter: FilterKey) => {
     updateParams({ focus: nextFilter === 'all' ? null : nextFilter });
     trackEvent('homepage_filter', { action: 'focus', value: nextFilter });
   };
 
-  useEffect(() => {
-    setPageOverride(null);
-  }, [pageParam]);
-
-  const setPage = (nextPage: number) => {
+  const setPage = useCallback((nextPage: number) => {
     const safePage = Math.max(1, nextPage);
-    console.log('[DEBUG] setPage called:', { nextPage, safePage, currentPage });
-    setPageOverride(safePage);
     updateParams({ page: safePage === 1 ? null : String(safePage) }, false);
     trackEvent('homepage_filter', { action: 'pagination', value: safePage });
-  };
+  }, [updateParams]);
 
   const categoryOptions = useMemo(() => {
     const unique = new Set<string>();
@@ -182,7 +194,6 @@ export function HomepageFilters({
       if (categoryFilter !== 'all' && product.category !== categoryFilter) return false;
       if (brandFilter !== 'all' && product.brand !== brandFilter) return false;
       if (hasTags && !tagFilters.some((tag) => (product.best_for_tags || []).includes(tag))) return false;
-
       if (query) {
         const blob = [
           product.title,
@@ -199,13 +210,10 @@ export function HomepageFilters({
           .toLowerCase();
         if (!blob.includes(query)) return false;
       }
-
       const priceCents = product.price_cents ?? null;
       if (minPriceCents !== null && (!priceCents || priceCents < minPriceCents)) return false;
       if (maxPriceCents !== null && (!priceCents || priceCents > maxPriceCents)) return false;
-
       if (ratingFloor !== null && (!product.rating || product.rating < ratingFloor)) return false;
-
       return true;
     });
   }, [activeFilter, brandFilter, categoryFilter, maxPrice, minPrice, minRating, products, searchQuery, tagFilters]);
@@ -248,17 +256,28 @@ export function HomepageFilters({
         sorted.sort(byRank);
         break;
     }
-
     return sorted;
   }, [filteredProducts, sortBy]);
 
   const totalResults = sortedProducts.length;
   const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
-  const resolvedPage = pageOverride ?? pageParam;
-  const currentPage = Math.min(Math.max(1, resolvedPage), totalPages);
+
+  /**
+   * FIX: Derive current page entirely from URL params.
+   * Clamp to valid range so stale/out-of-range values are handled gracefully.
+   * Removed the `pageOverride` state that caused a race condition:
+   *   - When filters changed, updateParams deleted `page` from the URL
+   *     but pageOverride kept its old value (e.g. 3).
+   *   - resolvedPage = pageOverride ?? pageParam resolved to the stale 3
+   *     instead of falling back to 1.
+   * Now there is a single source of truth: the URL.
+   */
+  const currentPage = Math.min(Math.max(1, pageParam), totalPages);
+
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = Math.min(startIndex + pageSize, totalResults);
   const pagedProducts = sortedProducts.slice(startIndex, endIndex);
+
   const rangeStart = totalResults === 0 ? 0 : startIndex + 1;
   const rangeEnd = totalResults === 0 ? 0 : endIndex;
 
@@ -299,7 +318,6 @@ export function HomepageFilters({
 
   return (
     <div className="space-y-8">
-
       {/* ── FILTER TABS ── */}
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
@@ -312,11 +330,12 @@ export function HomepageFilters({
               onClick={() => setFilter('all')}
               className="text-xs font-bold text-trust-blue hover:text-white transition-colors flex items-center gap-1"
             >
-              <X className="w-3 h-3" /> Reset
+              <X className="w-3 h-3" />
+              Reset
             </button>
           )}
         </div>
-        
+
         <div
           role="tablist"
           className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2"
@@ -330,8 +349,8 @@ export function HomepageFilters({
                 aria-selected={isActive}
                 onClick={() => setFilter(filter.key)}
                 className={`group flex flex-col items-start p-4 rounded-inner border transition-all duration-200 ${
-                  isActive 
-                    ? 'border-data-lime bg-data-lime/10 shadow-[0_0_20px_rgba(198,255,61,0.08)]' 
+                  isActive
+                    ? 'border-data-lime bg-data-lime/10 shadow-[0_0_20px_rgba(198,255,61,0.08)]'
                     : 'border-white/[0.06] bg-graphite-800 hover:border-white/20'
                 }`}
               >
@@ -364,7 +383,8 @@ export function HomepageFilters({
               }}
               className="text-xs font-bold text-trust-blue hover:text-white transition-colors flex items-center gap-1"
             >
-              <X className="w-3 h-3" /> Clear all
+              <X className="w-3 h-3" />
+              Clear all
             </button>
           )}
         </div>
@@ -390,7 +410,6 @@ export function HomepageFilters({
               className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none"
             />
           </label>
-
           <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
             Category
             <select
@@ -407,7 +426,6 @@ export function HomepageFilters({
               ))}
             </select>
           </label>
-
           <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
             Brand
             <select
@@ -424,7 +442,6 @@ export function HomepageFilters({
               ))}
             </select>
           </label>
-
           <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
             Min price
             <input
@@ -439,7 +456,6 @@ export function HomepageFilters({
               className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none"
             />
           </label>
-
           <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
             Max price
             <input
@@ -454,7 +470,6 @@ export function HomepageFilters({
               className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none"
             />
           </label>
-
           <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
             Min rating
             <select
@@ -526,7 +541,6 @@ export function HomepageFilters({
               <option value="newest">Recently updated</option>
             </select>
           </label>
-
           <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
             Results per page
             <select
@@ -602,7 +616,7 @@ export function HomepageFilters({
         {totalPages > 1 && (
           <div className="relative z-[55] pointer-events-auto flex flex-wrap items-center justify-between gap-3 rounded-pill border border-white/[0.06] bg-graphite-900/60 px-4 py-3">
             <div className="text-xs font-bold uppercase tracking-widest text-neutral-500">
-              Showing {rangeStart}-{rangeEnd} of {totalResults}
+              Showing {rangeStart}–{rangeEnd} of {totalResults}
             </div>
             <div className="pointer-events-auto flex items-center gap-2">
               <button
