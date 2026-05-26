@@ -298,25 +298,25 @@ export default async function HomePage() {
       </section>
 
       {/* ── INLINE NEWSLETTER (after scrolling through first cards) ── */}
-      <div className="mx-auto max-w-4xl px-4 sm:px-8 pb-16">
+      <div className="mx-auto max-w-4xl px-4 sm:px-8 pb-10">
         <Newsletter source="homepage-inline" />
       </div>
 
       {/* ── BUYER GUIDE (E-E-A-T + internal linking hub) ── */}
-      <section className="mx-auto max-w-6xl px-4 sm:px-8 pb-16" aria-label="Buying guide for fitness equipment">
+      <section className="mx-auto max-w-6xl px-4 sm:px-8 pb-10" aria-label="Buying guide for fitness equipment">
         <BuyerGuide />
       </section>
 
       {/* ── FAQ (schema-rich, buyer-intent) ── */}
       <section
-        className="mx-auto max-w-4xl px-4 sm:px-8 border-t border-white/[0.05] py-16"
+        className="mx-auto max-w-4xl px-4 sm:px-8 border-t border-white/[0.05] py-10"
         aria-label="Frequently asked questions about fitness gear"
       >
         <FAQ />
       </section>
 
       {/* ── BOTTOM NEWSLETTER (Audit #04-D) ── */}
-      <div className="mx-auto max-w-6xl px-4 sm:px-8 pb-20">
+      <div className="mx-auto max-w-6xl px-4 sm:px-8 pb-12">
         <Newsletter source="homepage-bottom" />
       </div>
     </>

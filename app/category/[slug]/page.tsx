@@ -83,20 +83,20 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         {/* Comparison + Grid */}
         <ComparisonTable products={products} articleSlug={`category-${params.slug}`} title={`${name} comparison`} />
         
-        <div className="mt-16">
+        <div className="mt-8">
           <ProductGrid products={products} articleSlug={`category-${params.slug}`} />
         </div>
 
         {/* Buying guide + trust content */}
-        <div className="mt-24 border-t border-white/10 pt-16">
+        <div className="mt-12 border-t border-white/10 pt-10">
           <BuyerGuide category={name.toLowerCase()} />
         </div>
 
-        <div className="mt-20 border-t border-white/10 pt-16">
+        <div className="mt-12 border-t border-white/10 pt-10">
           <FAQ />
         </div>
 
-        <div className="mt-20">
+        <div className="mt-12">
           <Newsletter source={`category:${params.slug}`} />
         </div>
       </div>
