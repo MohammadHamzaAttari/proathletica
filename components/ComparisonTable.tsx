@@ -1,6 +1,6 @@
 import { formatPrice, formatReviewCount, formatTimestamp } from '@/lib/format';
 import type { Product } from '@/lib/types';
-import { ShieldCheck, Star, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Star } from 'lucide-react';
 
 type EnhancedProduct = Product & {
   custom_blurb?: string | null;

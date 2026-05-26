@@ -53,7 +53,7 @@ export default function DisclosurePage() {
         <section className="space-y-4">
           <h2 className="text-xl font-black uppercase tracking-tight text-white">Editorial Independence</h2>
           <p>
-            Commission rates <strong className="text-white">never</strong> influence our rankings. Our Athletica Lab protocol aggregates data and editorial fit first. Many products we rank #1 have lower commission rates than lower-ranked alternatives. We do not accept paid placements, sponsored reviews, or "pay-to-play" rankings.
+            Commission rates <strong className="text-white">never</strong> influence our rankings. Our Athletica Lab protocol aggregates data and editorial fit first. Many products we rank #1 have lower commission rates than lower-ranked alternatives. We do not accept paid placements, sponsored reviews, or &quot;pay-to-play&quot; rankings.
           </p>
           <p>
             For more detail on our scoring process, please read our{' '}

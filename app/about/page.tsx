@@ -1,7 +1,7 @@
 import { buildMetadata } from '@/lib/seo/metadata';
 import { personSchema, jsonLdProps } from '@/lib/seo/schema';
 import { SITE_URL } from '@/lib/config';
-import { ShieldCheck, Target, Users, Zap, Award, Microscope, FlaskConical } from 'lucide-react';
+import { ShieldCheck, Target, Award, Microscope } from 'lucide-react';
 import Link from 'next/link';
 
 export const metadata = buildMetadata({
@@ -46,7 +46,7 @@ export default function AboutPage() {
       name: e.name,
       jobTitle: e.role,
       description: e.bio,
-      credentials: (e as any).credentials,
+      credentials: e.credentials,
       url: `${SITE_URL}/about#${e.id}`
     }))
   ];

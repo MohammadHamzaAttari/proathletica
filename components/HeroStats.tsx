@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
 import { ShieldCheck, Star, TrendingUp, Zap } from 'lucide-react';
 
 function formatCompact(value: number) {

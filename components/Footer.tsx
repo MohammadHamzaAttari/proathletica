@@ -32,7 +32,7 @@ export function Footer() {
     <footer className="border-t border-white/[0.05] bg-[#0A0D12]" role="contentinfo">
       {/* Trust strip above footer */}
       <div className="border-b border-white/[0.04] py-5">
-        <div className="mx-auto max-w-6xl px-4 sm:px-8">
+        <div className="mx-auto max-w-[1800px] px-4 sm:px-8 lg:px-12">
           <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-2xs font-bold uppercase tracking-[0.15em] text-neutral-600">
             <span className="flex items-center gap-2">
               <span className="text-savings-green">✓</span>
@@ -55,7 +55,7 @@ export function Footer() {
       </div>
 
       {/* Main footer grid */}
-      <div className="mx-auto max-w-6xl px-4 py-14 sm:px-8">
+      <div className="mx-auto max-w-[1800px] px-4 py-14 sm:px-8 lg:px-12">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
 
           {/* Brand column */}
@@ -157,7 +157,7 @@ export function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-white/[0.04] py-5">
-        <div className="mx-auto max-w-6xl px-4 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="mx-auto max-w-[1800px] px-4 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-2xs text-neutral-700">
             © {new Date().getFullYear()} ProAthletica. All rights reserved.
           </p>

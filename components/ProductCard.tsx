@@ -151,19 +151,19 @@ export function ProductCard({
   const compareHref = `/compare?ids=${encodeURIComponent(product.id)}`;
 
   const badgeClass =
-    variant === 'bestseller' ? 'editorial-badge editorial-badge--bestseller' :
-    variant === 'trending'   ? 'editorial-badge editorial-badge--trending' :
-    variant === 'value'      ? 'editorial-badge editorial-badge--value' :
+    variant === 'bestseller' ? 'editorial-badge editorial-badge--bestseller border-data-lime/40' :
+    variant === 'trending'   ? 'editorial-badge editorial-badge--trending border-purple-500/40' :
+    variant === 'value'      ? 'editorial-badge editorial-badge--value border-emerald-500/40' :
     'editorial-badge';
 
   return (
     <article
-      className={`product-card animate-card-in gpu flex flex-col h-full ${isRank1 ? 'product-card--rank1' : ''}`}
+      className={`product-card animate-card-in gpu flex flex-col h-full group/card transition-all duration-500 ${isRank1 ? 'product-card--rank1 ring-1 ring-data-lime/20' : ''}`}
       style={{ animationDelay: `${animationDelay}ms` }}
       aria-labelledby={`product-title-${product.id}`}
     >
       {/* ── IMAGE AREA ── */}
-      <div className="card-image-wrap">
+      <div className="card-image-wrap bg-white/[0.02]">
         {product.image_url ? (
           <Image
             src={product.image_url.replace(/\._AC_UL\d+_\.jpg/, '._AC_SL800_.jpg')}
@@ -269,7 +269,7 @@ export function ProductCard({
         ) : null}
 
         {/* Verdict — editorial summary */}
-        <p className="text-sm leading-relaxed text-neutral-300 clamp-3 pl-3 border-l-2 border-data-lime/30">
+        <p className="text-sm leading-relaxed text-neutral-300 clamp-3 pl-3 border-l-2 border-data-lime/30 group-hover/card:border-data-lime transition-colors">
           {verdict}
         </p>
 

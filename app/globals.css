@@ -549,6 +549,8 @@
   .aspect-product { aspect-ratio: 4 / 3; }
 
   /* Section container */
-  .container-site { max-width: 72rem; margin-inline: auto; padding-inline: 1.5rem; }
+  .container-site { max-width: 100%; margin-inline: auto; padding-inline: 1rem; }
   @media (min-width: 640px) { .container-site { padding-inline: 2rem; } }
+  @media (min-width: 1280px) { .container-site { padding-inline: 4rem; } }
+  @media (min-width: 1600px) { .container-site { padding-inline: 6rem; } }
 }

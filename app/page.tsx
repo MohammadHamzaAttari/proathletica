@@ -103,7 +103,7 @@ export default async function HomePage() {
 
       {/* ── HERO ── */}
       <section
-        className="relative bg-graphite-900 pt-20 pb-24 overflow-hidden"
+        className="relative bg-graphite-900 pt-12 pb-16 overflow-hidden border-b border-white/[0.04]"
         aria-label="ProAthletica — data-driven fitness gear rankings"
       >
         {/* Background Image */}
@@ -112,76 +112,73 @@ export default async function HomePage() {
             src="/images/hero-bg.png" 
             alt="ProAthletica modern home gym setup" 
             fill 
-            className="object-cover opacity-25 mix-blend-luminosity" 
+            className="object-cover opacity-20 mix-blend-luminosity"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0A0D12]/90 via-[#0A0D12]/70 to-[#0A0D12]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0A0D12]/95 via-[#0A0D12]/80 to-[#0A0D12]" />
         </div>
 
-        {/* Decorative background glows */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-trust-blue/[0.04] rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-data-lime/[0.03] rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+        <div className="relative mx-auto max-w-[1800px] px-4 sm:px-8 lg:px-12 z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="text-left">
+              {/* Trust eyebrow */}
+              <div className="inline-flex items-center gap-2 rounded-pill border border-trust-blue/25 bg-trust-blue/[0.06] px-4 py-1.5 text-[10px] font-black tracking-[0.15em] text-trust-blue mb-6 backdrop-blur-md">
+                <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
+                INDEPENDENT · DATA-DRIVEN · NO PAID PLACEMENTS
+              </div>
 
-        <div className="relative mx-auto max-w-6xl px-4 sm:px-8 text-center z-10">
-          {/* Trust eyebrow */}
-          <div className="inline-flex items-center gap-2 rounded-pill border border-trust-blue/25 bg-trust-blue/[0.06] px-5 py-2 text-xs font-black tracking-[0.15em] text-trust-blue mb-8 backdrop-blur-md">
-            <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
-            INDEPENDENT · DATA-DRIVEN · NO PAID PLACEMENTS
-          </div>
+              {/* H1 — primary keyword target */}
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-[0.9] text-offwhite text-balance mb-6">
+                Best Home Gym Gear. <br />
+                <span className="text-data-lime">Expert-Ranked.</span>
+              </h1>
 
-          {/* H1 — primary keyword target */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-none text-offwhite text-balance">
-            Best Home Gym Gear. <br />
-            <span className="text-data-lime">Expert-Ranked.</span>
-          </h1>
+              <p className="max-w-xl text-base sm:text-lg text-neutral-400 leading-relaxed mb-8">
+                We analyze <strong className="text-offwhite font-semibold">47,000+ verified reviews</strong> across adjustable dumbbells, benches, and more — then rank what actually works for home gyms.
+              </p>
 
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-neutral-400 leading-relaxed">
-            We analyze <strong className="text-offwhite font-semibold">47,000+ verified customer reviews</strong> across adjustable dumbbells, resistance bands, weight benches, massage guns, and running shoes — then rank what actually works for home gyms, apartments, beginners, and busy moms.
-          </p>
+              {/* Primary CTAs */}
+              <div className="flex flex-wrap gap-4">
+                <Link
+                  href="#top-picks"
+                  className="cta-primary w-auto px-8 h-12 text-sm"
+                  aria-label="See our current top fitness gear picks"
+                >
+                  See Top Picks
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                </Link>
+                <Link
+                  href="/methodology"
+                  className="cta-secondary w-auto px-8 h-12 text-xs"
+                  aria-label="Read our testing and ranking methodology"
+                >
+                  <FlaskConical className="w-4 h-4" aria-hidden="true" />
+                  Methodology
+                </Link>
+              </div>
+            </div>
 
-          {/* Primary CTAs */}
-          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="#top-picks"
-              className="cta-primary w-auto px-10 h-14 text-base"
-              aria-label="See our current top fitness gear picks"
-            >
-              See Top Picks
-              <ArrowRight className="w-5 h-5" aria-hidden="true" />
-            </Link>
-            <Link
-              href="/methodology"
-              className="cta-secondary w-auto px-10 h-14 text-sm"
-              aria-label="Read our testing and ranking methodology"
-            >
-              <FlaskConical className="w-4 h-4" aria-hidden="true" />
-              Our Methodology
-            </Link>
-          </div>
-
-          {/* Live stat counters */}
-          <HeroStats
-            stats={{
-              testedProducts: stats.testedProducts || stats.products,
-              reviews: stats.reviews || 0,
-              clicks: stats.clicks || 0,
-            }}
-          />
-
-          {/* Lifestyle Hubs (Audit #04-A) */}
-          <div className="mt-20">
-            <LifestyleHubs />
+            <div className="hidden lg:block space-y-8">
+              <HeroStats
+                stats={{
+                  testedProducts: stats.testedProducts || stats.products,
+                  reviews: stats.reviews || 0,
+                  clicks: stats.clicks || 0,
+                }}
+              />
+              <LifestyleHubs />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── TOP PICKS (Moved directly after hero) ── */}
+      {/* ── TOP PICKS & PRODUCTS ── */}
       <section
         id="top-picks"
-        className="mx-auto max-w-6xl px-4 sm:px-8 pt-12 pb-10"
+        className="mx-auto max-w-[1800px] px-4 sm:px-8 lg:px-12 py-10"
         aria-label="Current top fitness gear picks"
       >
-        <div className="flex items-end justify-between mb-6">
+        <div className="flex items-end justify-between mb-8 border-b border-white/[0.06] pb-6">
           <div>
             <div className="section-eyebrow mb-2">
               <TrendingUp className="inline w-3 h-3 mr-1.5" aria-hidden="true" />
@@ -200,7 +197,7 @@ export default async function HomePage() {
         </div>
 
         {featured.length > 0 && (
-          <Suspense fallback={<div className="h-40 animate-pulse bg-white/[0.03] rounded-card" />}>
+          <Suspense fallback={<div className="h-96 animate-pulse bg-white/[0.03] rounded-card" />}>
             <HomepageFilters products={featured} articleSlug="homepage" initialFilter="all" />
           </Suspense>
         )}
@@ -208,7 +205,7 @@ export default async function HomePage() {
 
       {/* ── AUTHOR / E-E-A-T STRIP ── */}
       <div className="border-y border-white/[0.05] bg-graphite-800">
-        <div className="mx-auto max-w-6xl px-4 sm:px-8 py-5">
+        <div className="mx-auto max-w-[1800px] px-4 sm:px-8 lg:px-12 py-5">
           <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-5">
             {AUTHORS.map(({ name, role, credentials, avatar, color }) => (
               <Link
@@ -241,7 +238,7 @@ export default async function HomePage() {
 
       {/* ── CATEGORIES ── */}
       {categories.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 sm:px-8 py-10" aria-label="Browse by training category">
+        <section className="mx-auto max-w-[1800px] px-4 sm:px-8 lg:px-12 py-10" aria-label="Browse by training category">
           <div className="flex items-center justify-between mb-5">
             <div>
               <div className="section-eyebrow mb-1">Browse by Category</div>
@@ -293,30 +290,32 @@ export default async function HomePage() {
       )}
 
       {/* ── HOME GYM MATCHER (Audit #03-E) ── */}
-      <section id="gear-finder" className="mx-auto max-w-6xl px-4 sm:px-8 py-10" aria-label="Home gym setup quiz">
+      <section id="gear-finder" className="mx-auto max-w-[1800px] px-4 sm:px-8 lg:px-12 py-10" aria-label="Home gym setup quiz">
         <GymQuiz />
       </section>
 
       {/* ── INLINE NEWSLETTER (after scrolling through first cards) ── */}
-      <div className="mx-auto max-w-4xl px-4 sm:px-8 pb-10">
+      <div className="mx-auto max-w-[1800px] px-4 sm:px-8 lg:px-12 pb-10">
         <Newsletter source="homepage-inline" />
       </div>
 
       {/* ── BUYER GUIDE (E-E-A-T + internal linking hub) ── */}
-      <section className="mx-auto max-w-6xl px-4 sm:px-8 pb-10" aria-label="Buying guide for fitness equipment">
+      <section className="mx-auto max-w-[1800px] px-4 sm:px-8 lg:px-12 pb-10" aria-label="Buying guide for fitness equipment">
         <BuyerGuide />
       </section>
 
       {/* ── FAQ (schema-rich, buyer-intent) ── */}
       <section
-        className="mx-auto max-w-4xl px-4 sm:px-8 border-t border-white/[0.05] py-10"
+        className="mx-auto max-w-[1800px] px-4 sm:px-8 lg:px-12 border-t border-white/[0.05] py-10"
         aria-label="Frequently asked questions about fitness gear"
       >
-        <FAQ />
+        <div className="max-w-4xl">
+          <FAQ />
+        </div>
       </section>
 
       {/* ── BOTTOM NEWSLETTER (Audit #04-D) ── */}
-      <div className="mx-auto max-w-6xl px-4 sm:px-8 pb-12">
+      <div className="mx-auto max-w-[1800px] px-4 sm:px-8 lg:px-12 pb-12">
         <Newsletter source="homepage-bottom" />
       </div>
     </>

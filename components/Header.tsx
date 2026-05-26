@@ -7,7 +7,7 @@ export function Header() {
       className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#0A0D12]/90 backdrop-blur-xl"
       role="banner"
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-8">
+      <div className="mx-auto flex max-w-[1800px] items-center justify-between px-4 py-3.5 sm:px-8 lg:px-12">
 
         {/* Logo */}
         <Link

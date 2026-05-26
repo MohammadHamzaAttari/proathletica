@@ -3,7 +3,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Calendar, Clock, User, FlaskConical, Star } from 'lucide-react';
 import { ComparisonTable } from '@/components/ComparisonTable';
-import { formatPrice, formatTimestamp } from '@/lib/format';
+import { formatTimestamp } from '@/lib/format';
 import { DisclosureBar } from '@/components/DisclosureBar';
 import { FAQ } from '@/components/FAQ';
 import { Newsletter } from '@/components/Newsletter';

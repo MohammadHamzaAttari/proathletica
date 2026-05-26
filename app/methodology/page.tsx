@@ -1,8 +1,7 @@
 import Link from 'next/link';
-import { FlaskConical, ShieldCheck, Target, TrendingUp, Users, Zap } from 'lucide-react';
+import { FlaskConical, ShieldCheck, Target, TrendingUp, Users } from 'lucide-react';
 import { buildMetadata } from '@/lib/seo/metadata';
-import { articleSchema, howToSchema, jsonLdProps } from '@/lib/seo/schema';
-import { SITE_URL } from '@/lib/config';
+import { articleSchema, howToSchema, jsonLdProps, type Article } from '@/lib/seo/schema';
 
 export const metadata = buildMetadata({
   title: 'Our Methodology',
@@ -38,10 +37,10 @@ export default function MethodologyPage() {
     title: 'The Athletica Lab Protocol: How We Rank Fitness Gear',
     excerpt: 'Rankings should be explainable, repeatable, and honest. We combine large-scale review data with technical specs and editorial oversight to cut through the noise.',
     slug: 'methodology',
-    author: 'ProAthletica Editorial Board',
+    author_name: 'ProAthletica Editorial Board',
     published_at: '2026-05-13T00:00:00Z',
     updated_at: new Date().toISOString(),
-  } as any, '/methodology');
+  } as unknown as Article, '/methodology');
 
   const howTo = howToSchema({
     name: 'How We Rank Fitness Equipment',
@@ -96,7 +95,7 @@ export default function MethodologyPage() {
               Our internal engine pulls and verifies public data including current pricing, material compositions, footprint dimensions, and warranty coverage. We emphasize <strong className="text-white">Total Cost of Ownership</strong>—how much a product actually costs when you factor in durability and necessary accessories.
             </p>
             <p>
-              When independent testing data or hands-on experience is available from our editorial team, we highlight it with the <span className="text-trust-blue font-bold">"Verified"</span> chip. When it is not, we rely on transparent, reproducible spec comparisons and aggregated customer feedback.
+              When independent testing data or hands-on experience is available from our editorial team, we highlight it with the <span className="text-trust-blue font-bold">&quot;Verified&quot;</span> chip. When it is not, we rely on transparent, reproducible spec comparisons and aggregated customer feedback.
             </p>
           </div>
         </div>

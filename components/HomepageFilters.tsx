@@ -195,6 +195,7 @@ export function HomepageFilters({
   const [isPending, startTransition] = useTransition();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showAllTags, setShowAllTags] = useState(false);
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
   const activeFilter = (searchParams.get('focus') as FilterKey) || initialFilter || 'all';
   const searchQuery = (searchParams.get('q') || '').trim();
@@ -392,53 +393,36 @@ export function HomepageFilters({
     trackEvent('homepage_filter', { action: 'tag', value: tag, selected: nextTags.has(tag) });
   };
 
-  return (
-    <div className="space-y-4">
-      {/* ── FILTER TABS ── */}
-      <div className="flex flex-col gap-4">
+  const FilterContent = (
+    <div className="space-y-8">
+      {/* ── FOCUS FILTERS ── */}
+      <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-neutral-500">
-            <SlidersHorizontal className="w-3 h-3" />
-            Filter by training focus
-          </div>
+          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Training Focus</div>
           {activeFilter !== 'all' && (
-            <button
-              onClick={() => setFilter('all')}
-              className="text-xs font-bold text-trust-blue hover:text-white transition-colors flex items-center gap-1"
-            >
-              <X className="w-3 h-3" />
-              Reset
-            </button>
+            <button onClick={() => setFilter('all')} className="text-[10px] font-bold text-trust-blue">Reset</button>
           )}
         </div>
-
-        <div
-          role="tablist"
-          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2"
-        >
+        <div className="flex flex-col gap-2">
           {FILTERS.map((filter) => {
             const isActive = activeFilter === filter.key;
             return (
               <button
                 key={filter.key}
-                role="tab"
-                aria-selected={isActive}
-                onClick={() => setFilter(filter.key)}
-                className={`group flex flex-col items-start p-4 rounded-inner border transition-all duration-200 ${
+                onClick={() => {
+                  setFilter(filter.key);
+                  setIsMobileFiltersOpen(false);
+                }}
+                className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
                   isActive
-                    ? 'border-data-lime bg-data-lime/10 shadow-[0_0_20px_rgba(198,255,61,0.08)]'
-                    : 'border-white/[0.06] bg-graphite-800 hover:border-white/20'
+                    ? 'border-data-lime bg-data-lime/10 text-data-lime'
+                    : 'border-white/[0.06] bg-graphite-800 text-offwhite hover:border-white/20'
                 }`}
               >
-                <div className="flex items-center justify-between w-full mb-1">
-                  <span className={`text-xl transition-transform ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} aria-hidden="true">{filter.icon}</span>
-                  {isActive && <div className="w-1.5 h-1.5 rounded-full bg-data-lime animate-pulse" />}
-                </div>
-                <div className={`text-xs font-black uppercase tracking-tight ${isActive ? 'text-data-lime' : 'text-offwhite'}`}>
-                  {filter.label}
-                </div>
-                <div className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mt-0.5 whitespace-nowrap">
-                  {filter.hint}
+                <span className="text-xl">{filter.icon}</span>
+                <div className="text-left">
+                  <div className="text-xs font-black uppercase tracking-tight">{filter.label}</div>
+                  <div className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">{filter.hint}</div>
                 </div>
               </button>
             );
@@ -446,200 +430,170 @@ export function HomepageFilters({
         </div>
       </div>
 
-      {/* ── ADVANCED FILTERS ── */}
-      <div className="rounded-card border border-white/[0.06] bg-graphite-800/60 p-5 space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Advanced search</div>
-          {(searchQuery || categoryFilter !== 'all' || brandFilter !== 'all' || tagFilters.length > 0 || Number.isFinite(minPrice)
-            || Number.isFinite(maxPrice) || Number.isFinite(minRating) || sortBy !== 'rank') && (
-            <button
-              onClick={() => {
-                updateParams({ q: null, category: null, brand: null, tags: null, minPrice: null, maxPrice: null, minRating: null, sort: null });
-                trackEvent('homepage_filter', { action: 'clear_all' });
-              }}
-              className="text-[10px] font-bold text-trust-blue hover:text-white transition-colors flex items-center gap-1"
-            >
-              <X className="w-2.5 h-2.5" />
-              Clear advanced
-            </button>
-          )}
-        </div>
+      {/* ── SEARCH & CATEGORIES ── */}
+      <div className="space-y-4">
+        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Refine Search</div>
 
-        <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 border border-white/[0.04] p-2 bg-graphite-900 rounded-lg">
-          <label className="flex flex-col gap-1 w-full">
-            <span className="sr-only">Search</span>
+        <div className="space-y-3">
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-bold uppercase text-neutral-600">Keyword</span>
             <input
               type="search"
-              placeholder="Search gear, brands..."
+              placeholder="Search gear..."
               value={searchQuery}
-              onChange={(event) => updateParams({ q: event.target.value })}
-              onBlur={(event) => {
-                if (event.target.value.trim()) trackEvent('homepage_filter', { action: 'search', value: event.target.value.trim() });
-              }}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' && searchQuery.trim()) trackEvent('homepage_filter', { action: 'search', value: searchQuery.trim() });
-              }}
-              className="h-8 rounded-[4px] border border-white/[0.04] bg-graphite-800 px-2.5 text-xs text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none w-full"
+              onChange={(e) => updateParams({ q: e.target.value })}
+              className="h-10 rounded-lg border border-white/10 bg-graphite-900 px-3 text-xs text-offwhite focus:border-data-lime/50 focus:outline-none"
             />
           </label>
-          <label className="flex flex-col gap-1 w-full">
-            <span className="sr-only">Category</span>
+
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-bold uppercase text-neutral-600">Category</span>
             <select
               value={categoryFilter}
-              onChange={(event) => {
-                updateParams({ category: event.target.value });
-                trackEvent('homepage_filter', { action: 'category', value: event.target.value });
-              }}
-              className="h-8 rounded-[4px] border border-white/[0.04] bg-graphite-800 px-2 text-xs text-offwhite focus:border-data-lime/60 focus:outline-none w-full"
+              onChange={(e) => updateParams({ category: e.target.value })}
+              className="h-10 rounded-lg border border-white/10 bg-graphite-900 px-3 text-xs text-offwhite focus:border-data-lime/50 focus:outline-none"
             >
               <option value="all">All categories</option>
-              {categoryOptions.map((category) => (
-                <option key={category} value={category}>{category}</option>
-              ))}
+              {categoryOptions.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </label>
-          <label className="flex flex-col gap-1 w-full">
-            <span className="sr-only">Brand</span>
+
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-bold uppercase text-neutral-600">Brand</span>
             <select
               value={brandFilter}
-              onChange={(event) => {
-                updateParams({ brand: event.target.value });
-                trackEvent('homepage_filter', { action: 'brand', value: event.target.value });
-              }}
-              className="h-8 rounded-[4px] border border-white/[0.04] bg-graphite-800 px-2 text-xs text-offwhite focus:border-data-lime/60 focus:outline-none w-full"
+              onChange={(e) => updateParams({ brand: e.target.value })}
+              className="h-10 rounded-lg border border-white/10 bg-graphite-900 px-3 text-xs text-offwhite focus:border-data-lime/50 focus:outline-none"
             >
               <option value="all">All brands</option>
-              {brandOptions.map((brand) => (
-                <option key={brand} value={brand}>{brand}</option>
-              ))}
-            </select>
-          </label>
-          <div className="flex gap-2 w-full col-span-2 sm:col-span-1 lg:col-span-2">
-            <label className="flex flex-col gap-1 w-full">
-              <span className="sr-only">Min price</span>
-              <input
-                type="number"
-                min={0}
-                placeholder="Min $"
-                value={Number.isFinite(minPrice) ? String(minPrice) : ''}
-                onChange={(event) => updateParams({ minPrice: event.target.value })}
-                className="h-8 rounded-[4px] border border-white/[0.04] bg-graphite-800 px-2.5 text-xs text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none w-full"
-              />
-            </label>
-            <label className="flex flex-col gap-1 w-full">
-              <span className="sr-only">Max price</span>
-              <input
-                type="number"
-                min={0}
-                placeholder="Max $"
-                value={Number.isFinite(maxPrice) ? String(maxPrice) : ''}
-                onChange={(event) => updateParams({ maxPrice: event.target.value })}
-                className="h-8 rounded-[4px] border border-white/[0.04] bg-graphite-800 px-2.5 text-xs text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none w-full"
-              />
-            </label>
-          </div>
-          <label className="flex flex-col gap-1 w-full">
-            <span className="sr-only">Min rating</span>
-            <select
-              value={Number.isFinite(minRating) ? String(minRating) : 'all'}
-              onChange={(event) => updateParams({ minRating: event.target.value === 'all' ? null : event.target.value })}
-              className="h-8 rounded-[4px] border border-white/[0.04] bg-graphite-800 px-2 text-xs text-offwhite focus:border-data-lime/60 focus:outline-none w-full"
-            >
-              <option value="all">Any rating</option>
-              <option value="4.8">4.8+ stars</option>
-              <option value="4.6">4.6+ stars</option>
-              <option value="4.4">4.4+ stars</option>
-              <option value="4.2">4.2+ stars</option>
-            </select>
-          </label>
-        </div>
-
-        {tagOptions.length > 0 && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-widest text-neutral-500">Best for</span>
-              {tagFilters.length > 0 && (
-                <button
-                  onClick={() => {
-                    updateParams({ tags: null });
-                    trackEvent('homepage_filter', { action: 'tags_clear' });
-                  }}
-                  className="text-xs font-bold text-trust-blue hover:text-white transition-colors"
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {(showAllTags ? tagOptions : tagOptions.slice(0, 20)).map((tag) => {
-                const isActive = tagFilters.includes(tag);
-                const display = cleanTagName(tag);
-                return (
-                  <button
-                    key={tag}
-                    onClick={() => toggleTag(tag)}
-                    className={`rounded-pill border px-3 py-1 text-[10px] font-black uppercase tracking-widest transition-colors ${
-                      isActive
-                        ? 'border-data-lime bg-data-lime/15 text-data-lime'
-                        : 'border-white/[0.08] text-neutral-400 hover:border-white/20 hover:text-offwhite'
-                    }`}
-                  >
-                    {display}
-                  </button>
-                );
-              })}
-            </div>
-            {tagOptions.length > 20 && (
-              <button
-                onClick={() => setShowAllTags((v) => !v)}
-                className="text-[11px] font-bold text-trust-blue hover:text-offwhite transition-colors"
-              >
-                {showAllTags ? '↑ Show fewer' : `+ ${tagOptions.length - 20} more tags`}
-              </button>
-            )}
-          </div>
-        )}
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
-            Sort by
-            <select
-              value={sortBy}
-              onChange={(event) => {
-                updateParams({ sort: event.target.value });
-                trackEvent('homepage_filter', { action: 'sort', value: event.target.value });
-              }}
-              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite focus:border-data-lime/60 focus:outline-none"
-            >
-              <option value="rank">Editor rank</option>
-              <option value="price-asc">Price: low to high</option>
-              <option value="price-desc">Price: high to low</option>
-              <option value="rating-desc">Highest rated</option>
-              <option value="reviews-desc">Most reviewed</option>
-              <option value="newest">Recently updated</option>
-            </select>
-          </label>
-          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
-            Results per page
-            <select
-              value={String(pageSize)}
-              onChange={(event) => {
-                updateParams({ pageSize: event.target.value });
-                trackEvent('homepage_filter', { action: 'page_size', value: event.target.value });
-              }}
-              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite focus:border-data-lime/60 focus:outline-none"
-            >
-              <option value="6">6</option>
-              <option value="9">9</option>
-              <option value="12">12</option>
-              <option value="18">18</option>
+              {brandOptions.map((b) => <option key={b} value={b}>{b}</option>)}
             </select>
           </label>
         </div>
       </div>
 
+      {/* ── PRICE RANGE ── */}
+      <div className="space-y-4">
+        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Price Range</div>
+        <div className="grid grid-cols-2 gap-2">
+          <input
+            type="number"
+            placeholder="Min $"
+            value={Number.isFinite(minPrice) ? String(minPrice) : ''}
+            onChange={(e) => updateParams({ minPrice: e.target.value })}
+            className="h-10 rounded-lg border border-white/10 bg-graphite-900 px-3 text-xs text-offwhite focus:border-data-lime/50 focus:outline-none"
+          />
+          <input
+            type="number"
+            placeholder="Max $"
+            value={Number.isFinite(maxPrice) ? String(maxPrice) : ''}
+            onChange={(e) => updateParams({ maxPrice: e.target.value })}
+            className="h-10 rounded-lg border border-white/10 bg-graphite-900 px-3 text-xs text-offwhite focus:border-data-lime/50 focus:outline-none"
+          />
+        </div>
+      </div>
+
+      {/* ── TAGS ── */}
+      {tagOptions.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Best For</div>
+            {tagFilters.length > 0 && (
+              <button onClick={() => updateParams({ tags: null })} className="text-[10px] font-bold text-trust-blue">Clear</button>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {(showAllTags ? tagOptions : tagOptions.slice(0, 15)).map((tag) => {
+              const isActive = tagFilters.includes(tag);
+              return (
+                <button
+                  key={tag}
+                  onClick={() => toggleTag(tag)}
+                  className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-widest transition-colors ${
+                    isActive ? 'border-data-lime bg-data-lime/15 text-data-lime' : 'border-white/10 text-neutral-500 hover:text-offwhite'
+                  }`}
+                >
+                  {cleanTagName(tag)}
+                </button>
+              );
+            })}
+          </div>
+          {tagOptions.length > 15 && (
+            <button onClick={() => setShowAllTags(!showAllTags)} className="text-[10px] font-bold text-trust-blue">
+              {showAllTags ? 'Show less' : `+ ${tagOptions.length - 15} more`}
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* ── SORT ── */}
+      <div className="space-y-4">
+        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Sort By</div>
+        <select
+          value={sortBy}
+          onChange={(e) => updateParams({ sort: e.target.value })}
+          className="h-11 w-full rounded-xl border border-white/10 bg-graphite-900 px-3 text-xs font-bold text-offwhite focus:border-data-lime/50 focus:outline-none"
+        >
+          <option value="rank">Editor rank</option>
+          <option value="price-asc">Price: low to high</option>
+          <option value="price-desc">Price: high to low</option>
+          <option value="rating-desc">Highest rated</option>
+          <option value="reviews-desc">Most reviewed</option>
+          <option value="newest">Recently updated</option>
+        </select>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="flex flex-col lg:flex-row gap-8 items-start">
+      {/* ── DESKTOP SIDEBAR ── */}
+      <aside className="hidden lg:block w-72 flex-shrink-0 sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto no-scrollbar pr-4">
+        {FilterContent}
+      </aside>
+
+      {/* ── MOBILE FILTER TRIGGER ── */}
+      <div className="lg:hidden w-full sticky top-20 z-30 py-2 bg-graphite-950/80 backdrop-blur-md">
+        <button
+          onClick={() => setIsMobileFiltersOpen(true)}
+          className="flex items-center justify-center gap-2 w-full h-12 rounded-xl bg-data-lime text-black font-black uppercase tracking-widest text-xs shadow-glow-lime"
+        >
+          <SlidersHorizontal className="w-4 h-4" />
+          Filters & Sort
+          {tagFilters.length + (activeFilter !== 'all' ? 1 : 0) > 0 && (
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-black text-data-lime text-[10px]">
+              {tagFilters.length + (activeFilter !== 'all' ? 1 : 0)}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* ── MOBILE FILTER DRAWER ── */}
+      {isMobileFiltersOpen && (
+        <div className="fixed inset-0 z-[100] lg:hidden">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsMobileFiltersOpen(false)} />
+          <div className="absolute inset-y-0 left-0 w-[85%] max-w-sm bg-graphite-950 shadow-2xl p-6 overflow-y-auto animate-cardIn">
+            <div className="flex items-center justify-between mb-8">
+              <div className="text-lg font-black uppercase tracking-tighter text-offwhite">Filters</div>
+              <button onClick={() => setIsMobileFiltersOpen(false)} className="p-2 text-neutral-400 hover:text-offwhite">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            {FilterContent}
+            <div className="mt-10">
+              <button
+                onClick={() => setIsMobileFiltersOpen(false)}
+                className="w-full h-14 rounded-xl bg-data-lime text-black font-black uppercase tracking-widest text-sm shadow-glow-lime"
+              >
+                Apply Filters
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── RESULTS ── */}
-      <div className="space-y-8 animate-cardIn">
+      <div className="flex-1 space-y-8 animate-cardIn w-full">
         {/* Results Metadata */}
         <div className="flex items-center gap-4">
           <div className="h-px flex-1 bg-white/[0.06]" />
