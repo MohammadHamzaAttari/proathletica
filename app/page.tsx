@@ -118,7 +118,7 @@ export default async function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-b from-[#0A0D12]/95 via-[#0A0D12]/80 to-[#0A0D12]" />
         </div>
 
-        <div className="relative mx-auto max-w-[1800px] px-4 sm:px-8 lg:px-12 z-10">
+        <div className="relative container-site z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-left">
               {/* Trust eyebrow */}
@@ -175,10 +175,10 @@ export default async function HomePage() {
       {/* ── TOP PICKS & PRODUCTS ── */}
       <section
         id="top-picks"
-        className="mx-auto max-w-[1800px] px-4 sm:px-8 lg:px-12 py-10"
+        className="container-site py-12"
         aria-label="Current top fitness gear picks"
       >
-        <div className="flex items-end justify-between mb-8 border-b border-white/[0.06] pb-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 border-b border-white/[0.06] pb-6 gap-4">
           <div>
             <div className="section-eyebrow mb-2">
               <TrendingUp className="inline w-3 h-3 mr-1.5" aria-hidden="true" />
@@ -205,7 +205,7 @@ export default async function HomePage() {
 
       {/* ── AUTHOR / E-E-A-T STRIP ── */}
       <div className="border-y border-white/[0.05] bg-graphite-800">
-        <div className="mx-auto max-w-[1800px] px-4 sm:px-8 lg:px-12 py-5">
+        <div className="container-site py-5">
           <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-5">
             {AUTHORS.map(({ name, role, credentials, avatar, color }) => (
               <Link
@@ -238,7 +238,7 @@ export default async function HomePage() {
 
       {/* ── CATEGORIES ── */}
       {categories.length > 0 && (
-        <section className="mx-auto max-w-[1800px] px-4 sm:px-8 lg:px-12 py-10" aria-label="Browse by training category">
+        <section className="container-site py-12" aria-label="Browse by training category">
           <div className="flex items-center justify-between mb-5">
             <div>
               <div className="section-eyebrow mb-1">Browse by Category</div>
@@ -290,32 +290,34 @@ export default async function HomePage() {
       )}
 
       {/* ── HOME GYM MATCHER (Audit #03-E) ── */}
-      <section id="gear-finder" className="mx-auto max-w-[1800px] px-4 sm:px-8 lg:px-12 py-10" aria-label="Home gym setup quiz">
+      <section id="gear-finder" className="container-site py-12" aria-label="Home gym setup quiz">
         <GymQuiz />
       </section>
 
       {/* ── INLINE NEWSLETTER (after scrolling through first cards) ── */}
-      <div className="mx-auto max-w-[1800px] px-4 sm:px-8 lg:px-12 pb-10">
+      <div className="container-site pb-12">
         <Newsletter source="homepage-inline" />
       </div>
 
       {/* ── BUYER GUIDE (E-E-A-T + internal linking hub) ── */}
-      <section className="mx-auto max-w-[1800px] px-4 sm:px-8 lg:px-12 pb-10" aria-label="Buying guide for fitness equipment">
-        <BuyerGuide />
+      <section className="container-site pb-12" aria-label="Buying guide for fitness equipment">
+        <div className="container-reading">
+          <BuyerGuide />
+        </div>
       </section>
 
       {/* ── FAQ (schema-rich, buyer-intent) ── */}
       <section
-        className="mx-auto max-w-[1800px] px-4 sm:px-8 lg:px-12 border-t border-white/[0.05] py-10"
+        className="container-site border-t border-white/[0.05] py-12"
         aria-label="Frequently asked questions about fitness gear"
       >
-        <div className="max-w-4xl">
+        <div className="container-reading">
           <FAQ />
         </div>
       </section>
 
       {/* ── BOTTOM NEWSLETTER (Audit #04-D) ── */}
-      <div className="mx-auto max-w-[1800px] px-4 sm:px-8 lg:px-12 pb-12">
+      <div className="container-site pb-16">
         <Newsletter source="homepage-bottom" />
       </div>
     </>

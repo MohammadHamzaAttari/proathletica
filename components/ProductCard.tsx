@@ -269,7 +269,7 @@ export function ProductCard({
         ) : null}
 
         {/* Verdict — editorial summary */}
-        <p className="text-sm leading-relaxed text-neutral-300 clamp-3 pl-3 border-l-2 border-data-lime/30 group-hover/card:border-data-lime transition-colors">
+        <p className="text-sm leading-relaxed text-neutral-300 clamp-2 pl-3 border-l-2 border-data-lime/30 group-hover/card:border-data-lime transition-colors">
           {verdict}
         </p>
 
