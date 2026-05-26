@@ -194,6 +194,7 @@ export function HomepageFilters({
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showAllTags, setShowAllTags] = useState(false);
 
   const activeFilter = (searchParams.get('focus') as FilterKey) || initialFilter || 'all';
   const searchQuery = (searchParams.get('q') || '').trim();
@@ -392,7 +393,7 @@ export function HomepageFilters({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       {/* ── FILTER TABS ── */}
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
@@ -567,7 +568,7 @@ export function HomepageFilters({
         {tagOptions.length > 0 && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-widest text-neutral-500">Best for tags</span>
+              <span className="text-xs font-bold uppercase tracking-widest text-neutral-500">Best for</span>
               {tagFilters.length > 0 && (
                 <button
                   onClick={() => {
@@ -576,25 +577,37 @@ export function HomepageFilters({
                   }}
                   className="text-xs font-bold text-trust-blue hover:text-white transition-colors"
                 >
-                  Clear tags
+                  Clear
                 </button>
               )}
             </div>
-            <div className="flex flex-wrap gap-2">
-              {tagOptions.map((tag) => {
+            <div className="flex flex-wrap gap-1.5">
+              {(showAllTags ? tagOptions : tagOptions.slice(0, 20)).map((tag) => {
                 const isActive = tagFilters.includes(tag);
                 const display = cleanTagName(tag);
                 return (
                   <button
                     key={tag}
                     onClick={() => toggleTag(tag)}
-                    className={`rounded-pill border px-4 py-1.5 text-[11px] font-black uppercase tracking-widest transition-colors ${isActive ? 'border-data-lime bg-data-lime/15 text-data-lime' : 'border-white/[0.08] text-neutral-400 hover:border-white/20 hover:text-offwhite'}`}
+                    className={`rounded-pill border px-3 py-1 text-[10px] font-black uppercase tracking-widest transition-colors ${
+                      isActive
+                        ? 'border-data-lime bg-data-lime/15 text-data-lime'
+                        : 'border-white/[0.08] text-neutral-400 hover:border-white/20 hover:text-offwhite'
+                    }`}
                   >
                     {display}
                   </button>
                 );
               })}
             </div>
+            {tagOptions.length > 20 && (
+              <button
+                onClick={() => setShowAllTags((v) => !v)}
+                className="text-[11px] font-bold text-trust-blue hover:text-offwhite transition-colors"
+              >
+                {showAllTags ? '↑ Show fewer' : `+ ${tagOptions.length - 20} more tags`}
+              </button>
+            )}
           </div>
         )}
 

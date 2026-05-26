@@ -210,63 +210,52 @@ export default async function HomePage() {
 
       {/* ── CATEGORIES ── */}
       {categories.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 sm:px-8 py-16" aria-label="Browse by training category">
-          <div className="flex items-end justify-between mb-8">
+        <section className="mx-auto max-w-6xl px-4 sm:px-8 py-10" aria-label="Browse by training category">
+          <div className="flex items-center justify-between mb-5">
             <div>
-              <div className="section-eyebrow mb-2">Browse by Category</div>
-              <h2 className="text-3xl font-black uppercase tracking-tighter text-offwhite">
-                Shop by training focus
+              <div className="section-eyebrow mb-1">Browse by Category</div>
+              <h2 className="text-2xl font-black uppercase tracking-tighter text-offwhite">
+                Shop by Training Focus
               </h2>
             </div>
-            <Link href="/categories" className="text-sm font-bold text-trust-blue hover:text-offwhite transition-colors hidden sm:inline-flex items-center gap-1.5">
-              All categories <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+            <Link href="/categories" className="text-sm font-bold text-trust-blue hover:text-offwhite transition-colors inline-flex items-center gap-1.5 shrink-0">
+              All <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
             </Link>
           </div>
 
-          <div className="space-y-12">
-            {[
-              { title: 'Strength Training', filter: (slug: string) => ['home-gym', 'resistance-training', 'powerlifting'].some(k => slug.includes(k)) },
-              { title: 'Cardio & Endurance', filter: (slug: string) => ['running', 'cardio'].some(k => slug.includes(k)) },
-              { title: 'Recovery & Mobility', filter: (slug: string) => ['recovery', 'yoga', 'pilates', 'massage'].some(k => slug.includes(k)) },
-            ].map((group) => {
-              const groupCats = categories.filter((c) => group.filter(c.slug));
-              if (groupCats.length === 0) return null;
-              
+          <div
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2"
+            role="list"
+          >
+            {categories.slice(0, 10).map((category) => {
+              const icon = CATEGORY_ICONS[category.slug] ?? CATEGORY_ICONS['default'];
               return (
-                <div key={group.title}>
-                  <h3 className="text-lg font-bold text-neutral-400 mb-4">{group.title}</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3" role="list">
-                    {groupCats.map((category) => {
-                      const icon = CATEGORY_ICONS[category.slug] ?? CATEGORY_ICONS['default'];
-                      return (
-                        <Link
-                          key={category.slug}
-                          href={`/category/${category.slug}`}
-                          role="listitem"
-                          className="group relative overflow-hidden rounded-card border border-white/[0.06] bg-graphite-800 p-5 sm:p-6 transition-all hover:border-data-lime/25 hover:-translate-y-0.5 hover:shadow-card-hover"
-                        >
-                          <div className="text-2xl mb-3" aria-hidden="true">{icon}</div>
-                          <div className="text-sm font-black uppercase tracking-tight text-offwhite group-hover:text-data-lime transition-colors">
-                            {category.name}
-                          </div>
-                          <div className="mt-1 text-xs text-neutral-500">
-                            {category.count} ranked picks
-                          </div>
-                          <div className="absolute -bottom-4 -right-4 text-[80px] font-black text-data-lime/[0.04] group-hover:text-data-lime/[0.08] transition-colors leading-none select-none" aria-hidden="true">
-                            {category.name.slice(0, 1).toUpperCase()}
-                          </div>
-                        </Link>
-                      );
-                    })}
+                <Link
+                  key={category.slug}
+                  href={`/category/${category.slug}`}
+                  role="listitem"
+                  className="group relative overflow-hidden rounded-lg border border-white/[0.06] bg-graphite-800 p-3 sm:p-4 transition-all hover:border-data-lime/30 hover:-translate-y-0.5 hover:shadow-card-hover"
+                >
+                  <div className="text-lg mb-1.5" aria-hidden="true">{icon}</div>
+                  <div className="text-xs font-black uppercase tracking-tight text-offwhite group-hover:text-data-lime transition-colors leading-tight">
+                    {category.name}
                   </div>
-                </div>
+                  <div className="mt-0.5 text-[10px] text-neutral-500 font-medium">
+                    {category.count} picks
+                  </div>
+                </Link>
               );
             })}
-          </div>
 
-          <div className="mt-8 flex justify-center sm:hidden">
-            <Link href="/categories" className="cta-secondary w-auto px-6 text-xs">
-              Browse all categories →
+            {/* "View all" tile */}
+            <Link
+              href="/categories"
+              className="group flex flex-col items-center justify-center rounded-lg border border-dashed border-white/[0.10] bg-graphite-800/40 p-3 sm:p-4 transition-all hover:border-trust-blue/40 hover:bg-trust-blue/[0.04]"
+            >
+              <ArrowRight className="w-4 h-4 text-trust-blue mb-1 group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />
+              <div className="text-[10px] font-black uppercase tracking-widest text-neutral-500 group-hover:text-trust-blue transition-colors text-center">
+                All {categories.length} categories
+              </div>
             </Link>
           </div>
         </section>
@@ -283,7 +272,7 @@ export default async function HomePage() {
         className="mx-auto max-w-6xl px-4 sm:px-8 pb-16"
         aria-label="Current top fitness gear picks"
       >
-        <div className="flex items-end justify-between mb-8">
+        <div className="flex items-end justify-between mb-6">
           <div>
             <div className="section-eyebrow mb-2">
               <TrendingUp className="inline w-3 h-3 mr-1.5" aria-hidden="true" />

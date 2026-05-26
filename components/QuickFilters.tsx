@@ -24,7 +24,7 @@ export function QuickFilters({ onFilterChange }: QuickFiltersProps) {
   };
 
   return (
-    <div className="flex flex-wrap gap-2 pb-8">
+    <div className="flex flex-wrap gap-2 pb-4">
       {FILTERS.map((filter) => (
         <button
           key={filter.id}
