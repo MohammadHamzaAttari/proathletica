@@ -11,7 +11,7 @@ import { HomepageFilters } from '@/components/HomepageFilters';
 import { LifestyleHubs } from '@/components/LifestyleHubs';
 import { Newsletter } from '@/components/Newsletter';
 import { getAllProducts, getCategoryList, getPublishedArticles } from '@/lib/db';
-import { itemListSchema, jsonLdProps, organizationSchema, howToSchema } from '@/lib/seo/schema';
+import { itemListSchema, jsonLdProps, howToSchema } from '@/lib/seo/schema';
 
 export const revalidate = 3600;
 
@@ -175,6 +175,37 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── TOP PICKS (Moved directly after hero) ── */}
+      <section
+        id="top-picks"
+        className="mx-auto max-w-6xl px-4 sm:px-8 pt-12 pb-10"
+        aria-label="Current top fitness gear picks"
+      >
+        <div className="flex items-end justify-between mb-6">
+          <div>
+            <div className="section-eyebrow mb-2">
+              <TrendingUp className="inline w-3 h-3 mr-1.5" aria-hidden="true" />
+              Data-Driven Recommendations
+            </div>
+            <h2 className="text-3xl font-black uppercase tracking-tighter text-offwhite">
+              Current Top Picks
+            </h2>
+            <p className="text-sm text-neutral-500 mt-1">
+              Updated {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} · {featured.length} products ranked
+            </p>
+          </div>
+          <Link href="/categories" className="hidden sm:flex items-center gap-1.5 text-sm font-bold text-trust-blue hover:text-offwhite transition-colors">
+            All categories <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        {featured.length > 0 && (
+          <Suspense fallback={<div className="h-40 animate-pulse bg-white/[0.03] rounded-card" />}>
+            <HomepageFilters products={featured} articleSlug="homepage" initialFilter="all" />
+          </Suspense>
+        )}
+      </section>
+
       {/* ── AUTHOR / E-E-A-T STRIP ── */}
       <div className="border-y border-white/[0.05] bg-graphite-800">
         <div className="mx-auto max-w-6xl px-4 sm:px-8 py-5">
@@ -262,39 +293,8 @@ export default async function HomePage() {
       )}
 
       {/* ── HOME GYM MATCHER (Audit #03-E) ── */}
-      <section id="gear-finder" className="mx-auto max-w-6xl px-4 sm:px-8 py-16" aria-label="Home gym setup quiz">
+      <section id="gear-finder" className="mx-auto max-w-6xl px-4 sm:px-8 py-10" aria-label="Home gym setup quiz">
         <GymQuiz />
-      </section>
-
-      {/* ── TOP PICKS ── */}
-      <section
-        id="top-picks"
-        className="mx-auto max-w-6xl px-4 sm:px-8 pb-16"
-        aria-label="Current top fitness gear picks"
-      >
-        <div className="flex items-end justify-between mb-6">
-          <div>
-            <div className="section-eyebrow mb-2">
-              <TrendingUp className="inline w-3 h-3 mr-1.5" aria-hidden="true" />
-              Data-Driven Recommendations
-            </div>
-            <h2 className="text-3xl font-black uppercase tracking-tighter text-offwhite">
-              Current Top Picks
-            </h2>
-            <p className="text-sm text-neutral-500 mt-1">
-              Updated {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} · {featured.length} products ranked
-            </p>
-          </div>
-          <Link href="/categories" className="hidden sm:flex items-center gap-1.5 text-sm font-bold text-trust-blue hover:text-offwhite transition-colors">
-            All categories <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-
-        {featured.length > 0 && (
-          <Suspense fallback={<div className="h-40 animate-pulse bg-white/[0.03] rounded-card" />}>
-            <HomepageFilters products={featured} articleSlug="homepage" initialFilter="all" />
-          </Suspense>
-        )}
       </section>
 
       {/* ── INLINE NEWSLETTER (after scrolling through first cards) ── */}

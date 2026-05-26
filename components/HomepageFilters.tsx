@@ -360,7 +360,7 @@ export function HomepageFilters({
   const paginationPages = useMemo(() => {
     const windowSize = 5;
     let start = Math.max(1, currentPage - 2);
-    let end = Math.min(totalPages, start + windowSize - 1);
+    const end = Math.min(totalPages, start + windowSize - 1);
     start = Math.max(1, end - windowSize + 1);
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   }, [currentPage, totalPages]);
@@ -449,7 +449,7 @@ export function HomepageFilters({
       {/* ── ADVANCED FILTERS ── */}
       <div className="rounded-card border border-white/[0.06] bg-graphite-800/60 p-5 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="text-xs font-black uppercase tracking-[0.2em] text-neutral-500">Advanced filters</div>
+          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Advanced search</div>
           {(searchQuery || categoryFilter !== 'all' || brandFilter !== 'all' || tagFilters.length > 0 || Number.isFinite(minPrice)
             || Number.isFinite(maxPrice) || Number.isFinite(minRating) || sortBy !== 'rank') && (
             <button
@@ -457,44 +457,40 @@ export function HomepageFilters({
                 updateParams({ q: null, category: null, brand: null, tags: null, minPrice: null, maxPrice: null, minRating: null, sort: null });
                 trackEvent('homepage_filter', { action: 'clear_all' });
               }}
-              className="text-xs font-bold text-trust-blue hover:text-white transition-colors flex items-center gap-1"
+              className="text-[10px] font-bold text-trust-blue hover:text-white transition-colors flex items-center gap-1"
             >
-              <X className="w-3 h-3" />
-              Clear all
+              <X className="w-2.5 h-2.5" />
+              Clear advanced
             </button>
           )}
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
-            Search
+        <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 border border-white/[0.04] p-2 bg-graphite-900 rounded-lg">
+          <label className="flex flex-col gap-1 w-full">
+            <span className="sr-only">Search</span>
             <input
               type="search"
-              placeholder="Search gear, brands, tags"
+              placeholder="Search gear, brands..."
               value={searchQuery}
               onChange={(event) => updateParams({ q: event.target.value })}
               onBlur={(event) => {
-                if (event.target.value.trim()) {
-                  trackEvent('homepage_filter', { action: 'search', value: event.target.value.trim() });
-                }
+                if (event.target.value.trim()) trackEvent('homepage_filter', { action: 'search', value: event.target.value.trim() });
               }}
               onKeyDown={(event) => {
-                if (event.key === 'Enter' && searchQuery.trim()) {
-                  trackEvent('homepage_filter', { action: 'search', value: searchQuery.trim() });
-                }
+                if (event.key === 'Enter' && searchQuery.trim()) trackEvent('homepage_filter', { action: 'search', value: searchQuery.trim() });
               }}
-              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none"
+              className="h-8 rounded-[4px] border border-white/[0.04] bg-graphite-800 px-2.5 text-xs text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none w-full"
             />
           </label>
-          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
-            Category
+          <label className="flex flex-col gap-1 w-full">
+            <span className="sr-only">Category</span>
             <select
               value={categoryFilter}
               onChange={(event) => {
                 updateParams({ category: event.target.value });
                 trackEvent('homepage_filter', { action: 'category', value: event.target.value });
               }}
-              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite focus:border-data-lime/60 focus:outline-none"
+              className="h-8 rounded-[4px] border border-white/[0.04] bg-graphite-800 px-2 text-xs text-offwhite focus:border-data-lime/60 focus:outline-none w-full"
             >
               <option value="all">All categories</option>
               {categoryOptions.map((category) => (
@@ -502,15 +498,15 @@ export function HomepageFilters({
               ))}
             </select>
           </label>
-          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
-            Brand
+          <label className="flex flex-col gap-1 w-full">
+            <span className="sr-only">Brand</span>
             <select
               value={brandFilter}
               onChange={(event) => {
                 updateParams({ brand: event.target.value });
                 trackEvent('homepage_filter', { action: 'brand', value: event.target.value });
               }}
-              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite focus:border-data-lime/60 focus:outline-none"
+              className="h-8 rounded-[4px] border border-white/[0.04] bg-graphite-800 px-2 text-xs text-offwhite focus:border-data-lime/60 focus:outline-none w-full"
             >
               <option value="all">All brands</option>
               {brandOptions.map((brand) => (
@@ -518,43 +514,36 @@ export function HomepageFilters({
               ))}
             </select>
           </label>
-          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
-            Min price
-            <input
-              type="number"
-              min={0}
-              placeholder="0"
-              value={Number.isFinite(minPrice) ? String(minPrice) : ''}
-              onChange={(event) => {
-                updateParams({ minPrice: event.target.value });
-                trackEvent('homepage_filter', { action: 'min_price', value: event.target.value || '0' });
-              }}
-              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none"
-            />
-          </label>
-          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
-            Max price
-            <input
-              type="number"
-              min={0}
-              placeholder="600"
-              value={Number.isFinite(maxPrice) ? String(maxPrice) : ''}
-              onChange={(event) => {
-                updateParams({ maxPrice: event.target.value });
-                trackEvent('homepage_filter', { action: 'max_price', value: event.target.value || '0' });
-              }}
-              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none"
-            />
-          </label>
-          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
-            Min rating
+          <div className="flex gap-2 w-full col-span-2 sm:col-span-1 lg:col-span-2">
+            <label className="flex flex-col gap-1 w-full">
+              <span className="sr-only">Min price</span>
+              <input
+                type="number"
+                min={0}
+                placeholder="Min $"
+                value={Number.isFinite(minPrice) ? String(minPrice) : ''}
+                onChange={(event) => updateParams({ minPrice: event.target.value })}
+                className="h-8 rounded-[4px] border border-white/[0.04] bg-graphite-800 px-2.5 text-xs text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none w-full"
+              />
+            </label>
+            <label className="flex flex-col gap-1 w-full">
+              <span className="sr-only">Max price</span>
+              <input
+                type="number"
+                min={0}
+                placeholder="Max $"
+                value={Number.isFinite(maxPrice) ? String(maxPrice) : ''}
+                onChange={(event) => updateParams({ maxPrice: event.target.value })}
+                className="h-8 rounded-[4px] border border-white/[0.04] bg-graphite-800 px-2.5 text-xs text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none w-full"
+              />
+            </label>
+          </div>
+          <label className="flex flex-col gap-1 w-full">
+            <span className="sr-only">Min rating</span>
             <select
               value={Number.isFinite(minRating) ? String(minRating) : 'all'}
-              onChange={(event) => {
-                updateParams({ minRating: event.target.value === 'all' ? null : event.target.value });
-                trackEvent('homepage_filter', { action: 'min_rating', value: event.target.value });
-              }}
-              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite focus:border-data-lime/60 focus:outline-none"
+              onChange={(event) => updateParams({ minRating: event.target.value === 'all' ? null : event.target.value })}
+              className="h-8 rounded-[4px] border border-white/[0.04] bg-graphite-800 px-2 text-xs text-offwhite focus:border-data-lime/60 focus:outline-none w-full"
             >
               <option value="all">Any rating</option>
               <option value="4.8">4.8+ stars</option>

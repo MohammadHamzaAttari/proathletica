@@ -64,24 +64,24 @@ export function ComparisonTable({
 
               return (
                 <tr key={product.id} className="group hover:bg-white/[0.02] transition-colors">
-                  <td className="py-6 pr-6 align-top">
-                    <div className={`rank-badge ${index === 0 ? 'rank-badge--gold' : ''}`}>
-                      #{index + 1}
+                  <td className="py-4 pr-4 align-top">
+                    <div className={`rank-badge ${index === 0 ? 'rank-badge--gold' : ''} !w-7 !h-7 !text-xs`}>
+                      {index + 1}
                     </div>
                   </td>
-                  <td className="py-6 pr-6 align-top">
-                    <div className="font-bold text-lg text-offwhite leading-tight">{product.short_title || product.title.split(' ').slice(0, 4).join(' ')}</div>
-                    <div className="text-xs text-neutral-500 mt-1.5 uppercase tracking-widest font-bold">{getLabel(index, product)}</div>
+                  <td className="py-4 pr-6 align-top">
+                    <div className="font-bold text-base text-offwhite leading-tight">{product.short_title || product.title.split(' ').slice(0, 4).join(' ')}</div>
+                    <div className="text-[10px] text-neutral-500 mt-1 uppercase tracking-widest font-bold">{getLabel(index, product)}</div>
                     {product.rating && (
-                      <div className="mt-4 flex items-center gap-1.5">
+                      <div className="mt-2 flex items-center gap-1.5">
                         <Star className="w-3.5 h-3.5 fill-star-gold text-star-gold" />
                         <span className="text-sm font-black text-offwhite">{product.rating.toFixed(1)}</span>
                         {product.review_count && <span className="text-[10px] text-neutral-600">({formatReviewCount(product.review_count)})</span>}
                       </div>
                     )}
                   </td>
-                  <td className="py-6 pr-6 align-top">
-                    <div className="flex flex-col gap-3">
+                  <td className="py-4 pr-4 align-top">
+                    <div className="flex flex-col gap-1.5 mt-1">
                       {(product.best_for_tags || []).slice(0, 3).map((tag) => (
                         <div key={tag} className="text-xs font-bold text-[#3D8BFF] leading-snug">
                           • {tag}
@@ -92,21 +92,21 @@ export function ComparisonTable({
                       )}
                     </div>
                   </td>
-                  <td className="py-6 pr-8 text-sm leading-relaxed text-neutral-300 align-top">
-                    <div className="line-clamp-3">{verdict}</div>
+                  <td className="py-4 pr-4 text-xs leading-relaxed text-neutral-300 align-top">
+                    <div className="line-clamp-2">{verdict}</div>
                     {product.pros?.length ? (
-                      <div className="mt-5 flex flex-col gap-2">
-                        <div className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Key Specs / Pros</div>
+                      <div className="mt-3 flex flex-col gap-1">
+                        <div className="text-[9px] font-black uppercase tracking-widest text-neutral-500">Key Specs</div>
                         {product.pros.slice(0, 2).map((item) => (
-                          <span key={item} className="text-xs text-neutral-400 flex items-start gap-2">
+                          <span key={item} className="text-[11px] text-neutral-400 flex items-start gap-1">
                             <span className="text-[#C6FF3D] mt-0.5">✓</span> <span className="flex-1">{item}</span>
                           </span>
                         ))}
                       </div>
                     ) : null}
                   </td>
-                  <td className="py-6 text-right align-top">
-                    <div className="text-3xl font-black text-[#C6FF3D] tracking-tighter">
+                  <td className="py-4 text-right align-top">
+                    <div className="text-2xl font-black text-[#C6FF3D] tracking-tighter">
                       {formatPrice(product.price_cents)}
                     </div>
                     <div className="text-[10px] text-neutral-500 mt-1 uppercase tracking-widest font-bold">Price as of {timestamp}</div>
