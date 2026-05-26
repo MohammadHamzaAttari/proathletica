@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronRight, Home, Target, TrendingUp, Zap, Trophy, Undo2, CheckCircle2 } from 'lucide-react';
+import { ChevronRight, Home, Target, TrendingUp, Zap, Trophy, Undo2, CheckCircle2, Mail } from 'lucide-react';
 import Link from 'next/link';
 
 const STEPS = [
@@ -64,6 +64,9 @@ export function GymQuiz() {
   const [stepIndex, setStepIndex] = useState(0);
   const [selections, setSelections] = useState<Record<string, string>>({});
   const [showResult, setShowResult] = useState(false);
+  const [isGated, setIsGated] = useState(false);
+  const [email, setEmail] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const currentStep = STEPS[stepIndex];
 
@@ -72,22 +75,91 @@ export function GymQuiz() {
     setSelections(newSelections);
 
     if (next === 'result') {
-      setShowResult(true);
+      setIsGated(true);
     } else {
       setStepIndex(STEPS.findIndex((s) => s.id === next));
     }
+  };
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setSubmitting(true);
+    try {
+      await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source: 'gear-finder' }),
+      });
+    } catch (err) {
+      console.error(err);
+    }
+    setSubmitting(false);
+    setIsGated(false);
+    setShowResult(true);
   };
 
   const reset = () => {
     setStepIndex(0);
     setSelections({});
     setShowResult(false);
+    setIsGated(false);
+    setEmail('');
   };
 
   const getResultKey = () => {
     const key = `${selections.goal}-${selections.space}-${selections.budget}`;
     return RESULTS[key] || RESULTS['strength-apartment-budget']; // Default fallback
   };
+
+  if (isGated) {
+    return (
+      <div className="rounded-card border border-white/[0.06] bg-graphite-800 p-8 text-center animate-cardIn max-w-xl mx-auto space-y-6">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-trust-blue/10 border border-trust-blue/20">
+          <Mail className="w-8 h-8 text-trust-blue" />
+        </div>
+        <div className="space-y-2">
+          <div className="section-eyebrow">Save Your Match</div>
+          <h3 className="text-3xl font-black uppercase tracking-tight text-white leading-none">
+            Unlock Your Custom Setup
+          </h3>
+          <p className="text-sm text-neutral-400 max-w-sm mx-auto leading-relaxed">
+            Enter your email to save your personalized home gym blueprint and get exclusive, high-value gear alerts directly in your inbox.
+          </p>
+        </div>
+
+        <form onSubmit={handleEmailSubmit} className="space-y-4 max-w-sm mx-auto">
+          <input
+            type="email"
+            required
+            placeholder="Enter your email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full h-12 rounded-xl bg-white/[0.02] border border-white/[0.08] px-4 text-sm text-white placeholder-neutral-500 focus:border-[#C6FF3D] focus:outline-none transition-colors text-center"
+          />
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full h-12 rounded-xl bg-[#C6FF3D] text-black font-black uppercase tracking-widest text-xs hover:bg-[#b0ec2e] disabled:opacity-50 transition-colors"
+          >
+            {submitting ? 'Unlocking...' : 'Get Recommendations'}
+          </button>
+        </form>
+
+        <div className="pt-2">
+          <button
+            onClick={() => {
+              setIsGated(false);
+              setShowResult(true);
+            }}
+            className="text-xs font-bold text-neutral-500 hover:text-white uppercase tracking-wider transition-colors hover:underline"
+          >
+            Skip and view results directly →
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (showResult) {
     const result = getResultKey();

@@ -32,6 +32,12 @@ export async function GET(request: NextRequest) {
   let destination: string | null = null;
 
   if (productId) {
+    // SECURITY FIX: Validate ASIN or UUID format to prevent Open Redirects
+    const isValidId = /^[A-Z0-9]{10}$/.test(productId) || /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(productId);
+    if (!isValidId) {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+
     const product = await getProductById(productId);
     if (product) {
       // Verify product URL is safe (Amazon-only)

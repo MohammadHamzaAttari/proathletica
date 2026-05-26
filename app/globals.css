@@ -199,16 +199,16 @@
     min-height: 3.25rem; /* 52px — WCAG AA touch target */
     padding: 0 1.5rem;
     border-radius: 0.875rem;
-    background: linear-gradient(135deg, #FF6B1A 0%, #FF8C4B 100%);
-    color: #fff;
+    background: #FF9900;
+    color: #000;
     font-size: 0.875rem;
-    font-weight: 800;
+    font-weight: 900;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     border: none;
     cursor: pointer;
-    box-shadow: 0 4px 20px -2px rgba(255,107,26,0.45),
-                inset 0 1px 0 rgba(255,255,255,0.15);
+    box-shadow: 0 4px 20px -2px rgba(255,153,0,0.45),
+                inset 0 1px 0 rgba(255,255,255,0.3);
     transition: transform 160ms cubic-bezier(0.34,1.56,0.64,1),
                 box-shadow 160ms ease,
                 background 160ms ease;
@@ -222,20 +222,20 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 60%);
+    background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 60%);
     pointer-events: none;
   }
 
   .cta-primary:hover {
     transform: translateY(-2px) scale(1.01);
-    box-shadow: 0 8px 32px -2px rgba(255,107,26,0.6),
-                inset 0 1px 0 rgba(255,255,255,0.2);
-    background: linear-gradient(135deg, #FF7A30 0%, #FF9A5C 100%);
+    box-shadow: 0 8px 32px -2px rgba(255,153,0,0.6),
+                inset 0 1px 0 rgba(255,255,255,0.4);
+    background: #FFAC33;
   }
 
   .cta-primary:active {
     transform: translateY(0) scale(0.99);
-    box-shadow: 0 2px 8px -1px rgba(255,107,26,0.4);
+    box-shadow: 0 2px 8px -1px rgba(255,153,0,0.4);
   }
 
   /* ─── CTA BUTTON — SECONDARY ─── */

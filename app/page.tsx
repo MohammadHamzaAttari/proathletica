@@ -169,7 +169,7 @@ export default async function HomePage() {
             {AUTHORS.map(({ name, role, credentials, avatar, color }) => (
               <Link
                 key={name}
-                href="/about"
+                href={`/author/${name.toLowerCase().replace(' ', '-')}`}
                 className="flex items-center gap-3 group"
                 aria-label={`${name}, ${role} at ProAthletica`}
               >
@@ -259,7 +259,7 @@ export default async function HomePage() {
           <div>
             <div className="section-eyebrow mb-2">
               <TrendingUp className="inline w-3 h-3 mr-1.5" aria-hidden="true" />
-              Editor Tested · Data Verified
+              Data-Driven Recommendations
             </div>
             <h2 className="text-3xl font-black uppercase tracking-tighter text-offwhite">
               Current Top Picks

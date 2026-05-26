@@ -142,6 +142,7 @@ supabase/
   migrations/
     0001_init.sql
     0002_add_apartment_dumbbells_article.sql
+    0003_rollback_non_amazon_affiliates.sql
 .env.example
 .gitignore
 CHANGES.md
@@ -352,71 +353,6 @@ export async function POST(request: NextRequest) {
     console.error('[subscribe]', error);
     return NextResponse.json({ ok: false, error: 'Server error.' }, { status: 500 });
   }
-}
-</file>
-
-<file path="app/api/track/route.ts">
-import crypto from 'node:crypto';
-import { NextRequest, NextResponse } from 'next/server';
-import { regionalizeAmazonUrl, isSafeAmazonUrl } from '@/lib/affiliate';
-import { getProductById, recordClick } from '@/lib/db';
-
-function hashIp(ip: string) {
-  return crypto.createHash('sha256').update(ip).digest('hex').slice(0, 16);
-}
-
-/**
- * FIX (Audit #05-12): strict URL validation prevents open-redirect abuse.
- * FIX (Audit #03-D): geo-aware Amazon link regionalization via Vercel header.
- * FIX (Audit #01 #3): this now correctly stores clicks in Supabase (not SQLite).
- *
- * Usage:
- *   /api/track?productId=B001ARYU58&articleSlug=best-home-gym&rank=1
- *   /api/track?url=https://www.amazon.com/dp/B001ARYU58&articleSlug=homepage&rank=1
- */
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const productId = searchParams.get('productId');
-  const articleSlug = searchParams.get('articleSlug');
-  const rank = searchParams.get('rank');
-  const rawUrl = searchParams.get('url');
-
-  // Geo headers from Vercel Edge network
-  const country = request.headers.get('x-vercel-ip-country') || 'US';
-  const ip = request.headers.get('x-forwarded-for') || 'unknown';
-  const referrer = request.headers.get('referer') || null;
-  const userAgent = request.headers.get('user-agent') || null;
-
-  let destination: string | null = null;
-
-  if (productId) {
-    const product = await getProductById(productId);
-    if (product) {
-      destination = regionalizeAmazonUrl(product.affiliate_url, country);
-    }
-  }
-
-  // FIX (Audit #05-12): only allow safe Amazon URLs via the ?url= param
-  if (!destination && rawUrl && isSafeAmazonUrl(rawUrl)) {
-    destination = regionalizeAmazonUrl(rawUrl, country);
-  }
-
-  if (!destination) {
-    return NextResponse.json({ error: 'Invalid or missing destination URL.' }, { status: 400 });
-  }
-
-  // Fire-and-forget click record — don't block the redirect
-  recordClick({
-    productId,
-    articleSlug,
-    rank: rank ? Number(rank) : null,
-    country,
-    referrer,
-    userAgent,
-    ipHash: hashIp(ip),
-  }).catch((err) => console.error('[track] recordClick failed:', err));
-
-  return NextResponse.redirect(destination, { status: 302 });
 }
 </file>
 
@@ -1545,59 +1481,6 @@ export function createReadClient() {
 }
 </file>
 
-<file path="lib/affiliate.ts">
-import { AMAZON_DOMAIN_BY_COUNTRY, AMAZON_TAGS } from '@/lib/config';
-
-// Strict allowlist — only actual Amazon hostnames and amzn.to shortlinks
-const ALLOWED_AMAZON_HOSTS = /(?:^|\.)amazon\.[a-z.]{2,6}$/i;
-const ALLOWED_SHORT_HOSTS = /^amzn\.to$/i;
-
-/**
- * FIX (Audit #05-12): validate URL against strict Amazon hostname allowlist
- * to prevent open-redirect abuse.
- */
-export function isSafeAmazonUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    const h = parsed.hostname.toLowerCase().replace(/^www\./, '');
-    return ALLOWED_AMAZON_HOSTS.test(h) || ALLOWED_SHORT_HOSTS.test(h);
-  } catch {
-    return false;
-  }
-}
-
-export function extractAsin(url: string): string | null {
-  const match = url.match(/\/dp\/([A-Z0-9]{8,})/i);
-  return match ? match[1].toUpperCase() : null;
-}
-
-/**
- * FIX (Audit #03-D): geo-aware Amazon URL — swap domain + inject correct tag.
- * Called from /api/track which reads Vercel's x-vercel-ip-country header.
- */
-export function regionalizeAmazonUrl(originalUrl: string, country?: string | null): string {
-  if (!isSafeAmazonUrl(originalUrl)) return originalUrl;
-
-  const asin = extractAsin(originalUrl);
-  const cc = (country || 'US').toUpperCase();
-  const domain = AMAZON_DOMAIN_BY_COUNTRY[cc] || 'amazon.com';
-  const tag = (AMAZON_TAGS as Record<string, string>)[cc] || AMAZON_TAGS.US;
-
-  if (asin) {
-    return `https://www.${domain}/dp/${asin}?tag=${encodeURIComponent(tag)}&linkCode=ll1&language=en_US`;
-  }
-
-  try {
-    const parsed = new URL(originalUrl);
-    parsed.hostname = `www.${domain}`;
-    parsed.searchParams.set('tag', tag);
-    return parsed.toString();
-  } catch {
-    return originalUrl;
-  }
-}
-</file>
-
 <file path="lib/analytics.ts">
 'use client';
 
@@ -2153,6 +2036,81 @@ export async function GET() {
     console.error('[health]', error);
     return NextResponse.json({ ok: false, error: 'Health check failed.' }, { status: 500 });
   }
+}
+</file>
+
+<file path="app/api/track/route.ts">
+import crypto from 'node:crypto';
+import { NextRequest, NextResponse } from 'next/server';
+import { regionalizeAmazonUrl, isSafeAmazonUrl } from '@/lib/affiliate';
+import { getProductById, recordClick } from '@/lib/db';
+
+function hashIp(ip: string) {
+  return crypto.createHash('sha256').update(ip).digest('hex').slice(0, 16);
+}
+
+/**
+ * FIX (Audit #05-12): strict URL validation prevents open-redirect abuse.
+ * FIX (Audit #03-D): geo-aware Amazon link regionalization via Vercel header.
+ * FIX (Audit #01 #3): this now correctly stores clicks in Supabase (not SQLite).
+ *
+ * Usage:
+ *   /api/track?productId=B001ARYU58&articleSlug=best-home-gym&rank=1
+ *   /api/track?url=https://www.amazon.com/dp/B001ARYU58&articleSlug=homepage&rank=1
+ */
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const productId = searchParams.get('productId');
+  const articleSlug = searchParams.get('articleSlug');
+  const rank = searchParams.get('rank');
+  const rawUrl = searchParams.get('url');
+
+  // Geo headers from Vercel Edge network
+  const country = request.headers.get('x-vercel-ip-country') || 'US';
+  const ip = request.headers.get('x-forwarded-for') || 'unknown';
+  const referrer = request.headers.get('referer') || null;
+  const userAgent = request.headers.get('user-agent') || null;
+
+  let destination: string | null = null;
+
+  if (productId) {
+    const product = await getProductById(productId);
+    if (product) {
+      // Verify product URL is safe (Amazon-only)
+      if (!isSafeAmazonUrl(product.affiliate_url)) {
+        console.error(`[SECURITY] Product ${productId} has invalid affiliate URL: ${product.affiliate_url}`);
+        return NextResponse.json({ error: 'Invalid affiliate URL for product.' }, { status: 400 });
+      }
+      destination = regionalizeAmazonUrl(product.affiliate_url, country);
+    }
+  }
+
+  // FIX (Audit #05-12): ONLY allow safe Amazon URLs via the ?url= param
+  // Non-Amazon platforms are completely rejected
+  if (!destination && rawUrl) {
+    if (!isSafeAmazonUrl(rawUrl)) {
+      console.error(`[SECURITY] Non-Amazon URL rejected in track: ${rawUrl}`);
+      return NextResponse.json({ error: 'Non-Amazon URLs are not supported.' }, { status: 400 });
+    }
+    destination = regionalizeAmazonUrl(rawUrl, country);
+  }
+
+  if (!destination) {
+    return NextResponse.json({ error: 'Invalid or missing destination URL.' }, { status: 400 });
+  }
+
+  // Fire-and-forget click record — don't block the redirect
+  recordClick({
+    productId,
+    articleSlug,
+    rank: rank ? Number(rank) : null,
+    country,
+    referrer,
+    userAgent,
+    ipHash: hashIp(ip),
+  }).catch((err) => console.error('[track] recordClick failed:', err));
+
+  return NextResponse.redirect(destination, { status: 302 });
 }
 </file>
 
@@ -2714,47 +2672,62 @@ on conflict (article_id, product_id) do update
   set position = excluded.position, custom_blurb = excluded.custom_blurb;
 </file>
 
-<file path=".env.example">
-# ─── Site ────────────────────────────────────────────────────────────────────
-NEXT_PUBLIC_SITE_URL=https://athletica.page
-NEXT_PUBLIC_SITE_NAME=ProAthletica
-NEXT_PUBLIC_SITE_DESCRIPTION=Independent reviews of the best fitness equipment, powerlifting gear, running shoes, and supplements — hand-picked by competing athletes.
+<file path="supabase/migrations/0003_rollback_non_amazon_affiliates.sql">
+-- ============================================================
+-- Migration: Remove Non-Amazon Affiliate Links & Products
+-- ============================================================
+-- This migration DELETES any products with non-Amazon affiliate URLs.
+-- All products must link to Amazon.com (or regional Amazon domains).
+-- Non-Amazon platforms (Rogue Fitness, REP Fitness, etc.) are completely removed.
 
-# ─── Supabase ─────────────────────────────────────────────────────────────────
-# Get these from: Supabase Dashboard → Project Settings → API
-NEXT_PUBLIC_SUPABASE_URL=https://kiphiogcysnyiwjaptff.supabase.co
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_ln3aSyHDdwfNX5K-LgMc1A_RpA2AIMt
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpcGhpb2djeXNueWl3amFwdGZmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODU3ODkxNywiZXhwIjoyMDk0MTU0OTE3fQ.ZiYloD1AUbwe0rAgDbsZbKX6F9IpcBJE6_MOhl-SJII
+-- 1. Identify products with non-Amazon affiliate URLs (for audit/logging)
+create temp table non_amazon_products as
+select 
+  id, 
+  asin,
+  title, 
+  affiliate_url,
+  case 
+    when affiliate_url is null then 'NULL'
+    when affiliate_url ~ 'amazon\.' then 'VALID_AMAZON'
+    when affiliate_url ~ 'amzn\.to' then 'VALID_AMAZON_SHORT'
+    else 'NON_AMAZON_WILL_BE_DELETED'
+  end as status
+from products
+where affiliate_url is not null
+  and affiliate_url !~ 'amazon\.'
+  and affiliate_url !~ 'amzn\.to';
 
-# ─── Amazon Associates affiliate tags (apply per-country) ─────────────────────
-AMAZON_AFFILIATE_TAG_US=proathletica-20
-AMAZON_AFFILIATE_TAG_UK=proathletica-21
-AMAZON_AFFILIATE_TAG_CA=proathletica-20
-AMAZON_AFFILIATE_TAG_DE=proathletica-21
-AMAZON_AFFILIATE_TAG_AU=proathletica-21
+-- Log the products being deleted
+select 'DELETED PRODUCTS' as action, count(*) as count from non_amazon_products;
 
-# ─── Email / newsletter ───────────────────────────────────────────────────────
-# Resend (transactional email — free 3k/mo): https://resend.com
-RESEND_API_KEY=re_REPLACE_ME
-NEWSLETTER_FROM_EMAIL=hello@athletica.page
-NEWSLETTER_FROM_NAME=ProAthletica
+-- 2. Delete non-Amazon products (cascade deletes article_products and click_events)
+delete from products
+where id in (select id from non_amazon_products);
 
-# ConvertKit (optional — newsletter list sync)
-CONVERTKIT_API_KEY=
-CONVERTKIT_FORM_ID=
+-- 3. Add constraint to prevent non-Amazon URLs going forward
+-- This prevents accidental insertion of non-Amazon affiliate links
+do $$ 
+begin
+  if not exists (
+    select 1 from information_schema.table_constraints 
+    where constraint_name = 'affiliate_url_amazon_only'
+  ) then
+    alter table products
+    add constraint affiliate_url_amazon_only
+    check (
+      affiliate_url ~ 'amazon\.' or 
+      affiliate_url ~ 'amzn\.to'
+    );
+  end if;
+end $$;
 
-# ─── Analytics ────────────────────────────────────────────────────────────────
-NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
-
-# ─── Pinterest ────────────────────────────────────────────────────────────────
-# FIX: replace with your real code from Pinterest Business → Settings → Claim website
-NEXT_PUBLIC_PINTEREST_TAG_ID=
-PINTEREST_DOMAIN_VERIFY=YOUR_REAL_PINTEREST_CODE_HERE
-
-# ─── Revalidation (cache busting) ─────────────────────────────────────────────
-# Set a long random string — update vercel.json cron URLs to match
-REVALIDATE_SECRET=CHANGE_ME_TO_A_LONG_RANDOM_STRING
-OPENROUTER_API_KEY=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
+-- 4. Verify all remaining products have valid Amazon affiliate URLs
+select 
+  count(*) as total_products,
+  sum(case when affiliate_url ~ 'amazon\.' or affiliate_url ~ 'amzn\.to' then 1 else 0 end) as valid_amazon_urls,
+  sum(case when affiliate_url is null then 1 else 0 end) as null_affiliate_urls
+from products;
 </file>
 
 <file path="package.json">
@@ -4651,6 +4624,87 @@ export function jsonLdProps(data: object | object[]) {
 }
 </file>
 
+<file path="lib/affiliate.ts">
+import { AMAZON_DOMAIN_BY_COUNTRY, AMAZON_TAGS } from '@/lib/config';
+
+// Strict allowlist — ONLY actual Amazon hostnames and amzn.to shortlinks
+// No other platforms (Rogue, REP, etc.) are allowed
+const ALLOWED_AMAZON_HOSTS = /(?:^|\.)amazon\.[a-z.]{2,6}$/i;
+const ALLOWED_SHORT_HOSTS = /^amzn\.to$/i;
+
+/**
+ * FIX (Audit #05-12): validate URL against strict Amazon hostname allowlist
+ * to prevent open-redirect abuse and block non-Amazon affiliate links.
+ * 
+ * ONLY Amazon.com and its regional variants (amazon.co.uk, amazon.de, etc.)
+ * and amzn.to shortlinks are allowed. All other platforms are rejected.
+ */
+export function isSafeAmazonUrl(url: string): boolean {
+  if (!url) return false;
+  try {
+    const parsed = new URL(url);
+    const h = parsed.hostname.toLowerCase().replace(/^www\./, '');
+    const isAmazon = ALLOWED_AMAZON_HOSTS.test(h) || ALLOWED_SHORT_HOSTS.test(h);
+    
+    // Log rejection of non-Amazon URLs for monitoring
+    if (!isAmazon && typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+      console.warn(`[SECURITY] Non-Amazon affiliate URL rejected: ${h}`);
+    }
+    
+    return isAmazon;
+  } catch {
+    return false;
+  }
+}
+
+export function extractAsin(url: string): string | null {
+  if (!isSafeAmazonUrl(url)) return null;
+  const match = url.match(/\/dp\/([A-Z0-9]{8,})/i);
+  return match ? match[1].toUpperCase() : null;
+}
+
+/**
+ * FIX (Audit #03-D): geo-aware Amazon URL — swap domain + inject correct tag.
+ * Called from /api/track which reads Vercel's x-vercel-ip-country header.
+ * 
+ * CRITICAL: This ONLY accepts Amazon URLs. Non-Amazon URLs are rejected completely.
+ */
+export function regionalizeAmazonUrl(originalUrl: string, country?: string | null): string {
+  // Strict validation: reject non-Amazon URLs entirely
+  if (!isSafeAmazonUrl(originalUrl)) {
+    console.error(`[SECURITY] Attempted to regionalize non-Amazon URL: ${originalUrl}`);
+    return '';
+  }
+
+  const asin = extractAsin(originalUrl);
+  const cc = (country || 'US').toUpperCase();
+  const domain = AMAZON_DOMAIN_BY_COUNTRY[cc] || 'amazon.com';
+  
+  // Try to extract and preserve the existing tag from the database
+  let existingTag = null;
+  try {
+    const parsed = new URL(originalUrl);
+    existingTag = parsed.searchParams.get('tag');
+  } catch {}
+
+  // Use the database tag if it exists. Otherwise, fall back to the env/config tag.
+  const tag = existingTag || (AMAZON_TAGS as Record<string, string>)[cc] || AMAZON_TAGS.US;
+
+  if (asin) {
+    return `https://www.${domain}/dp/${asin}?tag=${encodeURIComponent(tag)}&linkCode=ll1&language=en_US`;
+  }
+
+  try {
+    const parsed = new URL(originalUrl);
+    parsed.hostname = `www.${domain}`;
+    parsed.searchParams.set('tag', tag);
+    return parsed.toString();
+  } catch {
+    return '';
+  }
+}
+</file>
+
 <file path="lib/config.ts">
 export const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || 'ProAthletica';
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.athletica.page').replace(/\/$/, '');
@@ -5555,82 +5609,48 @@ export function hydrateProduct<T extends ProductSource>(product: T, rank = 0): T
 }
 </file>
 
-<file path="middleware.ts">
-import { NextRequest, NextResponse } from 'next/server';
+<file path=".env.example">
+# ─── Site ────────────────────────────────────────────────────────────────────
+NEXT_PUBLIC_SITE_URL=https://athletica.page
+NEXT_PUBLIC_SITE_NAME=ProAthletica
+NEXT_PUBLIC_SITE_DESCRIPTION=Independent reviews of the best fitness equipment, powerlifting gear, running shoes, and supplements — hand-picked by competing athletes.
 
-function slugify(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-}
+# ─── Supabase ─────────────────────────────────────────────────────────────────
+# Get these from: Supabase Dashboard → Project Settings → API
+NEXT_PUBLIC_SUPABASE_URL=https://kiphiogcysnyiwjaptff.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_ln3aSyHDdwfNX5K-LgMc1A_RpA2AIMt
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpcGhpb2djeXNueWl3amFwdGZmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODU3ODkxNywiZXhwIjoyMDk0MTU0OTE3fQ.ZiYloD1AUbwe0rAgDbsZbKX6F9IpcBJE6_MOhl-SJII
 
-/**
- * FIX (Audit #02-A #5): legacy ?slug= / ?category= / ?page= query-param routes
- * redirect to canonical SSR paths with 308 Permanent redirects, preventing
- * duplicate-content indexing.
- */
-export function middleware(request: NextRequest) {
-  const url = request.nextUrl.clone();
+# ─── Amazon Associates affiliate tags (apply per-country) ─────────────────────
+AMAZON_AFFILIATE_TAG_US=prolevelathle-20
+AMAZON_AFFILIATE_TAG_UK=prolevelathle-20
+AMAZON_AFFILIATE_TAG_CA=prolevelathle-20
+AMAZON_AFFILIATE_TAG_DE=prolevelathle-20
+AMAZON_AFFILIATE_TAG_AU=prolevelathle-20
 
-  // Enforce WWW Host (Audit #2 Fix)
-  if (url.hostname === 'athletica.page') {
-    url.hostname = 'www.athletica.page';
-    return NextResponse.redirect(url, 308);
-  }
 
-  const slug = url.searchParams.get('slug');
-  const page = url.searchParams.get('page');
-  const category = url.searchParams.get('category');
-  const highlightId = url.searchParams.get('highlightId');
+# ─── Email / newsletter ───────────────────────────────────────────────────────
+# Resend (transactional email — free 3k/mo): https://resend.com
+RESEND_API_KEY=re_REPLACE_ME
+NEWSLETTER_FROM_EMAIL=pro@athletica.page
+NEWSLETTER_FROM_NAME=ProAthletica
 
-  // Redirect ?slug=X → /best/X
-  if (url.pathname === '/' && slug) {
-    url.pathname = `/best/${slug}`;
-    url.search = '';
-    if (highlightId) url.searchParams.set('highlightId', highlightId);
-    return NextResponse.redirect(url, 308);
-  }
+# ConvertKit (optional — newsletter list sync)
+CONVERTKIT_API_KEY=
+CONVERTKIT_FORM_ID=
 
-  // Redirect ?page=about|contact|... → /about|/contact|...
-  if (
-    url.pathname === '/' &&
-    page &&
-    ['about', 'contact', 'privacy', 'terms', 'disclosure'].includes(page)
-  ) {
-    url.pathname = `/${page}`;
-    url.search = '';
-    return NextResponse.redirect(url, 308);
-  }
+# ─── Analytics ────────────────────────────────────────────────────────────────
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 
-  // Redirect ?category=X → /category/slug
-  if (url.pathname === '/' && category) {
-    url.pathname = `/category/${slugify(category)}`;
-    url.search = '';
-    return NextResponse.redirect(url, 308);
-  }
+# ─── Pinterest ────────────────────────────────────────────────────────────────
+# FIX: replace with your real code from Pinterest Business → Settings → Claim website
+NEXT_PUBLIC_PINTEREST_TAG_ID=
+PINTEREST_DOMAIN_VERIFY=YOUR_REAL_PINTEREST_CODE_HERE
 
-  if (url.pathname === '/categories' && category) {
-    url.pathname = `/category/${slugify(category)}`;
-    url.search = '';
-    return NextResponse.redirect(url, 308);
-  }
-
-  // Strip ?refresh= params (prevent indexing of cache-busting URLs)
-  if (url.searchParams.has('refresh')) {
-    url.searchParams.delete('refresh');
-    return NextResponse.redirect(url, 308);
-  }
-
-  // Redirect /best/*-2026 → /best/* (Audit #02-F)
-  if (url.pathname.startsWith('/best/') && url.pathname.endsWith('-2026')) {
-    url.pathname = url.pathname.replace(/-2026$/, '');
-    return NextResponse.redirect(url, 308);
-  }
-
-  return NextResponse.next();
-}
-
-export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.svg|manifest.json).*)'],
-};
+# ─── Revalidation (cache busting) ─────────────────────────────────────────────
+# Set a long random string — update vercel.json cron URLs to match
+REVALIDATE_SECRET=CHANGE_ME_TO_A_LONG_RANDOM_STRING
+OPENROUTER_API_KEY=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
 </file>
 
 <file path="tailwind.config.ts">
@@ -6690,676 +6710,102 @@ export function bustProductsCache() { revalidateTag('products'); }
 export function bustArticlesCache() { revalidateTag('articles'); }
 </file>
 
-<file path="components/HomepageFilters.tsx">
-'use client';
+<file path="middleware.ts">
+import { NextRequest, NextResponse } from 'next/server';
 
-import { useEffect, useMemo, useState, useTransition } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { ComparisonTable } from '@/components/ComparisonTable';
-import { ProductGrid } from '@/components/ProductGrid';
-import { StickyCompareBar } from '@/components/StickyCompareBar';
-import type { Product } from '@/lib/types';
-import { trackEvent } from '@/lib/analytics';
-import { SlidersHorizontal, X } from 'lucide-react';
-
-type FilterKey =
-  | 'all'
-  | 'small-apartments'
-  | 'budget'
-  | 'heavy-lifters'
-  | 'smart-equipment'
-  | 'compact-gear';
-
-const FILTERS: Array<{
-  key: FilterKey;
-  label: string;
-  hint: string;
-  icon: string;
-  match: (product: Product) => boolean;
-}> = [
-  {
-    key: 'all',
-    label: 'All Picks',
-    hint: 'Full ranked list',
-    icon: '⚡',
-    match: () => true,
-  },
-  {
-    key: 'small-apartments',
-    label: 'Apartments',
-    hint: 'Sub-30 sq ft',
-    icon: '🏠',
-    match: (p) =>
-      /compact|foldable|small footprint|space-saving/i.test(
-        [p.short_title, p.title, p.raw_description, p.editorial_summary, ...(p.best_for_tags || [])]
-          .filter(Boolean).join(' ')
-      ),
-  },
-  {
-    key: 'budget',
-    label: 'Budget',
-    hint: 'Under $200',
-    icon: '💰',
-    match: (p) =>
-      /budget|value|affordable|entry|starter/i.test(
-        [p.short_title, p.title, p.editorial_summary, ...(p.best_for_tags || [])]
-          .filter(Boolean).join(' ')
-      ) || (p.price_cents || 0) <= 20000,
-  },
-  {
-    key: 'heavy-lifters',
-    label: 'Heavy Load',
-    hint: 'Garage proof',
-    icon: '🏋️',
-    match: (p) =>
-      /heavy|garage|high load|durable|steel|pro/i.test(
-        [p.short_title, p.title, p.raw_description, p.editorial_summary, ...(p.best_for_tags || [])]
-          .filter(Boolean).join(' ')
-      ),
-  },
-  {
-    key: 'smart-equipment',
-    label: 'Smart Gear',
-    hint: 'Connected app',
-    icon: '📱',
-    match: (p) =>
-      /smart|app|bluetooth|connected/i.test(
-        [p.short_title, p.title, p.raw_description, p.editorial_summary, ...(p.best_for_tags || [])]
-          .filter(Boolean).join(' ')
-      ),
-  },
-];
-
-export function HomepageFilters({
-  products,
-  articleSlug,
-  initialFilter = 'all',
-}: {
-  products: Product[];
-  articleSlug: string;
-  initialFilter?: FilterKey;
-}) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [pageOverride, setPageOverride] = useState<number | null>(null);
-
-  console.log('[HomepageFilters] Rendered with searchParams:', searchParams.toString(), 'pageOverride:', pageOverride);
-
-  const activeFilter = (searchParams.get('focus') as FilterKey) || initialFilter || 'all';
-  const searchQuery = (searchParams.get('q') || '').trim();
-  const categoryFilter = searchParams.get('category') || 'all';
-  const brandFilter = searchParams.get('brand') || 'all';
-  const tagParam = searchParams.get('tags') || searchParams.get('tag') || '';
-  const tagFilters = tagParam.split(',').map((value) => value.trim()).filter(Boolean);
-  const sortBy = searchParams.get('sort') || 'rank';
-  const pageSize = Math.max(6, Math.min(24, Number.parseInt(searchParams.get('pageSize') || '9', 10) || 9));
-  const pageParam = Number.parseInt(searchParams.get('page') || '1', 10) || 1;
-  const minPrice = Number.parseInt(searchParams.get('minPrice') || '', 10);
-  const maxPrice = Number.parseInt(searchParams.get('maxPrice') || '', 10);
-  const minRating = Number.parseFloat(searchParams.get('minRating') || '');
-  const activeFilterMeta = FILTERS.find(f => f.key === activeFilter);
-
-  const updateParams = (updates: Record<string, string | null>, resetPage = true) => {
-    const params = new URLSearchParams(searchParams.toString());
-    Object.entries(updates).forEach(([key, value]) => {
-      if (value === null || value === '' || value === 'all') {
-        params.delete(key);
-      } else {
-        params.set(key, value);
-      }
-    });
-    if (updates.tags !== undefined) params.delete('tag');
-    if (resetPage) params.delete('page');
-    const query = params.toString();
-    const newUrl = query ? `${pathname}?${query}` : pathname;
-    console.log('[DEBUG] updateParams:', { updates, resetPage, newUrl, currentQuery: searchParams.toString() });
-    startTransition(() => {
-      router.replace(newUrl, { scroll: false });
-    });
-  };
-
-  const setFilter = (nextFilter: FilterKey) => {
-    updateParams({ focus: nextFilter === 'all' ? null : nextFilter });
-    trackEvent('homepage_filter', { action: 'focus', value: nextFilter });
-  };
-
-  useEffect(() => {
-    setPageOverride(null);
-  }, [pageParam]);
-
-  const setPage = (nextPage: number) => {
-    const safePage = Math.max(1, nextPage);
-    console.log('[DEBUG] setPage called:', { nextPage, safePage, currentPage });
-    setPageOverride(safePage);
-    updateParams({ page: safePage === 1 ? null : String(safePage) }, false);
-    trackEvent('homepage_filter', { action: 'pagination', value: safePage });
-  };
-
-  const categoryOptions = useMemo(() => {
-    const unique = new Set<string>();
-    products.forEach((product) => {
-      if (product.category) unique.add(product.category);
-    });
-    return Array.from(unique).sort((a, b) => a.localeCompare(b));
-  }, [products]);
-
-  const brandOptions = useMemo(() => {
-    const unique = new Set<string>();
-    products.forEach((product) => {
-      if (product.brand) unique.add(product.brand);
-    });
-    return Array.from(unique).sort((a, b) => a.localeCompare(b));
-  }, [products]);
-
-  const tagOptions = useMemo(() => {
-    const unique = new Set<string>();
-    products.forEach((product) => {
-      (product.best_for_tags || []).forEach((tag) => unique.add(tag));
-    });
-    return Array.from(unique).sort((a, b) => a.localeCompare(b));
-  }, [products]);
-
-  const filteredProducts = useMemo(() => {
-    const filter = FILTERS.find(f => f.key === activeFilter);
-    const query = searchQuery.toLowerCase();
-    const minPriceCents = Number.isFinite(minPrice) ? minPrice * 100 : null;
-    const maxPriceCents = Number.isFinite(maxPrice) ? maxPrice * 100 : null;
-    const ratingFloor = Number.isFinite(minRating) ? minRating : null;
-    const hasTags = tagFilters.length > 0;
-
-    return products.filter((product) => {
-      if (filter && !filter.match(product)) return false;
-      if (categoryFilter !== 'all' && product.category !== categoryFilter) return false;
-      if (brandFilter !== 'all' && product.brand !== brandFilter) return false;
-      if (hasTags && !tagFilters.some((tag) => (product.best_for_tags || []).includes(tag))) return false;
-
-      if (query) {
-        const blob = [
-          product.title,
-          product.short_title,
-          product.editorial_summary,
-          product.raw_description,
-          product.description,
-          product.brand,
-          product.category,
-          ...(product.best_for_tags || []),
-        ]
-          .filter(Boolean)
-          .join(' ')
-          .toLowerCase();
-        if (!blob.includes(query)) return false;
-      }
-
-      const priceCents = product.price_cents ?? null;
-      if (minPriceCents !== null && (!priceCents || priceCents < minPriceCents)) return false;
-      if (maxPriceCents !== null && (!priceCents || priceCents > maxPriceCents)) return false;
-
-      if (ratingFloor !== null && (!product.rating || product.rating < ratingFloor)) return false;
-
-      return true;
-    });
-  }, [activeFilter, brandFilter, categoryFilter, maxPrice, minPrice, minRating, products, searchQuery, tagFilters]);
-
-  const sortedProducts = useMemo(() => {
-    const sorted = [...filteredProducts];
-    const byRank = (a: Product, b: Product) => (a.rank || 0) - (b.rank || 0);
-    const byPriceAsc = (a: Product, b: Product) => {
-      const aPrice = a.price_cents ?? Number.MAX_SAFE_INTEGER;
-      const bPrice = b.price_cents ?? Number.MAX_SAFE_INTEGER;
-      return aPrice - bPrice;
-    };
-    const byPriceDesc = (a: Product, b: Product) => {
-      const aPrice = a.price_cents ?? 0;
-      const bPrice = b.price_cents ?? 0;
-      return bPrice - aPrice;
-    };
-    const byRating = (a: Product, b: Product) => (b.rating || 0) - (a.rating || 0);
-    const byReviews = (a: Product, b: Product) => (b.review_count || 0) - (a.review_count || 0);
-    const byUpdated = (a: Product, b: Product) =>
-      new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
-
-    switch (sortBy) {
-      case 'price-asc':
-        sorted.sort(byPriceAsc);
-        break;
-      case 'price-desc':
-        sorted.sort(byPriceDesc);
-        break;
-      case 'rating-desc':
-        sorted.sort(byRating);
-        break;
-      case 'reviews-desc':
-        sorted.sort(byReviews);
-        break;
-      case 'newest':
-        sorted.sort(byUpdated);
-        break;
-      default:
-        sorted.sort(byRank);
-        break;
-    }
-
-    return sorted;
-  }, [filteredProducts, sortBy]);
-
-  const totalResults = sortedProducts.length;
-  const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
-  const resolvedPage = pageOverride ?? pageParam;
-  const currentPage = Math.min(Math.max(1, resolvedPage), totalPages);
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, totalResults);
-  const pagedProducts = sortedProducts.slice(startIndex, endIndex);
-  const rangeStart = totalResults === 0 ? 0 : startIndex + 1;
-  const rangeEnd = totalResults === 0 ? 0 : endIndex;
-
-  const paginationPages = useMemo(() => {
-    const windowSize = 5;
-    let start = Math.max(1, currentPage - 2);
-    let end = Math.min(totalPages, start + windowSize - 1);
-    start = Math.max(1, end - windowSize + 1);
-    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
-  }, [currentPage, totalPages]);
-
-  const activeFilterLabel = [
-    activeFilterMeta?.label,
-    categoryFilter !== 'all' ? categoryFilter : null,
-    brandFilter !== 'all' ? brandFilter : null,
-    tagFilters.length > 0 ? tagFilters.join(', ') : null,
-    searchQuery ? `"${searchQuery}"` : null,
-  ]
-    .filter(Boolean)
-    .join(' · ');
-
-  const selectedProducts = useMemo(
-    () => products.filter((product) => selectedIds.has(product.id)),
-    [products, selectedIds]
-  );
-
-  const updateSelection = (next: Set<string>) => {
-    setSelectedIds(new Set(next));
-  };
-
-  const toggleTag = (tag: string) => {
-    const nextTags = new Set(tagFilters);
-    if (nextTags.has(tag)) nextTags.delete(tag);
-    else nextTags.add(tag);
-    updateParams({ tags: Array.from(nextTags).join(',') });
-    trackEvent('homepage_filter', { action: 'tag', value: tag, selected: nextTags.has(tag) });
-  };
-
-  return (
-    <div className="space-y-8">
-
-      {/* ── FILTER TABS ── */}
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-neutral-500">
-            <SlidersHorizontal className="w-3 h-3" />
-            Filter by training focus
-          </div>
-          {activeFilter !== 'all' && (
-            <button
-              onClick={() => setFilter('all')}
-              className="text-xs font-bold text-trust-blue hover:text-white transition-colors flex items-center gap-1"
-            >
-              <X className="w-3 h-3" /> Reset
-            </button>
-          )}
-        </div>
-        
-        <div
-          role="tablist"
-          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2"
-        >
-          {FILTERS.map((filter) => {
-            const isActive = activeFilter === filter.key;
-            return (
-              <button
-                key={filter.key}
-                role="tab"
-                aria-selected={isActive}
-                onClick={() => setFilter(filter.key)}
-                className={`group flex flex-col items-start p-4 rounded-inner border transition-all duration-200 ${
-                  isActive 
-                    ? 'border-data-lime bg-data-lime/10 shadow-[0_0_20px_rgba(198,255,61,0.08)]' 
-                    : 'border-white/[0.06] bg-graphite-800 hover:border-white/20'
-                }`}
-              >
-                <div className="flex items-center justify-between w-full mb-1">
-                  <span className={`text-xl transition-transform ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} aria-hidden="true">{filter.icon}</span>
-                  {isActive && <div className="w-1.5 h-1.5 rounded-full bg-data-lime animate-pulse" />}
-                </div>
-                <div className={`text-xs font-black uppercase tracking-tight ${isActive ? 'text-data-lime' : 'text-offwhite'}`}>
-                  {filter.label}
-                </div>
-                <div className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mt-0.5 whitespace-nowrap">
-                  {filter.hint}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ── ADVANCED FILTERS ── */}
-      <div className="rounded-card border border-white/[0.06] bg-graphite-800/60 p-5 space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="text-xs font-black uppercase tracking-[0.2em] text-neutral-500">Advanced filters</div>
-          {(searchQuery || categoryFilter !== 'all' || brandFilter !== 'all' || tagFilters.length > 0 || Number.isFinite(minPrice)
-            || Number.isFinite(maxPrice) || Number.isFinite(minRating) || sortBy !== 'rank') && (
-            <button
-              onClick={() => {
-                updateParams({ q: null, category: null, brand: null, tags: null, minPrice: null, maxPrice: null, minRating: null, sort: null });
-                trackEvent('homepage_filter', { action: 'clear_all' });
-              }}
-              className="text-xs font-bold text-trust-blue hover:text-white transition-colors flex items-center gap-1"
-            >
-              <X className="w-3 h-3" /> Clear all
-            </button>
-          )}
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
-            Search
-            <input
-              type="search"
-              placeholder="Search gear, brands, tags"
-              value={searchQuery}
-              onChange={(event) => updateParams({ q: event.target.value })}
-              onBlur={(event) => {
-                if (event.target.value.trim()) {
-                  trackEvent('homepage_filter', { action: 'search', value: event.target.value.trim() });
-                }
-              }}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' && searchQuery.trim()) {
-                  trackEvent('homepage_filter', { action: 'search', value: searchQuery.trim() });
-                }
-              }}
-              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none"
-            />
-          </label>
-
-          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
-            Category
-            <select
-              value={categoryFilter}
-              onChange={(event) => {
-                updateParams({ category: event.target.value });
-                trackEvent('homepage_filter', { action: 'category', value: event.target.value });
-              }}
-              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite focus:border-data-lime/60 focus:outline-none"
-            >
-              <option value="all">All categories</option>
-              {categoryOptions.map((category) => (
-                <option key={category} value={category}>{category}</option>
-              ))}
-            </select>
-          </label>
-
-          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
-            Brand
-            <select
-              value={brandFilter}
-              onChange={(event) => {
-                updateParams({ brand: event.target.value });
-                trackEvent('homepage_filter', { action: 'brand', value: event.target.value });
-              }}
-              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite focus:border-data-lime/60 focus:outline-none"
-            >
-              <option value="all">All brands</option>
-              {brandOptions.map((brand) => (
-                <option key={brand} value={brand}>{brand}</option>
-              ))}
-            </select>
-          </label>
-
-          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
-            Min price
-            <input
-              type="number"
-              min={0}
-              placeholder="0"
-              value={Number.isFinite(minPrice) ? String(minPrice) : ''}
-              onChange={(event) => {
-                updateParams({ minPrice: event.target.value });
-                trackEvent('homepage_filter', { action: 'min_price', value: event.target.value || '0' });
-              }}
-              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none"
-            />
-          </label>
-
-          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
-            Max price
-            <input
-              type="number"
-              min={0}
-              placeholder="600"
-              value={Number.isFinite(maxPrice) ? String(maxPrice) : ''}
-              onChange={(event) => {
-                updateParams({ maxPrice: event.target.value });
-                trackEvent('homepage_filter', { action: 'max_price', value: event.target.value || '0' });
-              }}
-              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none"
-            />
-          </label>
-
-          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
-            Min rating
-            <select
-              value={Number.isFinite(minRating) ? String(minRating) : 'all'}
-              onChange={(event) => {
-                updateParams({ minRating: event.target.value === 'all' ? null : event.target.value });
-                trackEvent('homepage_filter', { action: 'min_rating', value: event.target.value });
-              }}
-              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite focus:border-data-lime/60 focus:outline-none"
-            >
-              <option value="all">Any rating</option>
-              <option value="4.8">4.8+ stars</option>
-              <option value="4.6">4.6+ stars</option>
-              <option value="4.4">4.4+ stars</option>
-              <option value="4.2">4.2+ stars</option>
-            </select>
-          </label>
-        </div>
-
-        {tagOptions.length > 0 && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-widest text-neutral-500">Best for tags</span>
-              {tagFilters.length > 0 && (
-                <button
-                  onClick={() => {
-                    updateParams({ tags: null });
-                    trackEvent('homepage_filter', { action: 'tags_clear' });
-                  }}
-                  className="text-xs font-bold text-trust-blue hover:text-white transition-colors"
-                >
-                  Clear tags
-                </button>
-              )}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {tagOptions.map((tag) => {
-                const isActive = tagFilters.includes(tag);
-                return (
-                  <button
-                    key={tag}
-                    onClick={() => toggleTag(tag)}
-                    className={`rounded-pill border px-4 py-1.5 text-[11px] font-black uppercase tracking-widest transition-colors ${isActive ? 'border-data-lime bg-data-lime/15 text-data-lime' : 'border-white/[0.08] text-neutral-400 hover:border-white/20 hover:text-offwhite'}`}
-                  >
-                    {tag}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
-            Sort by
-            <select
-              value={sortBy}
-              onChange={(event) => {
-                updateParams({ sort: event.target.value });
-                trackEvent('homepage_filter', { action: 'sort', value: event.target.value });
-              }}
-              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite focus:border-data-lime/60 focus:outline-none"
-            >
-              <option value="rank">Editor rank</option>
-              <option value="price-asc">Price: low to high</option>
-              <option value="price-desc">Price: high to low</option>
-              <option value="rating-desc">Highest rated</option>
-              <option value="reviews-desc">Most reviewed</option>
-              <option value="newest">Recently updated</option>
-            </select>
-          </label>
-
-          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
-            Results per page
-            <select
-              value={String(pageSize)}
-              onChange={(event) => {
-                updateParams({ pageSize: event.target.value });
-                trackEvent('homepage_filter', { action: 'page_size', value: event.target.value });
-              }}
-              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite focus:border-data-lime/60 focus:outline-none"
-            >
-              <option value="6">6</option>
-              <option value="9">9</option>
-              <option value="12">12</option>
-              <option value="18">18</option>
-            </select>
-          </label>
-        </div>
-      </div>
-
-      {/* ── RESULTS ── */}
-      <div className="space-y-8 animate-cardIn">
-        {/* Results Metadata */}
-        <div className="flex items-center gap-4">
-          <div className="h-px flex-1 bg-white/[0.06]" />
-          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/[0.06] bg-white/[0.02]">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">
-              Showing
-            </span>
-            <span className="text-sm font-black text-data-lime tabular-nums">
-              {isPending ? '...' : totalResults}
-            </span>
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">
-              of {products.length} picks
-            </span>
-          </div>
-          <div className="h-px flex-1 bg-white/[0.06]" />
-        </div>
-
-        {/* At a glance Comparison */}
-        {filteredProducts.length > 1 && (
-          <div className="space-y-4">
-            <ComparisonTable
-              products={filteredProducts}
-              articleSlug={articleSlug}
-              title={`${activeFilterMeta?.key === 'all' ? 'All Ranked' : activeFilterMeta?.label || 'Top'} Gear Compared`}
-            />
-          </div>
-        )}
-
-        {/* Product Cards */}
-        <ProductGrid
-          products={pagedProducts}
-          articleSlug={articleSlug}
-          isLoading={isPending}
-          emptyFilterLabel={activeFilterLabel || activeFilterMeta?.label}
-          rankOffset={startIndex}
-          selectedIds={selectedIds}
-          onSelectedIdsChange={updateSelection}
-          showCompareBar={false}
-        />
-
-        <StickyCompareBar
-          selectedProducts={selectedProducts}
-          onRemove={(id) => {
-            const next = new Set(selectedIds);
-            next.delete(id);
-            updateSelection(next);
-          }}
-          onClear={() => updateSelection(new Set())}
-        />
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="relative z-[55] pointer-events-auto flex flex-wrap items-center justify-between gap-3 rounded-pill border border-white/[0.06] bg-graphite-900/60 px-4 py-3">
-            <div className="text-xs font-bold uppercase tracking-widest text-neutral-500">
-              Showing {rangeStart}-{rangeEnd} of {totalResults}
-            </div>
-            <div className="pointer-events-auto flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setPage(currentPage - 1)}
-                disabled={currentPage <= 1}
-                className="h-9 px-3 rounded-pill border border-white/[0.08] text-xs font-bold uppercase tracking-widest text-neutral-400 disabled:opacity-40 disabled:cursor-not-allowed hover:border-white/20 hover:text-offwhite"
-              >
-                Prev
-              </button>
-              <div className="flex items-center gap-1">
-                {paginationPages[0] > 1 && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => setPage(1)}
-                      className="h-9 w-9 rounded-full border border-white/[0.08] text-xs font-bold text-neutral-400 hover:border-white/20 hover:text-offwhite"
-                    >
-                      1
-                    </button>
-                    <span className="text-xs font-bold text-neutral-500 px-1">...</span>
-                  </>
-                )}
-                {paginationPages.map((pageNumber) => {
-                  const isActive = pageNumber === currentPage;
-                  return (
-                    <button
-                      type="button"
-                      key={pageNumber}
-                      onClick={() => setPage(pageNumber)}
-                      className={`h-9 w-9 rounded-full border text-xs font-bold ${isActive ? 'border-data-lime bg-data-lime/15 text-data-lime' : 'border-white/[0.08] text-neutral-400 hover:border-white/20 hover:text-offwhite'}`}
-                    >
-                      {pageNumber}
-                    </button>
-                  );
-                })}
-                {paginationPages[paginationPages.length - 1] < totalPages && (
-                  <>
-                    <span className="text-xs font-bold text-neutral-500 px-1">...</span>
-                    <button
-                      type="button"
-                      onClick={() => setPage(totalPages)}
-                      className="h-9 w-9 rounded-full border border-white/[0.08] text-xs font-bold text-neutral-400 hover:border-white/20 hover:text-offwhite"
-                    >
-                      {totalPages}
-                    </button>
-                  </>
-                )}
-              </div>
-              <button
-                type="button"
-                onClick={() => setPage(currentPage + 1)}
-                disabled={currentPage >= totalPages}
-                className="h-9 px-3 rounded-pill border border-white/[0.08] text-xs font-bold uppercase tracking-widest text-neutral-400 disabled:opacity-40 disabled:cursor-not-allowed hover:border-white/20 hover:text-offwhite"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+function slugify(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
+
+/**
+ * FIX (Audit #02-A #5): legacy ?slug= / ?category= / ?page= query-param routes
+ * redirect to canonical SSR paths with 308 Permanent redirects, preventing
+ * duplicate-content indexing.
+ *
+ * FIX: Only redirect ?category= when it's the SOLE meaningful param.
+ * If other filter params exist (focus, brand, sort, tags, q, etc.),
+ * the user is actively using the homepage filter panel — do NOT redirect
+ * away from the homepage or all their filters will be lost.
+ */
+export function middleware(request: NextRequest) {
+  const url = request.nextUrl.clone();
+
+  // Enforce WWW Host (Audit #2 Fix)
+  if (url.hostname === 'athletica.page') {
+    url.hostname = 'www.athletica.page';
+    return NextResponse.redirect(url, 308);
+  }
+
+  const slug = url.searchParams.get('slug');
+  const page = url.searchParams.get('page');
+  const category = url.searchParams.get('category');
+  const highlightId = url.searchParams.get('highlightId');
+
+  // Redirect ?slug=X → /best/X
+  if (url.pathname === '/' && slug) {
+    url.pathname = `/best/${slug}`;
+    url.search = '';
+    if (highlightId) url.searchParams.set('highlightId', highlightId);
+    return NextResponse.redirect(url, 308);
+  }
+
+  // Redirect ?page=about|contact|... → /about|/contact|...
+  if (
+    url.pathname === '/' &&
+    page &&
+    ['about', 'contact', 'privacy', 'terms', 'disclosure'].includes(page)
+  ) {
+    url.pathname = `/${page}`;
+    url.search = '';
+    return NextResponse.redirect(url, 308);
+  }
+
+  // FIX: Only redirect ?category=X → /category/X when category is the ONLY
+  // meaningful param. If the user has active homepage filters (focus, brand,
+  // sort, tags, q, minPrice, maxPrice, minRating, pageSize, page), they are
+  // using the filter panel and must stay on the homepage.
+  if (url.pathname === '/' && category) {
+    const otherFilterParams = [
+      'focus', 'brand', 'sort', 'tags', 'tag', 'q',
+      'minPrice', 'maxPrice', 'minRating', 'pageSize', 'page',
+    ];
+    const hasOtherFilters = otherFilterParams.some(
+      (param) => url.searchParams.has(param)
+    );
+
+    if (!hasOtherFilters) {
+      // Solo category param → redirect to dedicated category page
+      url.pathname = `/category/${slugify(category)}`;
+      url.search = '';
+      return NextResponse.redirect(url, 308);
+    }
+    // Otherwise: stay on homepage with category as an in-page filter
+  }
+
+  if (url.pathname === '/categories' && category) {
+    url.pathname = `/category/${slugify(category)}`;
+    url.search = '';
+    return NextResponse.redirect(url, 308);
+  }
+
+  // Strip ?refresh= params (prevent indexing of cache-busting URLs)
+  if (url.searchParams.has('refresh')) {
+    url.searchParams.delete('refresh');
+    return NextResponse.redirect(url, 308);
+  }
+
+  // Redirect /best/*-2026 → /best/* (Audit #02-F)
+  if (url.pathname.startsWith('/best/') && url.pathname.endsWith('-2026')) {
+    url.pathname = url.pathname.replace(/-2026$/, '');
+    return NextResponse.redirect(url, 308);
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|favicon.svg|manifest.json).*)'],
+};
 </file>
 
 <file path="components/ProductGrid.tsx">
@@ -8904,6 +8350,768 @@ export default async function ArticlePage({ params }: { params: { slug: string }
         </section>
       </article>
     </>
+  );
+}
+</file>
+
+<file path="components/HomepageFilters.tsx">
+'use client';
+
+import { useMemo, useState, useTransition, useCallback } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+
+import { ComparisonTable } from '@/components/ComparisonTable';
+import { ProductGrid } from '@/components/ProductGrid';
+import { StickyCompareBar } from '@/components/StickyCompareBar';
+import type { Product } from '@/lib/types';
+import { trackEvent } from '@/lib/analytics';
+import { SlidersHorizontal, X } from 'lucide-react';
+
+type FilterKey =
+  | 'all'
+  | 'small-apartments'
+  | 'budget'
+  | 'heavy-lifters'
+  | 'smart-equipment'
+  | 'compact-gear';
+
+/**
+ * Helper: build a searchable text blob from product fields.
+ * Memoized callers should use this consistently.
+ */
+function productBlob(p: Product): string {
+  return [
+    p.short_title,
+    p.title,
+    p.raw_description,
+    p.editorial_summary,
+    p.description,
+    p.brand,
+    p.category,
+    ...(p.best_for_tags || []),
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+}
+
+/**
+ * Helper: test if blob contains ANY of the given phrases as whole-word or
+ * word-start matches. Uses word boundaries so "app" doesn't match "apple".
+ */
+function hasWord(blob: string, words: string[]): boolean {
+  return words.some((w) => {
+    const escaped = w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(`\\b${escaped}`, 'i').test(blob);
+  });
+}
+
+const FILTERS: Array<{
+  key: FilterKey;
+  label: string;
+  hint: string;
+  icon: string;
+  match: (product: Product) => boolean;
+}> = [
+  {
+    key: 'all',
+    label: 'All Picks',
+    hint: 'Full ranked list',
+    icon: '⚡',
+    match: () => true,
+  },
+  {
+    key: 'small-apartments',
+    label: 'Apartments',
+    hint: 'Compact & portable',
+    icon: '🏠',
+    match: (p) => {
+      const blob = productBlob(p);
+      // Broad but precise: compact/folding/portable/small/home-friendly
+      return hasWord(blob, [
+        'compact',
+        'foldable',
+        'folding',
+        'fold',
+        'portable',
+        'lightweight',
+        'small footprint',
+        'space-saving',
+        'space saving',
+        'under desk',
+        'travel',
+        'stowable',
+        'easy storage',
+        'quiet',
+        'silent',
+      ]);
+    },
+  },
+  {
+    key: 'budget',
+    label: 'Budget',
+    hint: 'Under $100',
+    icon: '💰',
+    match: (p) => {
+      // PRIMARY: price-based — under $100 is a true budget filter
+      if (p.price_cents && p.price_cents > 0 && p.price_cents <= 10000) return true;
+      // SECONDARY: explicit budget/value keywords in title or tags only (not summaries)
+      const titleBlob = [
+        p.short_title,
+        p.title,
+        ...(p.best_for_tags || []),
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+      return hasWord(titleBlob, ['budget', 'affordable', 'entry level', 'starter']);
+    },
+  },
+  {
+    key: 'heavy-lifters',
+    label: 'Heavy Load',
+    hint: 'Garage & pro',
+    icon: '🏋️',
+    match: (p) => {
+      const blob = productBlob(p);
+      // Precise: avoid matching "pro" in brand names or "durable" in generic copy
+      return (
+        hasWord(blob, [
+          'heavy duty',
+          'heavy-duty',
+          'heavyweight',
+          'power rack',
+          'powerlifting',
+          'olympic bar',
+          'garage gym',
+          'squat rack',
+          'commercial grade',
+          'commercial-grade',
+          'power cage',
+        ]) ||
+        // Category-based match for heavy lifting categories
+        /(powerlifting|weightlifting|crossfit|strength)/i.test(p.category || '') ||
+        // High weight capacity is a strong signal
+        /\b\d{3,}\s*lb/i.test(blob)
+      );
+    },
+  },
+  {
+    key: 'smart-equipment',
+    label: 'Smart Gear',
+    hint: 'App & Bluetooth',
+    icon: '📱',
+    match: (p) => {
+      const blob = productBlob(p);
+      // Precise: require actual smart/connected features
+      return hasWord(blob, [
+        'smart',
+        'bluetooth',
+        'wifi-enabled',
+        'app-connected',
+        'app controlled',
+        'app-controlled',
+        'voice control',
+        'heart rate monitor',
+        'fitness tracker',
+        'garmin',
+        'wahoo',
+        'connected fitness',
+        'digital display',
+        'led display',
+        'lcd display',
+        'peloton',
+      ]);
+    },
+  },
+];
+
+/**
+ * Clean a raw tag slug for display in the UI.
+ * Converts "boxing-&-mma" → "Boxing & MMA", "home-gym" → "Home Gym"
+ */
+function cleanTagName(tag: string): string {
+  return tag
+    .replace(/-&-/g, ' & ')
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+export function HomepageFilters({
+  products,
+  articleSlug,
+  initialFilter = 'all',
+}: {
+  products: Product[];
+  articleSlug: string;
+  initialFilter?: FilterKey;
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const activeFilter = (searchParams.get('focus') as FilterKey) || initialFilter || 'all';
+  const searchQuery = (searchParams.get('q') || '').trim();
+  const categoryFilter = searchParams.get('category') || 'all';
+  const brandFilter = searchParams.get('brand') || 'all';
+  const tagParam = searchParams.get('tags') || searchParams.get('tag') || '';
+  const tagFilters = tagParam.split(',').map((value) => value.trim()).filter(Boolean);
+  const sortBy = searchParams.get('sort') || 'rank';
+  const pageSize = Math.max(6, Math.min(24, Number.parseInt(searchParams.get('pageSize') || '9', 10) || 9));
+  const pageParam = Math.max(1, Number.parseInt(searchParams.get('page') || '1', 10) || 1);
+  const minPrice = Number.parseInt(searchParams.get('minPrice') || '', 10);
+  const maxPrice = Number.parseInt(searchParams.get('maxPrice') || '', 10);
+  const minRating = Number.parseFloat(searchParams.get('minRating') || '');
+
+  const activeFilterMeta = FILTERS.find(f => f.key === activeFilter);
+
+  /**
+   * Build URL from live browser search params to avoid stale reads.
+   */
+  const updateParams = useCallback((updates: Record<string, string | null>, resetPage = true) => {
+    const current = new URLSearchParams(
+      typeof window !== 'undefined' ? window.location.search : searchParams.toString()
+    );
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === null || value === '' || value === 'all') {
+        current.delete(key);
+      } else {
+        current.set(key, value);
+      }
+    });
+
+    if (updates.tags !== undefined) current.delete('tag');
+
+    if (resetPage) {
+      current.delete('page');
+    }
+
+    const query = current.toString();
+    const newUrl = query ? `${pathname}?${query}` : pathname;
+
+    startTransition(() => {
+      router.replace(newUrl, { scroll: false });
+    });
+  }, [pathname, router, searchParams]);
+
+  const setFilter = (nextFilter: FilterKey) => {
+    updateParams({ focus: nextFilter === 'all' ? null : nextFilter });
+    trackEvent('homepage_filter', { action: 'focus', value: nextFilter });
+  };
+
+  const setPage = useCallback((nextPage: number) => {
+    const safePage = Math.max(1, nextPage);
+    updateParams({ page: safePage === 1 ? null : String(safePage) }, false);
+    trackEvent('homepage_filter', { action: 'pagination', value: safePage });
+  }, [updateParams]);
+
+  const categoryOptions = useMemo(() => {
+    const unique = new Set<string>();
+    products.forEach((product) => {
+      if (product.category) unique.add(product.category);
+    });
+    return Array.from(unique).sort((a, b) => a.localeCompare(b));
+  }, [products]);
+
+  const brandOptions = useMemo(() => {
+    const unique = new Set<string>();
+    products.forEach((product) => {
+      if (product.brand) unique.add(product.brand);
+    });
+    return Array.from(unique).sort((a, b) => a.localeCompare(b));
+  }, [products]);
+
+  const tagOptions = useMemo(() => {
+    const unique = new Set<string>();
+    products.forEach((product) => {
+      (product.best_for_tags || []).forEach((tag) => unique.add(tag));
+    });
+    return Array.from(unique).sort((a, b) => a.localeCompare(b));
+  }, [products]);
+
+  const filteredProducts = useMemo(() => {
+    const filter = FILTERS.find(f => f.key === activeFilter);
+    const query = searchQuery.toLowerCase();
+    const minPriceCents = Number.isFinite(minPrice) ? minPrice * 100 : null;
+    const maxPriceCents = Number.isFinite(maxPrice) ? maxPrice * 100 : null;
+    const ratingFloor = Number.isFinite(minRating) ? minRating : null;
+    const hasTags = tagFilters.length > 0;
+
+    return products.filter((product) => {
+      if (filter && !filter.match(product)) return false;
+      if (categoryFilter !== 'all' && product.category !== categoryFilter) return false;
+      if (brandFilter !== 'all' && product.brand !== brandFilter) return false;
+      if (hasTags && !tagFilters.some((tag) => (product.best_for_tags || []).includes(tag))) return false;
+      if (query) {
+        const blob = productBlob(product).toLowerCase();
+        if (!blob.includes(query)) return false;
+      }
+      const priceCents = product.price_cents ?? null;
+      if (minPriceCents !== null && (!priceCents || priceCents < minPriceCents)) return false;
+      if (maxPriceCents !== null && (!priceCents || priceCents > maxPriceCents)) return false;
+      if (ratingFloor !== null && (!product.rating || product.rating < ratingFloor)) return false;
+      return true;
+    });
+  }, [activeFilter, brandFilter, categoryFilter, maxPrice, minPrice, minRating, products, searchQuery, tagFilters]);
+
+  const sortedProducts = useMemo(() => {
+    const sorted = [...filteredProducts];
+    const byRank = (a: Product, b: Product) => (a.rank || 0) - (b.rank || 0);
+    const byPriceAsc = (a: Product, b: Product) => {
+      const aPrice = a.price_cents ?? Number.MAX_SAFE_INTEGER;
+      const bPrice = b.price_cents ?? Number.MAX_SAFE_INTEGER;
+      return aPrice - bPrice;
+    };
+    const byPriceDesc = (a: Product, b: Product) => {
+      const aPrice = a.price_cents ?? 0;
+      const bPrice = b.price_cents ?? 0;
+      return bPrice - aPrice;
+    };
+    const byRating = (a: Product, b: Product) => (b.rating || 0) - (a.rating || 0);
+    const byReviews = (a: Product, b: Product) => (b.review_count || 0) - (a.review_count || 0);
+    const byUpdated = (a: Product, b: Product) =>
+      new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+
+    switch (sortBy) {
+      case 'price-asc':
+        sorted.sort(byPriceAsc);
+        break;
+      case 'price-desc':
+        sorted.sort(byPriceDesc);
+        break;
+      case 'rating-desc':
+        sorted.sort(byRating);
+        break;
+      case 'reviews-desc':
+        sorted.sort(byReviews);
+        break;
+      case 'newest':
+        sorted.sort(byUpdated);
+        break;
+      default:
+        sorted.sort(byRank);
+        break;
+    }
+    return sorted;
+  }, [filteredProducts, sortBy]);
+
+  const totalResults = sortedProducts.length;
+  const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
+
+  /**
+   * Single source of truth: URL page param, clamped to valid range.
+   */
+  const currentPage = Math.min(Math.max(1, pageParam), totalPages);
+
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalResults);
+  const pagedProducts = sortedProducts.slice(startIndex, endIndex);
+
+  const rangeStart = totalResults === 0 ? 0 : startIndex + 1;
+  const rangeEnd = totalResults === 0 ? 0 : endIndex;
+
+  const paginationPages = useMemo(() => {
+    const windowSize = 5;
+    let start = Math.max(1, currentPage - 2);
+    let end = Math.min(totalPages, start + windowSize - 1);
+    start = Math.max(1, end - windowSize + 1);
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  }, [currentPage, totalPages]);
+
+  const activeFilterLabel = [
+    activeFilterMeta?.label,
+    categoryFilter !== 'all' ? categoryFilter : null,
+    brandFilter !== 'all' ? brandFilter : null,
+    tagFilters.length > 0 ? tagFilters.map(cleanTagName).join(', ') : null,
+    searchQuery ? `"${searchQuery}"` : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
+  const selectedProducts = useMemo(
+    () => products.filter((product) => selectedIds.has(product.id)),
+    [products, selectedIds]
+  );
+
+  const updateSelection = (next: Set<string>) => {
+    setSelectedIds(new Set(next));
+  };
+
+  const toggleTag = (tag: string) => {
+    const nextTags = new Set(tagFilters);
+    if (nextTags.has(tag)) nextTags.delete(tag);
+    else nextTags.add(tag);
+    updateParams({ tags: Array.from(nextTags).join(',') });
+    trackEvent('homepage_filter', { action: 'tag', value: tag, selected: nextTags.has(tag) });
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* ── FILTER TABS ── */}
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-neutral-500">
+            <SlidersHorizontal className="w-3 h-3" />
+            Filter by training focus
+          </div>
+          {activeFilter !== 'all' && (
+            <button
+              onClick={() => setFilter('all')}
+              className="text-xs font-bold text-trust-blue hover:text-white transition-colors flex items-center gap-1"
+            >
+              <X className="w-3 h-3" />
+              Reset
+            </button>
+          )}
+        </div>
+
+        <div
+          role="tablist"
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2"
+        >
+          {FILTERS.map((filter) => {
+            const isActive = activeFilter === filter.key;
+            return (
+              <button
+                key={filter.key}
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setFilter(filter.key)}
+                className={`group flex flex-col items-start p-4 rounded-inner border transition-all duration-200 ${
+                  isActive
+                    ? 'border-data-lime bg-data-lime/10 shadow-[0_0_20px_rgba(198,255,61,0.08)]'
+                    : 'border-white/[0.06] bg-graphite-800 hover:border-white/20'
+                }`}
+              >
+                <div className="flex items-center justify-between w-full mb-1">
+                  <span className={`text-xl transition-transform ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} aria-hidden="true">{filter.icon}</span>
+                  {isActive && <div className="w-1.5 h-1.5 rounded-full bg-data-lime animate-pulse" />}
+                </div>
+                <div className={`text-xs font-black uppercase tracking-tight ${isActive ? 'text-data-lime' : 'text-offwhite'}`}>
+                  {filter.label}
+                </div>
+                <div className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mt-0.5 whitespace-nowrap">
+                  {filter.hint}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── ADVANCED FILTERS ── */}
+      <div className="rounded-card border border-white/[0.06] bg-graphite-800/60 p-5 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-neutral-500">Advanced filters</div>
+          {(searchQuery || categoryFilter !== 'all' || brandFilter !== 'all' || tagFilters.length > 0 || Number.isFinite(minPrice)
+            || Number.isFinite(maxPrice) || Number.isFinite(minRating) || sortBy !== 'rank') && (
+            <button
+              onClick={() => {
+                updateParams({ q: null, category: null, brand: null, tags: null, minPrice: null, maxPrice: null, minRating: null, sort: null });
+                trackEvent('homepage_filter', { action: 'clear_all' });
+              }}
+              className="text-xs font-bold text-trust-blue hover:text-white transition-colors flex items-center gap-1"
+            >
+              <X className="w-3 h-3" />
+              Clear all
+            </button>
+          )}
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
+            Search
+            <input
+              type="search"
+              placeholder="Search gear, brands, tags"
+              value={searchQuery}
+              onChange={(event) => updateParams({ q: event.target.value })}
+              onBlur={(event) => {
+                if (event.target.value.trim()) {
+                  trackEvent('homepage_filter', { action: 'search', value: event.target.value.trim() });
+                }
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && searchQuery.trim()) {
+                  trackEvent('homepage_filter', { action: 'search', value: searchQuery.trim() });
+                }
+              }}
+              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none"
+            />
+          </label>
+          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
+            Category
+            <select
+              value={categoryFilter}
+              onChange={(event) => {
+                updateParams({ category: event.target.value });
+                trackEvent('homepage_filter', { action: 'category', value: event.target.value });
+              }}
+              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite focus:border-data-lime/60 focus:outline-none"
+            >
+              <option value="all">All categories</option>
+              {categoryOptions.map((category) => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
+          </label>
+          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
+            Brand
+            <select
+              value={brandFilter}
+              onChange={(event) => {
+                updateParams({ brand: event.target.value });
+                trackEvent('homepage_filter', { action: 'brand', value: event.target.value });
+              }}
+              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite focus:border-data-lime/60 focus:outline-none"
+            >
+              <option value="all">All brands</option>
+              {brandOptions.map((brand) => (
+                <option key={brand} value={brand}>{brand}</option>
+              ))}
+            </select>
+          </label>
+          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
+            Min price
+            <input
+              type="number"
+              min={0}
+              placeholder="0"
+              value={Number.isFinite(minPrice) ? String(minPrice) : ''}
+              onChange={(event) => {
+                updateParams({ minPrice: event.target.value });
+                trackEvent('homepage_filter', { action: 'min_price', value: event.target.value || '0' });
+              }}
+              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none"
+            />
+          </label>
+          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
+            Max price
+            <input
+              type="number"
+              min={0}
+              placeholder="600"
+              value={Number.isFinite(maxPrice) ? String(maxPrice) : ''}
+              onChange={(event) => {
+                updateParams({ maxPrice: event.target.value });
+                trackEvent('homepage_filter', { action: 'max_price', value: event.target.value || '0' });
+              }}
+              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite placeholder:text-neutral-600 focus:border-data-lime/60 focus:outline-none"
+            />
+          </label>
+          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
+            Min rating
+            <select
+              value={Number.isFinite(minRating) ? String(minRating) : 'all'}
+              onChange={(event) => {
+                updateParams({ minRating: event.target.value === 'all' ? null : event.target.value });
+                trackEvent('homepage_filter', { action: 'min_rating', value: event.target.value });
+              }}
+              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite focus:border-data-lime/60 focus:outline-none"
+            >
+              <option value="all">Any rating</option>
+              <option value="4.8">4.8+ stars</option>
+              <option value="4.6">4.6+ stars</option>
+              <option value="4.4">4.4+ stars</option>
+              <option value="4.2">4.2+ stars</option>
+            </select>
+          </label>
+        </div>
+
+        {tagOptions.length > 0 && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-widest text-neutral-500">Best for tags</span>
+              {tagFilters.length > 0 && (
+                <button
+                  onClick={() => {
+                    updateParams({ tags: null });
+                    trackEvent('homepage_filter', { action: 'tags_clear' });
+                  }}
+                  className="text-xs font-bold text-trust-blue hover:text-white transition-colors"
+                >
+                  Clear tags
+                </button>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {tagOptions.map((tag) => {
+                const isActive = tagFilters.includes(tag);
+                const display = cleanTagName(tag);
+                return (
+                  <button
+                    key={tag}
+                    onClick={() => toggleTag(tag)}
+                    className={`rounded-pill border px-4 py-1.5 text-[11px] font-black uppercase tracking-widest transition-colors ${isActive ? 'border-data-lime bg-data-lime/15 text-data-lime' : 'border-white/[0.08] text-neutral-400 hover:border-white/20 hover:text-offwhite'}`}
+                  >
+                    {display}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
+            Sort by
+            <select
+              value={sortBy}
+              onChange={(event) => {
+                updateParams({ sort: event.target.value });
+                trackEvent('homepage_filter', { action: 'sort', value: event.target.value });
+              }}
+              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite focus:border-data-lime/60 focus:outline-none"
+            >
+              <option value="rank">Editor rank</option>
+              <option value="price-asc">Price: low to high</option>
+              <option value="price-desc">Price: high to low</option>
+              <option value="rating-desc">Highest rated</option>
+              <option value="reviews-desc">Most reviewed</option>
+              <option value="newest">Recently updated</option>
+            </select>
+          </label>
+          <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-neutral-500">
+            Results per page
+            <select
+              value={String(pageSize)}
+              onChange={(event) => {
+                updateParams({ pageSize: event.target.value });
+                trackEvent('homepage_filter', { action: 'page_size', value: event.target.value });
+              }}
+              className="h-11 rounded-inner border border-white/[0.08] bg-graphite-900 px-3 text-sm font-semibold text-offwhite focus:border-data-lime/60 focus:outline-none"
+            >
+              <option value="6">6</option>
+              <option value="9">9</option>
+              <option value="12">12</option>
+              <option value="18">18</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      {/* ── RESULTS ── */}
+      <div className="space-y-8 animate-cardIn">
+        {/* Results Metadata */}
+        <div className="flex items-center gap-4">
+          <div className="h-px flex-1 bg-white/[0.06]" />
+          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/[0.06] bg-white/[0.02]">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">
+              Showing
+            </span>
+            <span className="text-sm font-black text-data-lime tabular-nums">
+              {isPending ? '...' : totalResults}
+            </span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">
+              of {products.length} picks
+            </span>
+          </div>
+          <div className="h-px flex-1 bg-white/[0.06]" />
+        </div>
+
+        {/* At a glance Comparison */}
+        {filteredProducts.length > 1 && (
+          <div className="space-y-4">
+            <ComparisonTable
+              products={filteredProducts}
+              articleSlug={articleSlug}
+              title={`${activeFilterMeta?.key === 'all' ? 'All Ranked' : activeFilterMeta?.label || 'Top'} Gear Compared`}
+            />
+          </div>
+        )}
+
+        {/* Product Cards */}
+        <ProductGrid
+          products={pagedProducts}
+          articleSlug={articleSlug}
+          isLoading={isPending}
+          emptyFilterLabel={activeFilterLabel || activeFilterMeta?.label}
+          rankOffset={startIndex}
+          selectedIds={selectedIds}
+          onSelectedIdsChange={updateSelection}
+          showCompareBar={false}
+        />
+
+        <StickyCompareBar
+          selectedProducts={selectedProducts}
+          onRemove={(id) => {
+            const next = new Set(selectedIds);
+            next.delete(id);
+            updateSelection(next);
+          }}
+          onClear={() => updateSelection(new Set())}
+        />
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="relative z-[55] pointer-events-auto flex flex-wrap items-center justify-between gap-3 rounded-pill border border-white/[0.06] bg-graphite-900/60 px-4 py-3">
+            <div className="text-xs font-bold uppercase tracking-widest text-neutral-500">
+              Showing {rangeStart}–{rangeEnd} of {totalResults}
+            </div>
+            <div className="pointer-events-auto flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setPage(currentPage - 1)}
+                disabled={currentPage <= 1}
+                className="h-9 px-3 rounded-pill border border-white/[0.08] text-xs font-bold uppercase tracking-widest text-neutral-400 disabled:opacity-40 disabled:cursor-not-allowed hover:border-white/20 hover:text-offwhite"
+              >
+                Prev
+              </button>
+              <div className="flex items-center gap-1">
+                {paginationPages[0] > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setPage(1)}
+                      className="h-9 w-9 rounded-full border border-white/[0.08] text-xs font-bold text-neutral-400 hover:border-white/20 hover:text-offwhite"
+                    >
+                      1
+                    </button>
+                    <span className="text-xs font-bold text-neutral-500 px-1">...</span>
+                  </>
+                )}
+                {paginationPages.map((pageNumber) => {
+                  const isActive = pageNumber === currentPage;
+                  return (
+                    <button
+                      type="button"
+                      key={pageNumber}
+                      onClick={() => setPage(pageNumber)}
+                      className={`h-9 w-9 rounded-full border text-xs font-bold ${isActive ? 'border-data-lime bg-data-lime/15 text-data-lime' : 'border-white/[0.08] text-neutral-400 hover:border-white/20 hover:text-offwhite'}`}
+                    >
+                      {pageNumber}
+                    </button>
+                  );
+                })}
+                {paginationPages[paginationPages.length - 1] < totalPages && (
+                  <>
+                    <span className="text-xs font-bold text-neutral-500 px-1">...</span>
+                    <button
+                      type="button"
+                      onClick={() => setPage(totalPages)}
+                      className="h-9 w-9 rounded-full border border-white/[0.08] text-xs font-bold text-neutral-400 hover:border-white/20 hover:text-offwhite"
+                    >
+                      {totalPages}
+                    </button>
+                  </>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => setPage(currentPage + 1)}
+                disabled={currentPage >= totalPages}
+                className="h-9 px-3 rounded-pill border border-white/[0.08] text-xs font-bold uppercase tracking-widest text-neutral-400 disabled:opacity-40 disabled:cursor-not-allowed hover:border-white/20 hover:text-offwhite"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 </file>

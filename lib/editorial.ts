@@ -137,3 +137,60 @@ export function buildEditorialBenchmark(
     `${title} is a solid ${category} alternative${badge ? ` with ${badge.toLowerCase()}` : ''}${rating ? ` and a ${rating} rating` : ''}; ${detailFragment(product)}.`
   );
 }
+
+export interface Author {
+  id: string;
+  name: string;
+  role: string;
+  bio: string;
+  longBio: string;
+  credentials: string[];
+  credentialString: string;
+  avatar: string;
+  img: string;
+  color: string;
+  linkedin: string;
+}
+
+export const AUTHORS: Record<string, Author> = {
+  'alex-rivera': {
+    id: 'alex-rivera',
+    name: 'Alex Rivera',
+    role: 'Editorial Director & Strength Editor',
+    bio: 'Former competitive powerlifter and CSCS with 12+ years of experience in gear testing. Alex oversees the Athletica Score weights.',
+    longBio: 'Alex Rivera has spent over a decade in the fitness industry as a competitive powerlifter, strength coach, and product analyst. Holding prestigious certifications including Certified Strength and Conditioning Specialist (CSCS) and NSCA-CPT, Alex focuses on heavy duty lifting equipment, barbells, power racks, and safety standards. At ProAthletica, Alex oversees the weighting factors of our proprietary scoring algorithm.',
+    credentials: ['CSCS', 'NSCA-CPT'],
+    credentialString: 'NSCA-CPT · 12 yrs powerlifting',
+    avatar: '💪',
+    img: 'AR',
+    color: 'bg-cta-orange/10 border-cta-orange/20',
+    linkedin: 'https://linkedin.com/in/alex-rivera-proathletica'
+  },
+  'jordan-kim': {
+    id: 'jordan-kim',
+    name: 'Jordan Kim',
+    role: 'Technical Lead & Endurance Editor',
+    bio: 'Material scientist focused on durability benchmarks and steel gauge verification. Jordan leads our spec validation lab.',
+    longBio: 'Jordan Kim is a materials science specialist with a Master of Science degree focusing on fatigue limits and steel alloy compositions. Jordan leads the technical vetting team at the ProAthletica validation lab, verifying structural integrity, welds, frame thicknesses, and motor duty ratings for treadmills and rowing machines. Jordan is also an avid long-distance runner and RRCA certified running coach.',
+    credentials: ['Material Science MSc', 'RRCA Coach'],
+    credentialString: 'RRCA Coach · 8× marathon runner',
+    avatar: '🏃',
+    img: 'JK',
+    color: 'bg-trust-blue/10 border-trust-blue/20',
+    linkedin: 'https://linkedin.com/in/jordan-kim-proathletica'
+  },
+  'sam-torres': {
+    id: 'sam-torres',
+    name: 'Sam Torres',
+    role: 'Testing Lead & Recovery Editor',
+    bio: 'Marathoner and CrossFit coach specializing in cardio equipment and small-space setups for urban athletes.',
+    longBio: 'Sam Torres is a recovery specialist, certified CrossFit Level 2 Trainer, and former NCAA Division 1 athlete. Sam specializes in evaluating mobility aids, massage guns, recovery sleeves, and designing optimal small-space and budget-friendly home gym configurations. Sam leads our hands-on user trial focus groups to obtain qualitative comfort and usability ratings.',
+    credentials: ['CrossFit Level 2', 'RRCA Coach', 'Former D1 Athlete'],
+    credentialString: 'CrossFit L2 · Former D1 Athlete',
+    avatar: '🔋',
+    img: 'ST',
+    color: 'bg-data-lime/10 border-data-lime/20',
+    linkedin: 'https://linkedin.com/in/sam-torres-proathletica'
+  }
+};
+

@@ -169,6 +169,7 @@ export function ProductCard({
             src={product.image_url.replace(/\._AC_UL\d+_\.jpg/, '._AC_SL800_.jpg')}
             alt={shortTitle}
             fill
+            unoptimized
             className="object-contain p-4"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
             priority={rank === 0}
@@ -343,7 +344,7 @@ export function ProductCard({
                 </span>
               )}
               <p className="text-xs text-neutral-600 mt-0.5">
-                as of {timestamp} · price may change
+                Price as of {timestamp} · Prices subject to change
               </p>
             </div>
 
@@ -384,10 +385,14 @@ export function ProductCard({
               href={trackHref}
               target="_blank"
               rel="sponsored nofollow noopener noreferrer"
-              aria-label={`Check today's price for ${shortTitle} on Amazon (opens in new tab)`}
+              aria-label={`Check price for ${shortTitle} on Amazon (opens in new tab)`}
               className="cta-primary h-12"
             >
-              Check Today&apos;s Price on Amazon
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M18.42 14.71C15.52 16.65 11.33 17.67 7.71 17.67c-5.04 0-9.58-1.86-13.01-4.95-.27-.24-.03-.57.3-.38 3.71 2.16 8.3 3.46 13.04 3.46 3.2 0 6.72-.66 9.96-2.03.49-.21.9.32.42.94z"/>
+                <path d="M19.63 13.33c-.37-.47-2.43-.22-3.35-.11-.28.03-.32-.21-.07-.39 1.64-1.15 4.33-.82 4.65-.43.32.39-.08 3.1-1.62 4.39-.24.2-.46.09-.36-.17.35-.87 1.12-2.82.75-3.29z"/>
+              </svg>
+              Check Price on Amazon
               <ArrowRight className="w-4 h-4 flex-shrink-0 ml-1" aria-hidden="true" />
             </a>
             {(product.review_count || 0) > 0 ? (

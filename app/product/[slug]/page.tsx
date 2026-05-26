@@ -7,7 +7,10 @@ import { formatPrice, formatTimestamp } from '@/lib/format';
 import { SITE_NAME } from '@/lib/config';
 import Image from 'next/image';
 import Link from 'next/link';
-import { User, Calendar, FlaskConical } from 'lucide-react';
+import { User, Calendar, FlaskConical, Award } from 'lucide-react';
+import { AUTHORS } from '@/lib/editorial';
+import { MultiMerchantSelector } from '@/components/MultiMerchantSelector';
+import { PriceTrackerTrigger } from '@/components/PriceTrackerTrigger';
 
 export const revalidate = 3600;
 
@@ -40,6 +43,15 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
   const shortTitle = product.short_title || product.title.split(' ').slice(0, 6).join(' ');
   const verdict = product.editorial_summary || 'Strong performance with measurable tradeoffs versus competitors.';
+
+  const cat = (product.category || '').toLowerCase();
+  let reviewerSlug = 'alex-rivera';
+  if (cat.includes('run') || cat.includes('cardio') || cat.includes('treadmill') || cat.includes('endurance')) {
+    reviewerSlug = 'jordan-kim';
+  } else if (cat.includes('recovery') || cat.includes('band') || cat.includes('massage') || cat.includes('apartment')) {
+    reviewerSlug = 'sam-torres';
+  }
+  const author = AUTHORS[reviewerSlug];
 
   return (
     <>
@@ -103,6 +115,9 @@ export default async function ProductPage({ params }: { params: { slug: string }
                     BUY ON AMAZON
                   </a>
                 </div>
+
+                {/* Live Price Drop Tracker Widget */}
+                <PriceTrackerTrigger product={product} />
               </div>
             </div>
 
@@ -120,10 +135,10 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
               {/* Trust Strip (Audit Fix) */}
               <div className="flex flex-wrap items-center gap-4 border-y border-white/10 py-4 text-[11px] font-bold uppercase tracking-widest text-neutral-400">
-                <span className="flex items-center gap-2 text-white">
+                <Link href={`/author/${author.id}`} className="flex items-center gap-2 text-white hover:text-[#C6FF3D] transition-colors">
                   <User className="h-4 w-4 text-emerald-400" />
-                  Reviewed by Athletica Lab
-                </span>
+                  Reviewed by {author.name}
+                </Link>
                 <span className="hidden sm:inline text-white/20">|</span>
                 <span className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
@@ -161,6 +176,9 @@ export default async function ProductPage({ params }: { params: { slug: string }
               <div className="rounded-3xl border border-[#C6FF3D]/20 bg-[#161B22] p-8 text-lg leading-relaxed">
                 {verdict}
               </div>
+
+              {/* Multi-Merchant Pricing Selector */}
+              <MultiMerchantSelector product={product} />
 
               {/* Pros / Cons (visually distinct) */}
               <div className="grid md:grid-cols-2 gap-6">
@@ -200,6 +218,23 @@ export default async function ProductPage({ params }: { params: { slug: string }
                       </>
                     )}
                   </ul>
+                </div>
+              </div>
+
+              {/* Author Info Card */}
+              <div className="rounded-3xl border border-white/[0.06] bg-[#161B22] p-6 flex flex-col sm:flex-row gap-6 items-start sm:items-center">
+                <div className={`flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl border text-3xl ${author.color}`}>
+                  {author.avatar}
+                </div>
+                <div className="space-y-2 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-sm font-bold text-white uppercase tracking-tight">Reviewed by {author.name}</span>
+                    <span className="text-[10px] font-bold text-trust-blue px-2 py-0.5 rounded bg-trust-blue/10 border border-trust-blue/20 uppercase tracking-widest">{author.credentials[0]}</span>
+                  </div>
+                  <p className="text-xs text-neutral-400 leading-relaxed">{author.bio}</p>
+                  <Link href={`/author/${author.id}`} className="inline-flex items-center gap-1 text-[11px] font-bold text-[#C6FF3D] hover:underline uppercase tracking-wider">
+                    View full profile & recommendations →
+                  </Link>
                 </div>
               </div>
 

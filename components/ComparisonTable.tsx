@@ -109,14 +109,18 @@ export function ComparisonTable({
                     <div className="text-3xl font-black text-[#C6FF3D] tracking-tighter">
                       {formatPrice(product.price_cents)}
                     </div>
-                    <div className="text-[10px] text-neutral-500 mt-1 uppercase tracking-widest font-bold">as of {timestamp}</div>
+                    <div className="text-[10px] text-neutral-500 mt-1 uppercase tracking-widest font-bold">Price as of {timestamp}</div>
                     <a
                       href={href}
                       target="_blank"
                       rel="sponsored nofollow noopener noreferrer"
-                      className="mt-6 inline-flex w-full items-center justify-center rounded-2xl bg-white px-5 py-4 text-xs font-black uppercase tracking-widest text-black hover:bg-neutral-200 transition active:scale-95 shadow-lg"
+                      className="mt-6 cta-primary h-12 text-xs"
                     >
-                      SEE PRICE
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M18.42 14.71C15.52 16.65 11.33 17.67 7.71 17.67c-5.04 0-9.58-1.86-13.01-4.95-.27-.24-.03-.57.3-.38 3.71 2.16 8.3 3.46 13.04 3.46 3.2 0 6.72-.66 9.96-2.03.49-.21.9.32.42.94z"/>
+                        <path d="M19.63 13.33c-.37-.47-2.43-.22-3.35-.11-.28.03-.32-.21-.07-.39 1.64-1.15 4.33-.82 4.65-.43.32.39-.08 3.1-1.62 4.39-.24.2-.46.09-.36-.17.35-.87 1.12-2.82.75-3.29z"/>
+                      </svg>
+                      Check Price
                     </a>
                   </td>
                 </tr>
@@ -147,7 +151,7 @@ export function ComparisonTable({
                 </div>
                 <div className="text-right">
                   <div className="text-lg font-black text-offwhite">{formatPrice(product.price_cents)}</div>
-                  <div className="text-[10px] text-neutral-600 uppercase tracking-widest mt-0.5">{timestamp}</div>
+                  <div className="text-[10px] text-neutral-600 uppercase tracking-widest mt-0.5">Price as of {timestamp}</div>
                 </div>
               </div>
 
@@ -177,7 +181,11 @@ export function ComparisonTable({
                   rel="sponsored nofollow noopener noreferrer"
                   className="cta-primary min-h-[2.75rem] px-5 py-2 text-xs w-auto"
                 >
-                  VIEW DEAL
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="mr-1">
+                    <path d="M18.42 14.71C15.52 16.65 11.33 17.67 7.71 17.67c-5.04 0-9.58-1.86-13.01-4.95-.27-.24-.03-.57.3-.38 3.71 2.16 8.3 3.46 13.04 3.46 3.2 0 6.72-.66 9.96-2.03.49-.21.9.32.42.94z"/>
+                    <path d="M19.63 13.33c-.37-.47-2.43-.22-3.35-.11-.28.03-.32-.21-.07-.39 1.64-1.15 4.33-.82 4.65-.43.32.39-.08 3.1-1.62 4.39-.24.2-.46.09-.36-.17.35-.87 1.12-2.82.75-3.29z"/>
+                  </svg>
+                  Check Price
                 </a>
               </div>
             </div>
