@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Dumbbell, Zap, Target, Home, ShieldCheck, ArrowRight, Activity, TrendingUp, Trophy } from 'lucide-react';
+import { Dumbbell, Zap, Target, Home, ShieldCheck, ArrowRight, Activity, TrendingUp, Trophy, type LucideIcon } from 'lucide-react';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { getCategoryList } from '@/lib/db';
 
@@ -11,7 +11,7 @@ export const metadata = buildMetadata({
 
 export const revalidate = 3600;
 
-const ICON_MAP: Record<string, any> = {
+const ICON_MAP: Record<string, LucideIcon> = {
   'home-gym': Home,
   'resistance-training': Zap,
   'powerlifting': Target,

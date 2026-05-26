@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { FlaskConical, ShieldCheck, Target, TrendingUp, Users } from 'lucide-react';
 import { buildMetadata } from '@/lib/seo/metadata';
-import { articleSchema, howToSchema, jsonLdProps, type Article } from '@/lib/seo/schema';
+import { articleSchema, howToSchema, jsonLdProps } from '@/lib/seo/schema';
+import type { Article } from '@/lib/types';
 
 export const metadata = buildMetadata({
   title: 'Our Methodology',

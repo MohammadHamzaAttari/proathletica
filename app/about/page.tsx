@@ -41,15 +41,13 @@ const EDITORS = [
 ];
 
 export default function AboutPage() {
-  const schemas = [
-    ...EDITORS.map(e => personSchema({
-      name: e.name,
-      jobTitle: e.role,
-      description: e.bio,
-      credentials: e.credentials,
-      url: `${SITE_URL}/about#${e.id}`
-    }))
-  ];
+  const schemas = EDITORS.map(e => personSchema({
+    name: e.name,
+    jobTitle: e.role,
+    description: e.bio,
+    credentials: e.credentials,
+    url: `${SITE_URL}/about#${e.id}`
+  }));
 
   return (
     <article className="mx-auto max-w-5xl space-y-24 px-4 py-20 sm:px-8">

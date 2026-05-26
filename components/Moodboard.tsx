@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, CheckCircle2, Info, Star, TrendingUp } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Star } from 'lucide-react';
 
 export function Moodboard() {
   return (
@@ -11,13 +11,13 @@ export function Moodboard() {
             MOODBOARD v1 — PROATHLETICA REDESIGN
           </div>
           <h1 className="mt-6 text-6xl font-black uppercase tracking-tighter leading-none">
-            RTINGS × STRAVA × APPLE<br />FITNESS
+            RTINGS &times; STRAVA &times; APPLE<br />FITNESS
           </h1>
           <p className="mt-4 max-w-md text-xl text-neutral-400">
             Premium. Scientific. Athletic. Editorial credibility with high-CTR conversion architecture.
           </p>
           <div className="mt-6 flex gap-8 text-sm">
-            <div><span className="text-[#3D8BFF]">TRUST</span> in 3s • <span className="text-[#C6FF3D]">ORIENT</span> in 5s • <span className="text-[#FF6B1A]">CLICK OUT</span></div>
+            <div><span className="text-[#3D8BFF]">TRUST</span> in 3s &bull; <span className="text-[#C6FF3D]">ORIENT</span> in 5s &bull; <span className="text-[#FF6B1A]">CLICK OUT</span></div>
           </div>
         </div>
 
@@ -55,7 +55,7 @@ export function Moodboard() {
                   <div className="font-mono text-sm">#FF6B1A</div>
                 </div>
               </div>
-              <div className="mt-3 text-xs text-neutral-400">All primary "See Today's Price" buttons. Amazon adjacent.</div>
+              <div className="mt-3 text-xs text-neutral-400">All primary &quot;See Today&apos;s Price&quot; buttons. Amazon adjacent.</div>
             </div>
 
             {/* Data Lime */}
@@ -66,7 +66,7 @@ export function Moodboard() {
                   <div className="font-mono text-sm">#C6FF3D</div>
                 </div>
               </div>
-              <div className="mt-3 text-xs text-neutral-400">Rank badges, ratings, stat counters, "Best Value"</div>
+              <div className="mt-3 text-xs text-neutral-400">Rank badges, ratings, stat counters, &quot;Best Value&quot;</div>
             </div>
 
             {/* Trust Blue */}
@@ -123,7 +123,7 @@ export function Moodboard() {
                   <ArrowRight className="w-5 h-5" />
                 </button>
                 <div className="flex justify-between text-xs mt-4">
-                  <div className="text-[#C6FF3D] font-medium">$189.00 <span className="text-neutral-500">• live 3h ago</span></div>
+                  <div className="text-[#C6FF3D] font-medium">$189.00 <span className="text-neutral-500">&bull; live 3h ago</span></div>
                   <div className="flex items-center gap-1 text-trust-blue">
                     <CheckCircle2 className="w-3.5 h-3.5" /> Prime
                   </div>
@@ -142,7 +142,7 @@ export function Moodboard() {
               <div>
                 <div className="text-xs font-black tracking-widest text-neutral-500 mb-3">TIER 3 — RANKS 11+</div>
                 <button className="text-sm border border-white/20 hover:bg-white/5 px-5 py-2.5 rounded-xl text-neutral-400 hover:text-offwhite transition-colors">
-                  See price →
+                  See price &rarr;
                 </button>
               </div>
             </div>
@@ -176,7 +176,7 @@ export function Moodboard() {
                     <div className="text-xs text-neutral-500">Live • 4h ago</div>
                   </div>
                   <button className="bg-[#FF6B1A] text-black font-black px-8 py-4 rounded-2xl text-sm tracking-widest">
-                    SEE PRICE →
+                    SEE PRICE &rarr;
                   </button>
                 </div>
               </div>
@@ -189,12 +189,12 @@ export function Moodboard() {
                 <div className="flex-1">
                   <div className="w-12 h-12 bg-neutral-700 rounded-2xl mb-3" />
                   <div className="font-semibold">Alex Rivera</div>
-                  <div className="text-xs text-neutral-400">NSCA-CPT • 12 years powerlifting</div>
+                  <div className="text-xs text-neutral-400">NSCA-CPT &bull; 12 years powerlifting</div>
                 </div>
                 <div className="flex-1">
                   <div className="w-12 h-12 bg-neutral-700 rounded-2xl mb-3" />
                   <div className="font-semibold">Jordan Kim</div>
-                  <div className="text-xs text-neutral-400">RRCA Coach • 8× marathoner</div>
+                  <div className="text-xs text-neutral-400">RRCA Coach &bull; 8&times; marathoner</div>
                 </div>
               </div>
               <div className="mt-auto pt-8 text-xs text-neutral-400 border-t border-white/10">
@@ -211,14 +211,14 @@ export function Moodboard() {
             <div className="grid md:grid-cols-2 gap-x-16 gap-y-8 text-sm">
               <div>
                 <div className="font-mono text-[10px] text-neutral-500 mb-1">INSTEAD OF</div>
-                <div className="line-through opacity-40">"Check Price on Amazon"</div>
-                <div className="mt-4 font-semibold text-[#FF6B1A]">“See Today’s Price on Amazon →”</div>
+                <div className="line-through opacity-40">&quot;Check Price on Amazon&quot;</div>
+                <div className="mt-4 font-semibold text-[#FF6B1A]">&ldquo;See Today&rsquo;s Price on Amazon &rarr;&rdquo;</div>
                 <div className="text-xs text-neutral-500 mt-6">Adds urgency without hype. Increases CTR by ~18% in our tests.</div>
               </div>
               <div>
                 <div className="font-mono text-[10px] text-neutral-500 mb-1">INSTEAD OF</div>
-                <div className="line-through opacity-40">"is a solid alternative"</div>
-                <div className="mt-3 font-medium">“Quietest massage gun under $35 — battery lasts 45 minutes. Fine for daily use but premium models run 2× longer.”</div>
+                <div className="line-through opacity-40">&quot;is a solid alternative&quot;</div>
+                <div className="mt-3 font-medium">&ldquo;Quietest massage gun under $35 &mdash; battery lasts 45 minutes. Fine for daily use but premium models run 2&times; longer.&rdquo;</div>
               </div>
             </div>
           </div>

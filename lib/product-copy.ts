@@ -226,7 +226,7 @@ function buildBestForTags(product: ProductSource, traits: Record<string, boolean
   return uniqueStrings(tags).slice(0, 3);
 }
 
-export function buildProductEditorialCopy(product: ProductSource, rank = 0): ProductEditorialCopy {
+export function buildProductEditorialCopy(product: ProductSource): ProductEditorialCopy {
   const baseTitle = product.short_title || product.title;
   const short_title = normalizeProductTitle(baseTitle);
   const traits = deriveTraits(product);
@@ -299,8 +299,8 @@ function getFallbackSpecs(product: ProductSource): Record<string, string> {
   };
 }
 
-export function hydrateProduct<T extends ProductSource>(product: T, rank = 0): T & Product {
-  const copy = buildProductEditorialCopy(product, rank);
+export function hydrateProduct<T extends ProductSource>(product: T): T & Product {
+  const copy = buildProductEditorialCopy(product);
   return {
     ...product,
     short_title: product.short_title?.trim() || copy.short_title,
