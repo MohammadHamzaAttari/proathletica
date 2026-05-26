@@ -6,6 +6,7 @@ import { CookieConsent } from '@/components/CookieConsent';
 import { ExitIntentModal } from '@/components/ExitIntentModal';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
+import { CompareProvider } from '@/components/CompareProvider';
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, PINTEREST_DOMAIN_VERIFY } from '@/lib/config';
 import { jsonLdProps, organizationSchema, websiteSchema } from '@/lib/seo/schema';
 
@@ -71,7 +72,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-[#0A0D12] font-sans text-neutral-100 antialiased">
         <Header />
-        <main>{children}</main>
+        <CompareProvider>
+          <main>{children}</main>
+        </CompareProvider>
         <Footer />
         <CookieConsent />
         <ExitIntentModal />

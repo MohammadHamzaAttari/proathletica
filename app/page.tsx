@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, FlaskConical, ShieldCheck, Trophy, TrendingUp } from 'lucide-react';
 import { BuyerGuide } from '@/components/BuyerGuide';
@@ -102,16 +103,28 @@ export default async function HomePage() {
 
       {/* ── HERO ── */}
       <section
-        className="relative bg-graphite-900 pt-14 pb-16 overflow-hidden"
+        className="relative bg-graphite-900 pt-20 pb-24 overflow-hidden"
         aria-label="ProAthletica — data-driven fitness gear rankings"
       >
-        {/* Decorative background glows */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-data-lime/[0.04] rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-cta-orange/[0.03] rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image 
+            src="/images/hero-bg.png" 
+            alt="ProAthletica modern home gym setup" 
+            fill 
+            className="object-cover opacity-25 mix-blend-luminosity" 
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0A0D12]/90 via-[#0A0D12]/70 to-[#0A0D12]" />
+        </div>
 
-        <div className="relative mx-auto max-w-6xl px-4 sm:px-8 text-center">
+        {/* Decorative background glows */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-trust-blue/[0.04] rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+        <div className="absolute bottom-0 right-0 w-80 h-80 bg-data-lime/[0.03] rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-8 text-center z-10">
           {/* Trust eyebrow */}
-          <div className="inline-flex items-center gap-2 rounded-pill border border-trust-blue/25 bg-trust-blue/[0.06] px-5 py-2 text-xs font-black tracking-[0.15em] text-trust-blue mb-8">
+          <div className="inline-flex items-center gap-2 rounded-pill border border-trust-blue/25 bg-trust-blue/[0.06] px-5 py-2 text-xs font-black tracking-[0.15em] text-trust-blue mb-8 backdrop-blur-md">
             <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
             INDEPENDENT · DATA-DRIVEN · NO PAID PLACEMENTS
           </div>
@@ -210,33 +223,48 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" role="list">
-            {categories.map((category) => {
-              const icon = CATEGORY_ICONS[category.slug] ?? CATEGORY_ICONS['default'];
+          <div className="space-y-12">
+            {[
+              { title: 'Strength Training', filter: (slug: string) => ['home-gym', 'resistance-training', 'powerlifting'].some(k => slug.includes(k)) },
+              { title: 'Cardio & Endurance', filter: (slug: string) => ['running', 'cardio'].some(k => slug.includes(k)) },
+              { title: 'Recovery & Mobility', filter: (slug: string) => ['recovery', 'yoga', 'pilates', 'massage'].some(k => slug.includes(k)) },
+            ].map((group) => {
+              const groupCats = categories.filter((c) => group.filter(c.slug));
+              if (groupCats.length === 0) return null;
+              
               return (
-                <Link
-                  key={category.slug}
-                  href={`/category/${category.slug}`}
-                  role="listitem"
-                  className="group relative overflow-hidden rounded-card border border-white/[0.06] bg-graphite-800 p-5 sm:p-6 transition-all hover:border-data-lime/25 hover:-translate-y-0.5 hover:shadow-card-hover"
-                >
-                  <div className="text-2xl mb-3" aria-hidden="true">{icon}</div>
-                  <div className="text-sm font-black uppercase tracking-tight text-offwhite group-hover:text-data-lime transition-colors">
-                    {category.name}
+                <div key={group.title}>
+                  <h3 className="text-lg font-bold text-neutral-400 mb-4">{group.title}</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3" role="list">
+                    {groupCats.map((category) => {
+                      const icon = CATEGORY_ICONS[category.slug] ?? CATEGORY_ICONS['default'];
+                      return (
+                        <Link
+                          key={category.slug}
+                          href={`/category/${category.slug}`}
+                          role="listitem"
+                          className="group relative overflow-hidden rounded-card border border-white/[0.06] bg-graphite-800 p-5 sm:p-6 transition-all hover:border-data-lime/25 hover:-translate-y-0.5 hover:shadow-card-hover"
+                        >
+                          <div className="text-2xl mb-3" aria-hidden="true">{icon}</div>
+                          <div className="text-sm font-black uppercase tracking-tight text-offwhite group-hover:text-data-lime transition-colors">
+                            {category.name}
+                          </div>
+                          <div className="mt-1 text-xs text-neutral-500">
+                            {category.count} ranked picks
+                          </div>
+                          <div className="absolute -bottom-4 -right-4 text-[80px] font-black text-data-lime/[0.04] group-hover:text-data-lime/[0.08] transition-colors leading-none select-none" aria-hidden="true">
+                            {category.name.slice(0, 1).toUpperCase()}
+                          </div>
+                        </Link>
+                      );
+                    })}
                   </div>
-                  <div className="mt-1 text-xs text-neutral-500">
-                    {category.count} ranked picks
-                  </div>
-                  {/* Decorative letter */}
-                  <div className="absolute -bottom-4 -right-4 text-[80px] font-black text-data-lime/[0.04] group-hover:text-data-lime/[0.08] transition-colors leading-none select-none" aria-hidden="true">
-                    {category.name.slice(0, 1).toUpperCase()}
-                  </div>
-                </Link>
+                </div>
               );
             })}
           </div>
 
-          <div className="mt-4 flex justify-center sm:hidden">
+          <div className="mt-8 flex justify-center sm:hidden">
             <Link href="/categories" className="cta-secondary w-auto px-6 text-xs">
               Browse all categories →
             </Link>
@@ -245,7 +273,7 @@ export default async function HomePage() {
       )}
 
       {/* ── HOME GYM MATCHER (Audit #03-E) ── */}
-      <section className="mx-auto max-w-6xl px-4 sm:px-8 py-16" aria-label="Home gym setup quiz">
+      <section id="gear-finder" className="mx-auto max-w-6xl px-4 sm:px-8 py-16" aria-label="Home gym setup quiz">
         <GymQuiz />
       </section>
 

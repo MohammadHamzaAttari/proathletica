@@ -32,6 +32,7 @@ export function Header() {
           {[
             { href: '/', label: 'Home' },
             { href: '/categories', label: 'Categories' },
+            { href: '/#gear-finder', label: 'Gear Finder' },
             { href: '/methodology', label: 'Methodology' },
             { href: '/about', label: 'About' },
             { href: '/contact', label: 'Contact' },
@@ -91,6 +92,7 @@ export function Header() {
         {[
           { href: '/', label: '⚡ Home' },
           { href: '/categories', label: '📂 Categories' },
+          { href: '/#gear-finder', label: '🎯 Gear Finder' },
           { href: '/methodology', label: '🔬 Methodology' },
           { href: '/about', label: '👋 About' },
           { href: '/disclosure', label: '⚖️ Disclosure' },

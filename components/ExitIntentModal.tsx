@@ -22,7 +22,20 @@ export function ExitIntentModal() {
     };
 
     document.addEventListener('mouseleave', handleMouseLeave);
-    return () => document.removeEventListener('mouseleave', handleMouseLeave);
+
+    // Fallback for mobile devices (show after 45 seconds)
+    const timer = setTimeout(() => {
+      if (!hasShown) {
+        setIsOpen(true);
+        setHasShown(true);
+        sessionStorage.setItem('exit_intent_shown', 'true');
+      }
+    }, 45000);
+
+    return () => {
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      clearTimeout(timer);
+    };
   }, [hasShown]);
 
   if (!isOpen) return null;
