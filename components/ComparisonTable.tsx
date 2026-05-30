@@ -1,6 +1,6 @@
 import { formatPrice, formatReviewCount, formatTimestamp } from '@/lib/format';
 import type { Product } from '@/lib/types';
-import { ShieldCheck, Star, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Star } from 'lucide-react';
 
 type EnhancedProduct = Product & {
   custom_blurb?: string | null;
@@ -28,7 +28,7 @@ export function ComparisonTable({
   if (rows.length === 0) return null;
 
   return (
-    <section className="product-card p-6 sm:p-8">
+    <section className="product-card p-6 sm:p-8 border-data-lime/20 shadow-[0_0_50px_rgba(198,255,61,0.05)]">
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <div className="editorial-badge editorial-badge--trending mb-3">

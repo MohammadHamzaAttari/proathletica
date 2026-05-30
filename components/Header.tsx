@@ -7,7 +7,7 @@ export function Header() {
       className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#0A0D12]/90 backdrop-blur-xl"
       role="banner"
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-8">
+      <div className="container-site flex items-center justify-between py-3.5">
 
         {/* Logo */}
         <Link
@@ -85,7 +85,7 @@ export function Header() {
 
       {/* Mobile nav drawer — scrollable horizontal */}
       <nav
-        className="flex md:hidden overflow-x-auto gap-1 px-4 pb-2.5 no-scrollbar"
+        className="flex md:hidden overflow-x-auto gap-1 px-4 pb-2.5 no-scrollbar max-w-full"
         role="navigation"
         aria-label="Mobile navigation"
       >

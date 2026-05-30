@@ -1,13 +1,13 @@
 import { notFound } from 'next/navigation';
 import { getProductById, getAllProducts } from '@/lib/db';
 import { buildMetadata } from '@/lib/seo/metadata';
-import { productSchema, jsonLdProps, breadcrumbSchema } from '@/lib/seo/schema';
+import { productSchema, jsonLdProps } from '@/lib/seo/schema';
 import { DisclosureBar } from '@/components/DisclosureBar';
 import { formatPrice, formatTimestamp } from '@/lib/format';
 import { SITE_NAME } from '@/lib/config';
 import Image from 'next/image';
 import Link from 'next/link';
-import { User, Calendar, FlaskConical, Award } from 'lucide-react';
+import { User, Calendar, FlaskConical } from 'lucide-react';
 import { AUTHORS } from '@/lib/editorial';
 import { MultiMerchantSelector } from '@/components/MultiMerchantSelector';
 import { PriceTrackerTrigger } from '@/components/PriceTrackerTrigger';
@@ -22,9 +22,6 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const product = await getProductById(params.slug);
   if (!product) return buildMetadata({ title: 'Product Not Found', noindex: true });
-  
-  const brand = product.brand || 'This';
-  const category = (product.category || 'Fitness Gear').toLowerCase();
   
   return buildMetadata({
     title: `${product.short_title || product.title.split(' ').slice(0, 6).join(' ')} Review (2026): Pros, Cons, Specs & Best Alternative | ${SITE_NAME}`,

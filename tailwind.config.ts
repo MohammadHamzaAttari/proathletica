@@ -70,13 +70,14 @@ const config: Config = {
       },
       boxShadow: {
         'card': '0 1px 3px 0 rgba(0,0,0,0.4), 0 4px 24px -4px rgba(0,0,0,0.5)',
-        'card-hover': '0 8px 32px -4px rgba(0,0,0,0.6), 0 0 0 1px rgba(198,255,61,0.15)',
+        'card-hover': '0 12px 48px -4px rgba(0,0,0,0.7), 0 0 0 1px rgba(198,255,61,0.2)',
         'cta': '0 4px 20px -2px rgba(255,107,26,0.45)',
         'cta-hover': '0 8px 32px -2px rgba(255,107,26,0.6)',
-        'glow-lime': '0 0 24px rgba(198,255,61,0.25)',
+        'glow-lime': '0 0 32px rgba(198,255,61,0.3)',
         'glow-blue': '0 0 20px rgba(61,139,255,0.3)',
         'glow-orange': '0 0 28px rgba(255,107,26,0.35)',
         'inner-highlight': 'inset 0 1px 0 rgba(255,255,255,0.06)',
+        'sidebar': '4px 0 24px -4px rgba(0,0,0,0.5)',
       },
       keyframes: {
         // Card entrance

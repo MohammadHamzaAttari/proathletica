@@ -7,7 +7,7 @@ import type { Article, ArticleWithProducts, Product } from '@/lib/types';
 const CACHE_REVALIDATE = 300; // 5 min
 
 function hydrateProducts(products: Array<Record<string, unknown>>): Product[] {
-  return products.map((product, index) => hydrateProduct(product as unknown as Product, index));
+  return products.map((product) => hydrateProduct(product as unknown as Product));
 }
 
 // ─── Products ────────────────────────────────────────────────────────────────
@@ -101,12 +101,13 @@ export const getArticleBySlug = unstable_cache(
     const sb = supabase as any;
     
     // Try provided slug first
-    let { data: article, error: articleError } = await sb
+    const { data: articleResult, error: articleError } = await sb
       .from('articles')
       .select('*')
       .eq('slug', slug)
       .not('published_at', 'is', null)
       .maybeSingle();
+    let article = articleResult;
 
     // Fallback for legacy -2026 URLs (Audit #02-F cleanup)
     if (!article && !slug.endsWith('-2026')) {

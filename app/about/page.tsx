@@ -1,7 +1,7 @@
 import { buildMetadata } from '@/lib/seo/metadata';
 import { personSchema, jsonLdProps } from '@/lib/seo/schema';
 import { SITE_URL } from '@/lib/config';
-import { ShieldCheck, Target, Users, Zap, Award, Microscope, FlaskConical } from 'lucide-react';
+import { ShieldCheck, Target, Award, Microscope } from 'lucide-react';
 import Link from 'next/link';
 
 export const metadata = buildMetadata({
@@ -41,15 +41,13 @@ const EDITORS = [
 ];
 
 export default function AboutPage() {
-  const schemas = [
-    ...EDITORS.map(e => personSchema({
-      name: e.name,
-      jobTitle: e.role,
-      description: e.bio,
-      credentials: (e as any).credentials,
-      url: `${SITE_URL}/about#${e.id}`
-    }))
-  ];
+  const schemas = EDITORS.map(e => personSchema({
+    name: e.name,
+    jobTitle: e.role,
+    description: e.bio,
+    credentials: e.credentials,
+    url: `${SITE_URL}/about#${e.id}`
+  }));
 
   return (
     <article className="mx-auto max-w-5xl space-y-24 px-4 py-20 sm:px-8">
