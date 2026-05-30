@@ -7,7 +7,7 @@ import Image from 'next/image';
 
 export default function RedesignedHero() {
   return (
-    <section className="relative min-h-[90vh] flex items-center pt-24 pb-20 overflow-hidden bg-[#05070a]">
+    <section className="relative min-h-[500px] flex items-center pt-16 pb-12 overflow-hidden bg-[#05070a]">
       {/* Dynamic Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
@@ -28,23 +28,23 @@ export default function RedesignedHero() {
       <div className="container-wide relative z-10">
         <div className="grid lg:grid-cols-12 gap-16 items-center">
           {/* Left Content */}
-          <div className="lg:col-span-7 space-y-10">
+          <div className="lg:col-span-7 space-y-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-morphism border-white/10 text-offwhite/80 text-xs font-bold tracking-widest uppercase mb-6">
-                <span className="flex h-2 w-2 rounded-full bg-data-lime animate-pulse" />
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-morphism border-white/10 text-offwhite/80 text-[10px] font-bold tracking-widest uppercase mb-4">
+                <span className="flex h-1.5 w-1.5 rounded-full bg-data-lime animate-pulse" />
                 Independent Data Labs
               </div>
 
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-offwhite leading-[0.95] tracking-tight">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-offwhite leading-[0.95] tracking-tight">
                 THE FUTURE OF <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-data-lime to-emerald-400">HOME FITNESS.</span>
               </h1>
 
-              <p className="mt-8 text-lg md:text-xl text-neutral-400 max-w-2xl leading-relaxed">
+              <p className="mt-4 text-base md:text-lg text-neutral-400 max-w-xl leading-relaxed">
                 We&apos;ve decoded 47,000+ data points to rank the gear that actually transforms your home gym. No fluff, just science-backed rankings.
               </p>
             </motion.div>
@@ -54,21 +54,21 @@ export default function RedesignedHero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="relative max-w-2xl group"
+              className="relative max-w-xl group"
             >
               <div className="absolute -inset-1 bg-gradient-to-r from-data-lime/20 to-trust-blue/20 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000" />
-              <div className="relative flex items-center bg-graphite-900 border border-white/10 rounded-2xl p-2 focus-within:border-data-lime/50 transition-all">
-                <Search className="w-6 h-6 text-neutral-500 ml-4" />
+              <div className="relative flex items-center bg-graphite-900 border border-white/10 rounded-2xl p-1.5 focus-within:border-data-lime/50 transition-all">
+                <Search className="w-5 h-5 text-neutral-500 ml-3" />
                 <input
                   type="text"
-                  placeholder="What are you training for? (e.g. Strength, Fat Loss, Recovery)"
-                  className="w-full bg-transparent border-none focus:ring-0 text-offwhite px-4 py-3 text-lg placeholder:text-neutral-600"
+                  placeholder="What are you training for?"
+                  className="w-full bg-transparent border-none focus:ring-0 text-offwhite px-3 py-2 text-base placeholder:text-neutral-600"
                 />
-                <button className="bg-data-lime text-black font-black px-8 py-3 rounded-xl hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-tighter">
+                <button className="bg-data-lime text-black font-black px-6 py-2.5 rounded-xl hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-tighter text-sm">
                   Search
                 </button>
               </div>
-              <div className="mt-4 flex gap-4 text-xs font-bold text-neutral-500 uppercase tracking-widest ml-2">
+              <div className="mt-3 flex gap-4 text-[10px] font-bold text-neutral-500 uppercase tracking-widest ml-2">
                 <span>Trending:</span>
                 <Link href="/category/dumbbells" className="hover:text-data-lime transition-colors">Dumbbells</Link>
                 <Link href="/category/benches" className="hover:text-data-lime transition-colors">Benches</Link>
@@ -80,15 +80,15 @@ export default function RedesignedHero() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="flex flex-wrap gap-6 items-center"
+              className="flex flex-wrap gap-5 items-center"
             >
-              <Link href="#top-picks" className="cta-primary h-14 px-10 rounded-2xl">
+              <Link href="#top-picks" className="cta-primary h-12 px-8 rounded-xl text-sm">
                 Explore Rankings
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight className="w-4 h-4" />
               </Link>
-              <Link href="/methodology" className="flex items-center gap-3 text-offwhite hover:text-data-lime transition-colors font-bold group">
-                <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center group-hover:border-data-lime/50 transition-all">
-                  <Play className="w-4 h-4 fill-current ml-1" />
+              <Link href="/methodology" className="flex items-center gap-2.5 text-offwhite hover:text-data-lime transition-colors font-bold group text-sm">
+                <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center group-hover:border-data-lime/50 transition-all">
+                  <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
                 </div>
                 See How We Test
               </Link>

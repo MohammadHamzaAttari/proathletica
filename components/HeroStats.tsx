@@ -1,6 +1,7 @@
 'use client';
 
 import { ShieldCheck, Star, TrendingUp, Zap } from 'lucide-react';
+import Link from 'next/link';
 
 function formatCompact(value: number) {
   return new Intl.NumberFormat('en-US', {
@@ -58,42 +59,41 @@ export function HeroStats({
   ];
 
   return (
-    <div className="mt-12 space-y-4">
-      <div className="grid gap-4 sm:grid-cols-3">
+    <div className="space-y-4">
+      <div className="grid gap-3 grid-cols-1 sm:grid-cols-3 lg:grid-cols-1">
         {statCards.map(({ label, sublabel, value, compact, icon: Icon, iconColor, iconBg, suffix }) => (
           <div
             key={label}
-            className="group relative overflow-hidden rounded-card border border-white/[0.07] bg-graphite-800 p-5 text-left shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200"
+            className="group relative overflow-hidden rounded-2xl border border-white/[0.05] bg-graphite-900 p-4 text-left transition-all duration-300 hover:border-white/10 hover:bg-graphite-800"
           >
-            {/* Subtle background glow */}
-            <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full opacity-20 blur-xl pointer-events-none" aria-hidden="true" />
-
-            <div className={`mb-4 inline-flex items-center justify-center w-9 h-9 rounded-inner border ${iconBg}`}>
-              <Icon className={`w-4 h-4 ${iconColor}`} aria-hidden="true" />
+            <div className="flex items-center gap-3 mb-3">
+              <div className={`flex items-center justify-center w-8 h-8 rounded-lg border ${iconBg}`}>
+                <Icon className={`w-4 h-4 ${iconColor}`} aria-hidden="true" />
+              </div>
+              <div className="text-[10px] font-black uppercase tracking-widest text-neutral-500">
+                {label}
+              </div>
             </div>
 
-            <div className="text-2xs font-black uppercase tracking-[0.2em] text-neutral-500 mb-2">
-              {label}
-            </div>
             <div className="flex items-baseline gap-1">
-              <span className="text-4xl sm:text-5xl font-black tracking-[-0.04em] text-offwhite">
+              <span className="text-3xl font-black tracking-tighter text-offwhite">
                 <StatValue value={value} compact={compact} />
               </span>
-              {suffix && <span className="text-2xl font-black text-neutral-500">{suffix}</span>}
+              {suffix && <span className="text-lg font-black text-neutral-600">{suffix}</span>}
             </div>
-            <div className="mt-1 text-xs text-neutral-600">{sublabel}</div>
+            <div className="mt-1 text-[10px] text-neutral-500 font-medium">{sublabel}</div>
           </div>
         ))}
       </div>
 
       {/* Methodology trust note */}
-      <div className="flex items-center justify-center gap-2 py-2">
-        <ShieldCheck className="w-3.5 h-3.5 text-trust-blue flex-shrink-0" aria-hidden="true" />
-        <p className="text-2xs font-bold uppercase tracking-[0.15em] text-neutral-600">
-          Human-edited rankings · AI-assisted data aggregation only ·{' '}
-          <a href="/methodology" className="text-trust-blue hover:text-offwhite transition-colors underline underline-offset-2">
-            See full methodology
-          </a>
+      <div className="flex items-center gap-2 px-1">
+        <ShieldCheck className="w-3 h-3 text-trust-blue flex-shrink-0" aria-hidden="true" />
+        <p className="text-[9px] font-bold uppercase tracking-wider text-neutral-600 leading-tight">
+          Human-edited rankings.<br />
+          <Link href="/methodology" className="text-trust-blue hover:text-offwhite transition-colors underline underline-offset-2">
+            See methodology
+          </Link>
         </p>
       </div>
     </div>
