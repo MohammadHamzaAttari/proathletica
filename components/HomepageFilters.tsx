@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition, useCallback } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { ComparisonTable } from '@/components/ComparisonTable';
 import { ProductGrid } from '@/components/ProductGrid';
@@ -678,31 +679,45 @@ export function HomepageFilters({
       )}
 
       {/* ── MOBILE/DRAWER FILTER ── */}
-      {isMobileFiltersOpen && (
-        <div className="fixed inset-0 z-[100]">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsMobileFiltersOpen(false)} />
-          <div className="absolute inset-y-0 right-0 w-[90%] max-w-sm bg-graphite-950 shadow-2xl p-6 overflow-y-auto animate-cardIn border-l border-white/5">
-            <div className="flex items-center justify-between mb-8">
-              <div className="text-lg font-black uppercase tracking-tighter text-offwhite">Advanced Filters</div>
-              <button onClick={() => setIsMobileFiltersOpen(false)} className="p-2 text-neutral-400 hover:text-offwhite">
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-            {FilterContent}
-            <div className="sticky bottom-0 mt-10 pt-4 bg-graphite-950/80 backdrop-blur-md">
-              <button
-                onClick={() => setIsMobileFiltersOpen(false)}
-                className="w-full h-14 rounded-xl bg-data-lime text-black font-black uppercase tracking-widest text-sm shadow-glow-lime"
-              >
-                Apply & Close
-              </button>
-            </div>
+      <AnimatePresence>
+        {isMobileFiltersOpen && (
+          <div className="fixed inset-0 z-[100] flex justify-end">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setIsMobileFiltersOpen(false)}
+            />
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="relative w-[90%] max-w-sm bg-graphite-950 shadow-2xl p-6 overflow-y-auto border-l border-white/5"
+            >
+              <div className="flex items-center justify-between mb-8">
+                <div className="text-lg font-black uppercase tracking-tighter text-offwhite">Advanced Filters</div>
+                <button onClick={() => setIsMobileFiltersOpen(false)} className="p-2 text-neutral-400 hover:text-offwhite">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              {FilterContent}
+              <div className="sticky bottom-0 mt-10 pt-4 bg-graphite-950/80 backdrop-blur-md">
+                <button
+                  onClick={() => setIsMobileFiltersOpen(false)}
+                  className="w-full h-14 rounded-xl bg-data-lime text-black font-black uppercase tracking-widest text-sm shadow-glow-lime"
+                >
+                  Apply & Close
+                </button>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
       {/* ── RESULTS ── */}
-      <div className="space-y-8 animate-cardIn w-full">
+      <div className="space-y-8 w-full">
         {/* Results Metadata */}
         <div className="flex items-center gap-4">
           <div className="h-px flex-1 bg-white/[0.06]" />

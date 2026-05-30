@@ -158,12 +158,14 @@ export function ProductCard({
 
   return (
     <article
-      className={`product-card animate-card-in gpu flex flex-col h-full group/card transition-all duration-500 ${isRank1 ? 'product-card--rank1 ring-1 ring-data-lime/20' : ''}`}
+      className={`product-card animate-card-in gpu flex flex-col h-full group/card transition-all duration-500 hover:ring-2 hover:ring-data-lime/30 ${isRank1 ? 'product-card--rank1 ring-2 ring-data-lime/40' : ''}`}
       style={{ animationDelay: `${animationDelay}ms` }}
       aria-labelledby={`product-title-${product.id}`}
     >
       {/* ── IMAGE AREA ── */}
-      <div className="card-image-wrap bg-white/[0.02]">
+      <div className="card-image-wrap bg-white/[0.02] relative overflow-hidden">
+        {/* Glow effect on hover */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-data-lime/5 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
         {product.image_url ? (
           <Image
             src={product.image_url.replace(/\._AC_UL\d+_\.jpg/, '._AC_SL800_.jpg')}
@@ -269,9 +271,12 @@ export function ProductCard({
         ) : null}
 
         {/* Verdict — editorial summary */}
-        <p className="text-sm leading-relaxed text-neutral-300 clamp-2 pl-3 border-l-2 border-data-lime/30 group-hover/card:border-data-lime transition-colors">
-          {verdict}
-        </p>
+        <div className="relative">
+          <div className="absolute -left-5 top-0 bottom-0 w-1 bg-gradient-to-b from-data-lime to-emerald-500 rounded-full opacity-30 group-hover/card:opacity-100 transition-opacity" />
+          <p className="text-sm leading-relaxed text-neutral-300 clamp-3 group-hover/card:text-offwhite transition-colors">
+            {verdict}
+          </p>
+        </div>
 
         {/* Specs at a glance (Audit #02-B) */}
         {product.specs && Object.keys(product.specs).length > 0 && (

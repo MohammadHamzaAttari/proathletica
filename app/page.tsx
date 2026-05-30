@@ -1,11 +1,11 @@
 import { Suspense } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, FlaskConical, ShieldCheck, Trophy, TrendingUp } from 'lucide-react';
+import { ArrowRight, Trophy, TrendingUp } from 'lucide-react';
 import { BuyerGuide } from '@/components/BuyerGuide';
 import { DisclosureBar } from '@/components/DisclosureBar';
 import { FAQ } from '@/components/FAQ';
 import { GymQuiz } from '@/components/GymQuiz';
+import RedesignedHero from '@/components/RedesignedHero';
 import { HeroStats } from '@/components/HeroStats';
 import { HomepageFilters } from '@/components/HomepageFilters';
 import { LifestyleHubs } from '@/components/LifestyleHubs';
@@ -101,73 +101,23 @@ export default async function HomePage() {
       {/* FTC/Amazon compliance disclosure */}
       <DisclosureBar />
 
-      {/* ── HERO ── */}
-      <section
-        className="relative bg-graphite-900 pt-12 pb-16 overflow-hidden border-b border-white/[0.04]"
-        aria-label="ProAthletica — data-driven fitness gear rankings"
-      >
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image 
-            src="/images/hero-bg.png" 
-            alt="ProAthletica modern home gym setup" 
-            fill 
-            className="object-cover opacity-20 mix-blend-luminosity"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0A0D12]/95 via-[#0A0D12]/80 to-[#0A0D12]" />
-        </div>
+      {/* ── REDESIGNED HERO ── */}
+      <RedesignedHero />
 
-        <div className="relative container-site z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="text-left">
-              {/* Trust eyebrow */}
-              <div className="inline-flex items-center gap-2 rounded-pill border border-trust-blue/25 bg-trust-blue/[0.06] px-4 py-1.5 text-[10px] font-black tracking-[0.15em] text-trust-blue mb-6 backdrop-blur-md">
-                <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
-                INDEPENDENT · DATA-DRIVEN · NO PAID PLACEMENTS
-              </div>
-
-              {/* H1 — primary keyword target */}
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-[0.9] text-offwhite text-balance mb-6">
-                Best Home Gym Gear. <br />
-                <span className="text-data-lime">Expert-Ranked.</span>
-              </h1>
-
-              <p className="max-w-xl text-base sm:text-lg text-neutral-400 leading-relaxed mb-8">
-                We analyze <strong className="text-offwhite font-semibold">47,000+ verified reviews</strong> across adjustable dumbbells, benches, and more — then rank what actually works for home gyms.
-              </p>
-
-              {/* Primary CTAs */}
-              <div className="flex flex-wrap gap-4">
-                <Link
-                  href="#top-picks"
-                  className="cta-primary w-auto px-8 h-12 text-sm"
-                  aria-label="See our current top fitness gear picks"
-                >
-                  See Top Picks
-                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
-                </Link>
-                <Link
-                  href="/methodology"
-                  className="cta-secondary w-auto px-8 h-12 text-xs"
-                  aria-label="Read our testing and ranking methodology"
-                >
-                  <FlaskConical className="w-4 h-4" aria-hidden="true" />
-                  Methodology
-                </Link>
-              </div>
-            </div>
-
-            <div className="hidden lg:block space-y-8">
-              <HeroStats
-                stats={{
-                  testedProducts: stats.testedProducts || stats.products,
-                  reviews: stats.reviews || 0,
-                  clicks: stats.clicks || 0,
-                }}
-              />
-              <LifestyleHubs />
-            </div>
+      {/* Stats and Hubs in a clean Bento Row below Hero */}
+      <section className="container-wide -mt-12 mb-16 relative z-20">
+        <div className="grid lg:grid-cols-4 gap-6">
+          <div className="lg:col-span-1">
+            <HeroStats
+              stats={{
+                testedProducts: stats.testedProducts || stats.products,
+                reviews: stats.reviews || 0,
+                clicks: stats.clicks || 0,
+              }}
+            />
+          </div>
+          <div className="lg:col-span-3">
+            <LifestyleHubs />
           </div>
         </div>
       </section>
