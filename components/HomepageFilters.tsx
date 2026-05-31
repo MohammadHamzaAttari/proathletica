@@ -681,7 +681,7 @@ export function HomepageFilters({
       {/* ── MOBILE/DRAWER FILTER ── */}
       <AnimatePresence>
         {isMobileFiltersOpen && (
-          <div className="fixed inset-0 z-[100] flex justify-end">
+          <div className="fixed inset-0 z-[100] flex justify-start">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -690,11 +690,11 @@ export function HomepageFilters({
               onClick={() => setIsMobileFiltersOpen(false)}
             />
             <motion.div
-              initial={{ x: '100%' }}
+              initial={{ x: '-100%' }}
               animate={{ x: 0 }}
-              exit={{ x: '100%' }}
+              exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="relative w-[90%] max-w-sm bg-graphite-950 shadow-2xl p-6 overflow-y-auto border-l border-white/5"
+              className="relative w-[90%] max-w-sm bg-graphite-950 shadow-2xl p-6 overflow-y-auto border-r border-white/5"
             >
               <div className="flex items-center justify-between mb-8">
                 <div className="text-lg font-black uppercase tracking-tighter text-offwhite">Advanced Filters</div>

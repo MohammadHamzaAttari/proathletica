@@ -105,8 +105,8 @@ export default async function HomePage() {
       <RedesignedHero />
 
       {/* Stats and Hubs in a clean Bento Row below Hero */}
-      <section className="container-wide -mt-12 mb-16 relative z-20">
-        <div className="grid lg:grid-cols-4 gap-6">
+      <section className="container-wide -mt-8 mb-12 relative z-20">
+        <div className="grid lg:grid-cols-4 gap-4">
           <div className="lg:col-span-1">
             <HeroStats
               stats={{
@@ -125,10 +125,10 @@ export default async function HomePage() {
       {/* ── TOP PICKS & PRODUCTS ── */}
       <section
         id="top-picks"
-        className="container-site py-12"
+        className="container-site py-8"
         aria-label="Current top fitness gear picks"
       >
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 border-b border-white/[0.06] pb-6 gap-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 border-b border-white/[0.06] pb-4 gap-4">
           <div>
             <div className="section-eyebrow mb-2">
               <TrendingUp className="inline w-3 h-3 mr-1.5" aria-hidden="true" />
