@@ -19,8 +19,8 @@ import { jsonLdProps, organizationSchema, websiteSchema } from '@/lib/seo/schema
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} | Best Fitness Gear 2026 — Tested & Reviewed`,
-    template: '%s',
+    default: `${SITE_NAME} | Best Fitness Gear 2026 — Expertly Tested & Ranked`,
+    template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,

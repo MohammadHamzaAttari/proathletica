@@ -2,6 +2,7 @@
 
 import { ArrowRight, SlidersHorizontal, X, LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 
 interface CompareItem {
@@ -120,9 +121,15 @@ export function StickyCompareBar({
 
           <div className="flex-1 flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
             {selectedProducts.slice(0, 4).map((product) => (
-              <div key={product.id} className="group relative flex-shrink-0 w-12 h-12 rounded-inner border border-white/10 bg-white p-1">
+              <div key={product.id} className="group relative flex-shrink-0 w-12 h-12 rounded-inner border border-white/10 bg-white p-1 overflow-hidden">
                 {product.image_url ? (
-                  <img src={product.image_url} alt={product.title} className="h-full w-full object-contain" />
+                  <Image
+                    src={product.image_url.replace(/\._AC_UL\d+_\.jpg/, '._AC_SL200_.jpg')}
+                    alt={product.title}
+                    fill
+                    className="object-contain p-1"
+                    sizes="48px"
+                  />
                 ) : (
                   <div className="h-full w-full flex items-center justify-center text-xs font-black text-neutral-400 bg-neutral-100">PA</div>
                 )}
@@ -204,8 +211,14 @@ export function StickyCompareBar({
                       {sortedProducts.map((p) => (
                         <th key={p.id} className="py-4 pr-8 border-b border-white/10">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-inner border border-white/10 bg-white p-1 flex-shrink-0">
-                              <img src={p.image_url || ''} className="h-full w-full object-contain" alt="" />
+                            <div className="w-10 h-10 rounded-inner border border-white/10 bg-white p-1 flex-shrink-0 relative overflow-hidden">
+                              <Image
+                                src={p.image_url?.replace(/\._AC_UL\d+_\.jpg/, '._AC_SL200_.jpg') || ''}
+                                alt=""
+                                fill
+                                className="object-contain p-1"
+                                sizes="40px"
+                              />
                             </div>
                             <div className="min-w-0">
                               <div className="text-sm font-bold text-offwhite truncate">{toTitle(p)}</div>

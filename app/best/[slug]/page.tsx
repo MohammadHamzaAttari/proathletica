@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Metadata } from 'next';
-import { Calendar, Clock, User, FlaskConical, Star } from 'lucide-react';
+import { Calendar, Clock, User, FlaskConical, Star, ShieldCheck, ArrowRight } from 'lucide-react';
 import { ComparisonTable } from '@/components/ComparisonTable';
 import { formatTimestamp } from '@/lib/format';
 import { DisclosureBar } from '@/components/DisclosureBar';
@@ -10,6 +11,7 @@ import { Newsletter } from '@/components/Newsletter';
 import { ProductGrid } from '@/components/ProductGrid';
 import { ShareButtons } from '@/components/ShareButtons';
 import { SITE_URL } from '@/lib/config';
+import { StickyMobileCTA } from '@/components/StickyMobileCTA';
 import { generateArticleSummary } from '@/lib/ai/article-summary';
 import { getArticleBySlug, getPublishedArticles } from '@/lib/db';
 import { buildMetadata } from '@/lib/seo/metadata';
@@ -87,7 +89,10 @@ export default async function ArticlePage({ params }: { params: { slug: string }
       {/* FIX (Audit #03-A): FTC disclosure above every product page */}
       <DisclosureBar />
 
-      <article className="mx-auto max-w-4xl px-4 py-12 sm:px-8">
+      <article className="mx-auto max-w-4xl px-4 py-12 sm:px-8 relative">
+        {article.products && article.products.length > 0 && (
+          <StickyMobileCTA product={article.products[0]} articleSlug={article.slug} />
+        )}
         {/* Breadcrumb */}
         <nav
           className="mb-6 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-neutral-500"
@@ -122,7 +127,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           {/* Trust Strip (Audit Fix) */}
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 border-y border-white/10 py-4 text-[11px] font-bold uppercase tracking-widest text-neutral-400">
             <Link
-              href={`/about#${article.author?.toLowerCase().replace(/\s+/g, '-')}`}
+              href={`/author/${article.author?.toLowerCase().replace(/\s+/g, '-')}`}
               className="flex items-center gap-2 text-white hover:text-emerald-400 transition-colors"
             >
               <User className="h-4 w-4 text-emerald-400" />
@@ -153,42 +158,61 @@ export default async function ArticlePage({ params }: { params: { slug: string }
         </header>
 
         {article.hero_image ? (
-          <img
-            src={article.hero_image}
-            alt={article.title}
-            className="mb-10 max-h-[500px] w-full rounded-2xl object-cover"
-          />
+          <div className="relative mb-10 h-[300px] sm:h-[400px] lg:h-[500px] w-full overflow-hidden rounded-2xl border border-white/5">
+            <Image
+              src={article.hero_image}
+              alt={article.title}
+              fill
+              priority
+              className="object-cover transition-transform duration-700 hover:scale-105"
+              sizes="(max-width: 1024px) 100vw, 1200px"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0A0D12]/60 to-transparent" />
+          </div>
         ) : null}
 
         {article.products && article.products.length > 0 ? (
-          <div className="mb-10 rounded-3xl border border-emerald-500/30 bg-[#0A0D12] p-8 flex flex-col sm:flex-row gap-8 items-center shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
-            <div className="flex-1 space-y-4">
-              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
-                <Star className="w-3.5 h-3.5 fill-emerald-500" /> Our Top Pick
+          <div className="mb-10 rounded-3xl border border-data-lime/30 bg-graphite-900/40 p-8 flex flex-col sm:flex-row gap-8 items-center shadow-2xl relative overflow-hidden group/pick">
+            {/* Animated accent border */}
+            <div className="absolute top-0 left-0 w-1.5 h-full bg-data-lime" />
+            <div className="absolute inset-0 bg-gradient-to-r from-data-lime/5 to-transparent opacity-0 group-hover/pick:opacity-100 transition-opacity duration-500" />
+
+            <div className="flex-1 space-y-4 relative z-10">
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-data-lime">
+                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-data-lime text-black">
+                  <Star className="w-3 h-3 fill-current" />
+                </div>
+                The Athletica Lab Choice
               </div>
-              <h2 className="text-3xl font-black text-white leading-tight">
+              <h2 className="text-3xl sm:text-4xl font-black text-offwhite leading-tight tracking-tight">
                 {article.products[0].short_title || article.products[0].title}
               </h2>
-              <p className="text-neutral-300 font-medium text-lg leading-relaxed">
+              <p className="text-neutral-400 font-medium text-lg leading-relaxed max-w-2xl">
                 {article.products[0].custom_blurb || article.products[0].editorial_summary || 'The best overall choice for most people based on our lab testing and owner reviews.'}
               </p>
-              <div className="text-xs text-neutral-500 uppercase tracking-widest font-bold">
-                Price last checked: {formatTimestamp(article.products[0].last_scraped_at)}
+              <div className="flex items-center gap-4 text-[10px] text-neutral-500 uppercase tracking-widest font-bold">
+                <span className="flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-trust-blue" />
+                  Verified Tech Specs
+                </span>
+                <span>•</span>
+                <span>Updated {formatTimestamp(article.products[0].last_scraped_at)}</span>
               </div>
             </div>
-            <div className="w-full sm:w-auto flex flex-col gap-4">
+
+            <div className="w-full sm:w-auto flex flex-col gap-4 relative z-10">
                <a
                 href={`/api/track?productId=${article.products[0].asin}&articleSlug=${article.slug}&rank=1`}
                 target="_blank"
                 rel="sponsored nofollow noopener noreferrer"
-                className="rounded-2xl bg-[#C6FF3D] px-8 py-5 text-center font-black uppercase tracking-widest text-black text-sm hover:bg-[#b3f024] transition whitespace-nowrap"
+                className="group/cta flex items-center justify-center gap-3 rounded-2xl bg-data-lime px-10 py-5 text-center font-black uppercase tracking-widest text-black text-base hover:scale-[1.02] hover:shadow-glow-lime transition-all whitespace-nowrap active:scale-95"
               >
                 Check Price
+                <ArrowRight className="w-5 h-5 group-hover/cta:translate-x-1 transition-transform" />
               </a>
               {article.products.length > 1 && (
-                <div className="text-[11px] font-bold text-center text-neutral-400 tracking-wider">
-                  Secondary option: <span className="text-white">{article.products[1].short_title || article.products[1].title.split(' ').slice(0, 3).join(' ')}</span>
+                <div className="text-[10px] font-bold text-center text-neutral-500 tracking-widest uppercase">
+                  Runner up: <span className="text-offwhite">{article.products[1].short_title || article.products[1].title.split(' ').slice(0, 3).join(' ')}</span>
                 </div>
               )}
             </div>

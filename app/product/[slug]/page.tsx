@@ -7,7 +7,7 @@ import { formatPrice, formatTimestamp } from '@/lib/format';
 import { SITE_NAME } from '@/lib/config';
 import Image from 'next/image';
 import Link from 'next/link';
-import { User, Calendar, FlaskConical } from 'lucide-react';
+import { User, Calendar, FlaskConical, ShieldCheck } from 'lucide-react';
 import { AUTHORS } from '@/lib/editorial';
 import { MultiMerchantSelector } from '@/components/MultiMerchantSelector';
 import { PriceTrackerTrigger } from '@/components/PriceTrackerTrigger';
@@ -121,36 +121,41 @@ export default async function ProductPage({ params }: { params: { slug: string }
             {/* Content */}
             <div className="lg:w-7/12 space-y-10">
               <div>
-                <div className="inline-flex rounded-full bg-emerald-500/10 px-5 py-1 text-xs font-black tracking-widest text-emerald-400">
-                  {product.category.toUpperCase()}
+                <div className="inline-flex items-center gap-2 rounded-full bg-data-lime/10 px-4 py-1 text-[10px] font-black tracking-widest text-data-lime border border-data-lime/20 uppercase">
+                  <span className="flex h-1.5 w-1.5 rounded-full bg-data-lime animate-pulse" />
+                  Independent Lab Review
                 </div>
-                <h1 className="mt-4 text-5xl font-black tracking-tighter text-offwhite leading-none">
+                <h1 className="mt-4 text-4xl sm:text-6xl font-black tracking-tighter text-offwhite leading-[0.95] uppercase italic">
                   {shortTitle}
                 </h1>
-                {product.brand && <p className="text-2xl text-[#3D8BFF] mt-2">{product.brand}</p>}
+                {product.brand && (
+                  <p className="text-xl font-bold text-trust-blue mt-3 tracking-widest uppercase opacity-80">
+                    {product.brand}
+                  </p>
+                )}
               </div>
 
-              {/* Trust Strip (Audit Fix) */}
-              <div className="flex flex-wrap items-center gap-4 border-y border-white/10 py-4 text-[11px] font-bold uppercase tracking-widest text-neutral-400">
-                <Link href={`/author/${author.id}`} className="flex items-center gap-2 text-white hover:text-[#C6FF3D] transition-colors">
-                  <User className="h-4 w-4 text-emerald-400" />
-                  Reviewed by {author.name}
+              {/* Trust Strip (Enhanced E-E-A-T) */}
+              <div className="flex flex-wrap items-center gap-y-3 gap-x-6 border-y border-white/5 py-5 text-[10px] font-bold uppercase tracking-[0.15em] text-neutral-500">
+                <Link href={`/author/${author.id}`} className="flex items-center gap-2 text-offwhite hover:text-data-lime transition-colors">
+                  <User className="h-3.5 w-3.5 text-data-lime" />
+                  Expert: {author.name}
                 </Link>
-                <span className="hidden sm:inline text-white/20">|</span>
+                <span className="hidden sm:inline text-white/10">|</span>
                 <span className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Updated{' '}
-                  {new Date(product.last_scraped_at || product.updated_at || new Date()).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}
+                  <Calendar className="h-3.5 w-3.5" />
+                  Updated {new Date(product.last_scraped_at || product.updated_at || new Date()).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                 </span>
-                <span className="hidden sm:inline text-white/20">|</span>
-                <Link href="/methodology" className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
-                  <FlaskConical className="h-4 w-4" />
-                  How we score
+                <span className="hidden sm:inline text-white/10">|</span>
+                <Link href="/methodology" className="flex items-center gap-2 hover:text-data-lime transition-colors">
+                  <FlaskConical className="h-3.5 w-3.5" />
+                  Lab Protocol
                 </Link>
+                <span className="hidden sm:inline text-white/10">|</span>
+                <span className="flex items-center gap-1.5 text-trust-blue">
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                  Verified Data
+                </span>
               </div>
 
               {/* Rating block */}
@@ -170,8 +175,11 @@ export default async function ProductPage({ params }: { params: { slug: string }
               </div>
 
               {/* Editor's Verdict */}
-              <div className="rounded-3xl border border-[#C6FF3D]/20 bg-[#161B22] p-8 text-lg leading-relaxed">
-                {verdict}
+              <div className="relative rounded-3xl border border-white/5 bg-graphite-900/50 p-8 text-lg leading-relaxed group/verdict overflow-hidden">
+                <div className="absolute top-0 left-0 w-1 h-full bg-data-lime opacity-30 group-hover/verdict:opacity-100 transition-opacity" />
+                <p className="relative z-10 text-neutral-300 group-hover:text-offwhite transition-colors">
+                  {verdict}
+                </p>
               </div>
 
               {/* Multi-Merchant Pricing Selector */}
