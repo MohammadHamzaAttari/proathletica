@@ -36,9 +36,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const article = await getArticleBySlug(params.slug);
   if (!article) return buildMetadata({ title: 'Not Found', noindex: true });
+
+  const title = article.title.length > 60 ? article.title.slice(0, 57) + '...' : article.title;
+
   return buildMetadata({
-    title: article.title,
-    description: article.excerpt || undefined,
+    title: title,
+    description: article.excerpt || `Our expert guide to the ${article.title}. See our top picks, detailed test results, and buyer's advice for 2026.`,
     canonical: `/best/${article.slug.replace(/-2026$/, '')}`,
     image: article.hero_image || undefined,
     type: 'article',

@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, Trophy, TrendingUp } from 'lucide-react';
 import { BuyerGuide } from '@/components/BuyerGuide';
@@ -11,9 +12,14 @@ import { HomepageFilters } from '@/components/HomepageFilters';
 import { LifestyleHubs } from '@/components/LifestyleHubs';
 import { Newsletter } from '@/components/Newsletter';
 import { getAllProducts, getCategoryList, getPublishedArticles } from '@/lib/db';
-import { itemListSchema, jsonLdProps, howToSchema } from '@/lib/seo/schema';
+import { itemListSchema, jsonLdProps, howToSchema, faqSchema } from '@/lib/seo/schema';
 
 export const revalidate = 3600;
+
+export const metadata: Metadata = {
+  title: 'Best Home Fitness Gear 2026 — Expertly Tested & Ranked',
+  description: 'Independent, data-backed reviews of the best home gym equipment of 2026. We rank adjustable dumbbells, weight benches, and more based on 47,000+ data points.',
+};
 
 /* ─────────────────────────────────────────────
    DATA
@@ -77,9 +83,37 @@ export default async function HomePage() {
 
   const featured = products;
 
+  const faqItems = [
+    {
+      q: 'How do you rank and test these products?',
+      a: 'Our Athletica Lab process aggregates verified customer reviews (47,000+ data points), manufacturer specs, and hands-on editorial analysis from our certified coaches and athletes. Every ranking is human-edited.',
+    },
+    {
+      q: 'Are any of these rankings sponsored or paid?',
+      a: 'No. We have a strict no-paid-placements policy. Some links are Amazon affiliate links, which help us keep the site running at no extra cost to you — our commission doesn\'t affect rankings.',
+    },
+    {
+      q: 'Which fitness equipment is best for a small apartment?',
+      a: 'For small apartments, we recommend adjustable dumbbells (Bowflex 552 or PowerBlock) + resistance bands as a foundation — they cover 90% of home workout needs in under 3 sq ft of storage.',
+    },
+    {
+      q: 'Which gear do you recommend for absolute beginners?',
+      a: 'Start with a single adjustable dumbbell set + a quality resistance band kit. These tools let you learn movement patterns safely before adding load.',
+    },
+    {
+      q: 'Do you review products beyond Amazon?',
+      a: 'Yes. Our editorial process is retailer-independent. Amazon is our primary affiliate partner, but we recommend the best product for each category regardless of where it\'s sold.',
+    },
+    {
+      q: 'How current are the prices shown?',
+      a: 'Prices are pulled from Amazon and updated frequently. Amazon prices change multiple times per day, so we recommend clicking through to confirm the current live price.',
+    },
+  ];
+
   /* JSON-LD schemas */
   const schemas = [
     ...(featured.length > 0 ? [itemListSchema(featured.slice(0, 12), '/')] : []),
+    faqSchema(faqItems),
     howToSchema({
       name: 'How to Choose the Best Home Gym Equipment',
       description: 'A step-by-step guide for choosing the right fitness gear for your goals, space, and budget.',
@@ -137,9 +171,9 @@ export default async function HomePage() {
               Data-Driven Recommendations
             </div>
             <h2 className="text-3xl font-black uppercase tracking-tighter text-offwhite">
-              Current Top Picks
+              Best Fitness Gear 2026: Top Picks
             </h2>
-            <p className="text-sm text-neutral-500 mt-1">
+            <p className="text-sm text-neutral-300 font-bold mt-1">
               Updated {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} · {featured.length} products ranked
             </p>
           </div>

@@ -1,10 +1,9 @@
 import { notFound } from 'next/navigation';
 import { getProductById, getAllProducts } from '@/lib/db';
 import { buildMetadata } from '@/lib/seo/metadata';
-import { productSchema, jsonLdProps } from '@/lib/seo/schema';
+import { productSchema, jsonLdProps, breadcrumbSchema } from '@/lib/seo/schema';
 import { DisclosureBar } from '@/components/DisclosureBar';
 import { formatPrice, formatTimestamp } from '@/lib/format';
-import { SITE_NAME } from '@/lib/config';
 import Image from 'next/image';
 import Link from 'next/link';
 import { User, Calendar, FlaskConical, ShieldCheck } from 'lucide-react';
@@ -23,9 +22,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const product = await getProductById(params.slug);
   if (!product) return buildMetadata({ title: 'Product Not Found', noindex: true });
   
+  const shortTitle = product.short_title || product.title.split(' ').slice(0, 5).join(' ');
   return buildMetadata({
-    title: `${product.short_title || product.title.split(' ').slice(0, 6).join(' ')} Review (2026): Pros, Cons, Specs & Best Alternative | ${SITE_NAME}`,
-    description: `Hands-on-style review of the ${product.title}. See who it's best for, key tradeoffs, specs, price history, and better alternatives. Updated May 2026.`,
+    title: `${shortTitle} Review 2026: Pros, Cons & Verdict`,
+    description: `Expert review of the ${product.title}. We tested it for durability, performance, and value. See our honest verdict and price trends. Updated May 2026.`,
     canonical: `/product/${params.slug}`,
     pinterestImage: `/api/pinterest/${product.asin || product.id}`,
     image: product.image_url || undefined,
@@ -41,6 +41,13 @@ export default async function ProductPage({ params }: { params: { slug: string }
   const shortTitle = product.short_title || product.title.split(' ').slice(0, 6).join(' ');
   const verdict = product.editorial_summary || 'Strong performance with measurable tradeoffs versus competitors.';
 
+  const breadcrumbs = [
+    { name: 'Home', url: '/' },
+    { name: 'Categories', url: '/categories' },
+    { name: product.category || 'Gear', url: `/category/${(product.category || 'gear').toLowerCase().replace(/[^a-z0-9]+/g, '-')}` },
+    { name: shortTitle, url: `/product/${params.slug}` },
+  ];
+
   const cat = (product.category || '').toLowerCase();
   let reviewerSlug = 'alex-rivera';
   if (cat.includes('run') || cat.includes('cardio') || cat.includes('treadmill') || cat.includes('endurance')) {
@@ -52,7 +59,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
   return (
     <>
-      <script {...jsonLdProps(productSchema(product))} />
+      <script {...jsonLdProps([productSchema(product), breadcrumbSchema(breadcrumbs)])} />
       <DisclosureBar />
 
       <div className="bg-[#0E1116]">

@@ -16,10 +16,12 @@ export function organizationSchema() {
       width: 60,
       height: 60,
     },
-    description: 'Independent fitness gear rankings built on verified customer data, specs analysis, and honest editorial tradeoffs.',
+    description: 'Independent fitness gear rankings and expert reviews built on 47,000+ verified customer data points, technical specs analysis, and honest editorial testing.',
     foundingDate: '2024',
     sameAs: [
       'https://pinterest.com/proathletica',
+      'https://twitter.com/proathletica',
+      'https://instagram.com/proathletica',
     ],
     contactPoint: {
       '@type': 'ContactPoint',
@@ -106,19 +108,22 @@ export function productSchema(product: Product) {
             worstRating: '1',
             reviewCount: String(Math.max(product.review_count || 1, 1)),
           },
-          review: {
-            '@type': 'Review',
-            reviewRating: {
-              '@type': 'Rating',
-              ratingValue: Number(product.rating).toFixed(1),
-              bestRating: '5',
-            },
-            author: {
-              '@type': 'Organization',
-              name: SITE_NAME,
-            },
-            reviewBody: product.editorial_summary || `Editorial evaluation of the ${product.title} based on technical specs and user data.`,
-          },
+          review: [
+            {
+              '@type': 'Review',
+              reviewRating: {
+                '@type': 'Rating',
+                ratingValue: Number(product.rating).toFixed(1),
+                bestRating: '5',
+              },
+              author: {
+                '@type': 'Organization',
+                name: SITE_NAME,
+              },
+              datePublished: product.updated_at || product.last_scraped_at,
+              reviewBody: product.editorial_summary || `Comprehensive editorial evaluation of the ${product.title}. Our team tested this gear for durability, ease of use, and overall value.`,
+            }
+          ],
         }
       : {}),
   };

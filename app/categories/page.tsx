@@ -4,8 +4,8 @@ import { buildMetadata } from '@/lib/seo/metadata';
 import { getCategoryList } from '@/lib/db';
 
 export const metadata = buildMetadata({
-  title: 'Browse Categories',
-  description: 'Explore ProAthletica product rankings and buyer-guide clusters across all training disciplines.',
+  title: 'Best Fitness Gear Categories 2026 — ProAthletica',
+  description: 'Explore our data-backed fitness gear rankings by category. From adjustable dumbbells to power racks, we rank the best equipment for your home gym.',
   canonical: '/categories',
 });
 

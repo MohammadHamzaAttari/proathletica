@@ -27,8 +27,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const name = slugToTitle(params.slug);
   return buildMetadata({
-    title: `Best ${name} 2026 — Reviewed & Tested`,
-    description: `Independent rankings of the best ${name.toLowerCase()} for 2026. Tested, scored, and curated by competing athletes.`,
+    title: `Best ${name} 2026 — Top 10 Ranked & Tested`,
+    description: `Expert reviews of the best ${name.toLowerCase()} for 2026. We rank the top picks based on durability, specs, and verified owner data.`,
     canonical: `/category/${params.slug}`,
   });
 }

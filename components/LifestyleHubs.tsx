@@ -68,7 +68,7 @@ export function LifestyleHubs() {
             Curated For You
           </div>
           <h2 className="text-xl font-black uppercase tracking-tight text-offwhite">
-            Shop by Lifestyle
+            Best Fitness Equipment by Lifestyle
           </h2>
         </div>
       </div>
@@ -104,7 +104,7 @@ export function LifestyleHubs() {
                 </p>
 
                 <div className="mt-4 flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-neutral-600 group-hover:text-data-lime transition-colors">
-                  Explore Hub <ArrowRight className="h-2.5 w-2.5 group-hover:translate-x-1 transition-transform" />
+                  Explore {hub.label} Reviews <ArrowRight className="h-2.5 w-2.5 group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
 
