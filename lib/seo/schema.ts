@@ -8,6 +8,7 @@ export function organizationSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
+    '@id': `${SITE_URL}/#organization`,
     name: SITE_NAME,
     url: SITE_URL,
     logo: {
@@ -16,16 +17,20 @@ export function organizationSchema() {
       width: 60,
       height: 60,
     },
+    image: { '@id': `${SITE_URL}/#logo` },
     description: 'Independent fitness gear rankings and expert reviews built on 47,000+ verified customer data points, technical specs analysis, and honest editorial testing.',
     foundingDate: '2024',
     sameAs: [
       'https://pinterest.com/proathletica',
       'https://twitter.com/proathletica',
       'https://instagram.com/proathletica',
+      'https://www.youtube.com/@proathletica',
+      'https://www.facebook.com/proathletica'
     ],
     contactPoint: {
       '@type': 'ContactPoint',
-      contactType: 'editorial',
+      contactType: 'customer service',
+      email: 'pro@athletica.page',
       url: `${SITE_URL}/contact`,
     },
   };

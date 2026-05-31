@@ -21,39 +21,29 @@ interface PageMetaInput {
  * Facebook, and AI crawlers all see it.
  */
 export function buildMetadata(input: PageMetaInput = {}): Metadata {
-  const pageTitle = input.title || '';
-  // FIX (Audit v2 Bug #1): Do not append brand name here, let layout.tsx template handle it
-  // or use it as a standalone title if no template is used.
-  // Actually, since buildMetadata is used in pages that might not use the template correctly
-  // or where we want full control, we should keep it flexible.
-  // BUT the layout.tsx template IS being used.
-  let fullTitle = pageTitle || SITE_NAME;
-
-  // Truncate to safe SERP length (~60 chars)
-  if (fullTitle.length > 60) {
-    fullTitle = fullTitle.slice(0, 57).trim() + '...';
-  }
-
   const description = input.description || SITE_DESCRIPTION;
-  const canonical = input.canonical
-    ? input.canonical.startsWith('http')
-      ? input.canonical
-      : `${SITE_URL}${input.canonical.startsWith('/') ? '' : '/'}${input.canonical}`
-    : SITE_URL;
-  const image = input.image || `${SITE_URL}/opengraph-image`;
+
+  // FIX (Audit v3): Robust canonical handling.
+  // Ensure we have a trailing-slash-free base URL and correct paths.
+  const baseUrl = SITE_URL.replace(/\/$/, '');
+  const canonicalPath = input.canonical || '';
+  const canonical = canonicalPath.startsWith('http')
+    ? canonicalPath
+    : `${baseUrl}${canonicalPath.startsWith('/') ? '' : '/'}${canonicalPath}`.replace(/\/$/, '');
+
+  const image = input.image || `${baseUrl}/opengraph-image`;
 
   return {
-    metadataBase: new URL(SITE_URL),
-    title: fullTitle,
-    description,
-    // FIX: canonical is now server-rendered HTML, not a client useEffect
+    metadataBase: new URL(baseUrl),
+    title: input.title, // If undefined, layout template uses 'default'
+    description: description.length > 160 ? description.slice(0, 157) + '...' : description,
     alternates: { canonical },
     robots: input.noindex
       ? { index: false, follow: false }
       : { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
     openGraph: {
-      title: fullTitle,
-      description,
+      title: input.title || SITE_NAME,
+      description: description.length > 160 ? description.slice(0, 157) + '...' : description,
       url: canonical,
       siteName: SITE_NAME,
       type: input.type || 'website',
@@ -69,8 +59,8 @@ export function buildMetadata(input: PageMetaInput = {}): Metadata {
     },
     twitter: {
       card: 'summary_large_image',
-      title: fullTitle,
-      description,
+      title: input.title || SITE_NAME,
+      description: description.length > 160 ? description.slice(0, 157) + '...' : description,
       images: [image],
     },
     other: {

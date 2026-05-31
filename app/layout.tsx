@@ -64,7 +64,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        {/* FIX: Organization + WebSite schema in <head> for all pages */}
+        {/* FIX (Audit v3 Critical): Ensure basic Schema is in <head> for all pages */}
         <script {...jsonLdProps([organizationSchema(), websiteSchema()])} />
         {/* FIX (Audit #01-5): Preconnect to Amazon for faster product image resolution */}
         <link rel="preconnect" href="https://m.media-amazon.com" crossOrigin="anonymous" />
