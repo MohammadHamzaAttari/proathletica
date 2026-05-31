@@ -19,7 +19,7 @@ import { jsonLdProps, organizationSchema, websiteSchema } from '@/lib/seo/schema
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `ProAthletica | Best Home Fitness Gear 2026 — Tested & Ranked`,
+    default: `Best Home Fitness Gear 2026 — Tested & Ranked`,
     template: `%s | ${SITE_NAME}`,
   },
   description: "Independent, data-backed reviews of the best home gym equipment, adjustable dumbbells, and fitness gear for 2026. Expertly tested for quality and value.",

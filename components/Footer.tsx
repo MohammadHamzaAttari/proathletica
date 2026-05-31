@@ -60,6 +60,18 @@ export function Footer() {
 
           {/* Brand column */}
           <div className="space-y-5 lg:col-span-1">
+            {/* Social profiles (Audit v2 Med #6) */}
+            <div className="flex items-center gap-3">
+              <a href="https://twitter.com/proathletica" target="_blank" rel="noopener noreferrer" className="text-neutral-500 hover:text-white transition-colors" aria-label="Follow ProAthletica on Twitter">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+              </a>
+              <a href="https://instagram.com/proathletica" target="_blank" rel="noopener noreferrer" className="text-neutral-500 hover:text-white transition-colors" aria-label="Follow ProAthletica on Instagram">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+              </a>
+              <a href="https://pinterest.com/proathletica" target="_blank" rel="noopener noreferrer" className="text-neutral-500 hover:text-white transition-colors" aria-label="Follow ProAthletica on Pinterest">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 7c2.2 0 4 1.8 4 4 0 1.1-.4 2.1-1.1 2.8-.7.7-1.7 1.2-2.9 1.2s-2.2-.5-2.9-1.2c-.7-.7-1.1-1.7-1.1-2.8 0-2.2 1.8-4 4-4z"/><path d="M12 17v-4"/></svg>
+              </a>
+            </div>
             <Link href="/" className="flex items-center gap-2.5 group" aria-label="ProAthletica homepage">
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-data-lime to-[#A8E600] text-black shadow-glow-lime">
                 <Dumbbell className="h-4 w-4" strokeWidth={2.5} />

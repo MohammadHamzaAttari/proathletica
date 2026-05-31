@@ -33,11 +33,13 @@ const FAQS = [
   },
 ];
 
-export function FAQ() {
+export function FAQ({ customFaqs }: { customFaqs?: Array<{ q: string, a: string }> }) {
+  const faqsToUse = customFaqs && customFaqs.length > 0 ? customFaqs : FAQS;
+
   return (
     <div className="space-y-8">
       {/* FAQPage schema — server-rendered for rich result eligibility */}
-      <script {...jsonLdProps(faqSchema(FAQS))} />
+      <script {...jsonLdProps(faqSchema(faqsToUse))} />
 
       <div className="space-y-2">
         <div className="section-eyebrow text-center">Got Questions?</div>
@@ -50,7 +52,7 @@ export function FAQ() {
       </div>
 
       <div className="space-y-2">
-        {FAQS.map((faq, i) => (
+        {faqsToUse.map((faq, i) => (
           <details
             key={faq.q}
             className="group rounded-inner border border-white/[0.06] bg-graphite-800 overflow-hidden transition-all"

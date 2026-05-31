@@ -280,13 +280,23 @@ function getFallbackSpecs(product: ProductSource): Record<string, string> {
     };
   }
 
-  if (cat.includes('run') || cat.includes('treadmill') || title.includes('treadmill')) {
+  if (cat.includes('treadmill') || title.includes('treadmill')) {
     return {
       'Adjustability': '0 - 12% Auto Incline',
       'Weight Capacity': '300 lbs Max User',
       'Material': 'Commercial Grade Alloy Frame',
       'Footprint': '15.5 sq ft (72" L x 31" W)',
       'Warranty': '10-Year Motor / Frame Warranty',
+    };
+  }
+
+  if (cat.includes('run') || title.includes('running') || title.includes('shoe')) {
+    return {
+      'Type': 'Neutral / Stability Support',
+      'Cushioning': 'High-Energy Foam Midsole',
+      'Material': 'Engineered Mesh Upper',
+      'Weight': '9.8 oz (Size 9)',
+      'Warranty': '90-Day Satisfaction Guarantee',
     };
   }
 

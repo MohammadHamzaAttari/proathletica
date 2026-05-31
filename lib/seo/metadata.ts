@@ -22,14 +22,16 @@ interface PageMetaInput {
  */
 export function buildMetadata(input: PageMetaInput = {}): Metadata {
   const pageTitle = input.title || '';
-  let fullTitle = pageTitle ? `${pageTitle} | ${SITE_NAME}` : SITE_NAME;
+  // FIX (Audit v2 Bug #1): Do not append brand name here, let layout.tsx template handle it
+  // or use it as a standalone title if no template is used.
+  // Actually, since buildMetadata is used in pages that might not use the template correctly
+  // or where we want full control, we should keep it flexible.
+  // BUT the layout.tsx template IS being used.
+  let fullTitle = pageTitle || SITE_NAME;
 
   // Truncate to safe SERP length (~60 chars)
   if (fullTitle.length > 60) {
-    if (pageTitle && pageTitle.length > 39) {
-      const truncatedPageTitle = pageTitle.slice(0, 39).trim() + '...';
-      fullTitle = `${truncatedPageTitle} | ${SITE_NAME}`;
-    }
+    fullTitle = fullTitle.slice(0, 57).trim() + '...';
   }
 
   const description = input.description || SITE_DESCRIPTION;

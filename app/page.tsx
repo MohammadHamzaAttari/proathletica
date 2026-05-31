@@ -1,5 +1,4 @@
 import { Suspense } from 'react';
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, Trophy, TrendingUp } from 'lucide-react';
 import { BuyerGuide } from '@/components/BuyerGuide';
@@ -12,14 +11,15 @@ import { HomepageFilters } from '@/components/HomepageFilters';
 import { LifestyleHubs } from '@/components/LifestyleHubs';
 import { Newsletter } from '@/components/Newsletter';
 import { getAllProducts, getCategoryList, getPublishedArticles } from '@/lib/db';
-import { itemListSchema, jsonLdProps, howToSchema, faqSchema } from '@/lib/seo/schema';
+import { itemListSchema, jsonLdProps, howToSchema, faqSchema, organizationSchema, websiteSchema } from '@/lib/seo/schema';
+import { buildMetadata } from '@/lib/seo/metadata';
 
 export const revalidate = 3600;
 
-export const metadata: Metadata = {
+export const metadata = buildMetadata({
   title: 'Best Home Fitness Gear 2026 — Expertly Tested & Ranked',
   description: 'Independent, data-backed reviews of the best home gym equipment of 2026. We rank adjustable dumbbells, weight benches, and more based on 47,000+ data points.',
-};
+});
 
 /* ─────────────────────────────────────────────
    DATA
@@ -108,10 +108,16 @@ export default async function HomePage() {
       q: 'How current are the prices shown?',
       a: 'Prices are pulled from Amazon and updated frequently. Amazon prices change multiple times per day, so we recommend clicking through to confirm the current live price.',
     },
+    {
+      q: 'How do I request deletion of my data?',
+      a: 'Email us at pro@athletica.page or use our dedicated Data Deletion Request form. We process all valid requests within 30 days per CCPA requirements.',
+    },
   ];
 
   /* JSON-LD schemas */
   const schemas = [
+    organizationSchema(),
+    websiteSchema(),
     ...(featured.length > 0 ? [itemListSchema(featured.slice(0, 12), '/')] : []),
     faqSchema(faqItems),
     howToSchema({

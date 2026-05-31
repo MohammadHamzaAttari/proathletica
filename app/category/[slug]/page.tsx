@@ -11,7 +11,7 @@ import { QuickFilters } from '@/components/QuickFilters';
 import { slugToTitle } from '@/lib/format';
 import { getCategoryList, getProductsByCategory } from '@/lib/db';
 import { buildMetadata } from '@/lib/seo/metadata';
-import { breadcrumbSchema, itemListSchema, jsonLdProps } from '@/lib/seo/schema';
+import { breadcrumbSchema, itemListSchema, jsonLdProps, organizationSchema, websiteSchema } from '@/lib/seo/schema';
 
 export const revalidate = 3600;
 
@@ -45,9 +45,14 @@ export default async function CategoryPage({ params }: { params: { slug: string 
     { name, url },
   ];
 
+  const customFaqs = [
+    { q: `How do you rank the best ${name.toLowerCase()}?`, a: `Our ranking for ${name.toLowerCase()} is based on a weighted algorithm that considers build materials, warranty length, and thousands of verified owner reviews.` },
+    { q: `Is the "Best Overall" ${name.toLowerCase()} right for everyone?`, a: `The #1 pick is chosen for its balance of features and value. However, we also provide specialized picks for small spaces and budget-conscious buyers.` }
+  ];
+
   return (
     <>
-      <script {...jsonLdProps([breadcrumbSchema(breadcrumbs), itemListSchema(products, url)])} />
+      <script {...jsonLdProps([organizationSchema(), websiteSchema(), breadcrumbSchema(breadcrumbs), itemListSchema(products, url)])} />
       <DisclosureBar />
 
       <div className="mx-auto max-w-6xl px-6 py-12">
@@ -93,7 +98,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         </div>
 
         <div className="mt-12 border-t border-white/10 pt-10">
-          <FAQ />
+          <FAQ customFaqs={customFaqs} />
         </div>
 
         <div className="mt-12">

@@ -15,7 +15,7 @@ import { StickyMobileCTA } from '@/components/StickyMobileCTA';
 import { generateArticleSummary } from '@/lib/ai/article-summary';
 import { getArticleBySlug, getPublishedArticles } from '@/lib/db';
 import { buildMetadata } from '@/lib/seo/metadata';
-import { articleSchema, breadcrumbSchema, itemListSchema, jsonLdProps } from '@/lib/seo/schema';
+import { articleSchema, breadcrumbSchema, itemListSchema, jsonLdProps, organizationSchema, websiteSchema, faqSchema } from '@/lib/seo/schema';
 
 export const revalidate = 3600;
 
@@ -77,13 +77,22 @@ export default async function ArticlePage({ params }: { params: { slug: string }
     { name: article.title, url },
   ];
 
+  const customFaqs = article.cluster === 'Dumbbells' ? [
+    { q: 'How many adjustable dumbbells do I need?', a: 'For most users, a single pair covering 5–50 lbs is sufficient for 90% of home exercises.' },
+    { q: 'Are adjustable dumbbells durable?', a: 'Modern selectorized dumbbells use high-grade steel and nylon. We test for impact resistance and mechanism smoothness.' },
+    { q: 'Which dumbbell brand is best for small spaces?', a: 'PowerBlock and Bowflex 552 are our top picks for compact storage.' }
+  ] : [];
+
   return (
     <>
       <script
         {...jsonLdProps([
+          organizationSchema(),
+          websiteSchema(),
           articleSchema(article, url),
           breadcrumbSchema(breadcrumbs),
           ...(article.products.length > 0 ? [itemListSchema(article.products, url)] : []),
+          ...(customFaqs.length > 0 ? [faqSchema(customFaqs)] : [])
         ])}
       />
 
@@ -172,6 +181,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           </div>
         ) : null}
 
+        {/* FIX (Audit v2 Bug #2): Ensure products are rendered if available */}
         {article.products && article.products.length > 0 ? (
           <div className="mb-10 rounded-3xl border border-data-lime/30 bg-graphite-900/40 p-8 flex flex-col sm:flex-row gap-8 items-center shadow-2xl relative overflow-hidden group/pick">
             {/* Animated accent border */}
@@ -270,7 +280,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
         </section>
 
         <section className="mt-16 border-t border-white/5 pt-12">
-          <FAQ />
+          <FAQ customFaqs={customFaqs} />
         </section>
 
         {relatedArticles.length > 0 ? (
