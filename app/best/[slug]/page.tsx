@@ -102,7 +102,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           websiteSchema(),
           articleSchema(article, url),
           breadcrumbSchema(breadcrumbs),
-          ...(displayProducts.length > 0 ? [itemListSchema(displayProducts as any, url)] : []),
+          ...(displayProducts.length > 0 ? [itemListSchema(displayProducts, url)] : []),
           ...(customFaqs.length > 0 ? [faqSchema(customFaqs)] : [])
         ])}
       />
@@ -263,8 +263,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               </h2>
               <p className="text-sm font-medium text-neutral-500">Independently vetted by the lab.</p>
             </div>
-            <ProductGrid products={displayProducts as any} articleSlug={article.slug} />
-            <ComparisonTable products={displayProducts as any} articleSlug={article.slug} title="Comparison at a glance" />
+            <ProductGrid products={displayProducts} articleSlug={article.slug} />
+            <ComparisonTable products={displayProducts} articleSlug={article.slug} title="Comparison at a glance" />
           </section>
         ) : null}
 
