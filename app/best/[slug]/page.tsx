@@ -37,7 +37,7 @@ export async function generateMetadata({
   const article = await getArticleBySlug(params.slug);
   if (!article) return buildMetadata({ title: 'Not Found', noindex: true });
 
-  const title = article.title.length > 60 ? article.title.slice(0, 57) + '...' : article.title;
+  const title = article.title.length > 42 ? article.title.slice(0, 39) + '...' : article.title;
 
   return buildMetadata({
     title: title,
