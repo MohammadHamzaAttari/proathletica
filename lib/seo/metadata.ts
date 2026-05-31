@@ -12,6 +12,7 @@ interface PageMetaInput {
   priceAmount?: number;
   priceCurrency?: string;
   pinterestImage?: string;
+  keywords?: string | string[];
   noindex?: boolean;
 }
 
@@ -35,6 +36,7 @@ export function buildMetadata(input: PageMetaInput = {}): Metadata {
     metadataBase: new URL(SITE_URL),
     title: fullTitle,
     description,
+    keywords: input.keywords,
     // FIX: canonical is now server-rendered HTML, not a client useEffect
     alternates: { canonical },
     robots: input.noindex

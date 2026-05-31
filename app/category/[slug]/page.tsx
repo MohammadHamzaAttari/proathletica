@@ -30,6 +30,13 @@ export async function generateMetadata({
     title: `Best ${name} 2026 — Reviewed & Tested`,
     description: `Independent rankings of the best ${name.toLowerCase()} for 2026. Tested, scored, and curated by competing athletes.`,
     canonical: `/category/${params.slug}`,
+    keywords: [
+      `best ${name.toLowerCase()}`,
+      `${name.toLowerCase()} reviews`,
+      `top rated ${name.toLowerCase()}`,
+      `${name.toLowerCase()} comparison 2026`,
+      `athletic ${name.toLowerCase()} testing`,
+    ],
   });
 }
 

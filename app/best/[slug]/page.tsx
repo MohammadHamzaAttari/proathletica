@@ -44,6 +44,13 @@ export async function generateMetadata({
     type: 'article',
     publishedTime: article.published_at || undefined,
     modifiedTime: article.updated_at,
+    keywords: [
+      article.title.toLowerCase(),
+      `${article.category || ''} reviews`.trim(),
+      `${article.cluster || ''} rankings`.trim(),
+      'best fitness gear 2026',
+      'athletica lab tested',
+    ].filter(Boolean),
   });
 }
 
