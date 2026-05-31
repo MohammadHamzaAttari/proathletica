@@ -22,7 +22,16 @@ interface PageMetaInput {
  */
 export function buildMetadata(input: PageMetaInput = {}): Metadata {
   const pageTitle = input.title || '';
-  const fullTitle = pageTitle ? `${pageTitle} | ${SITE_NAME}` : SITE_NAME;
+  let fullTitle = pageTitle ? `${pageTitle} | ${SITE_NAME}` : SITE_NAME;
+
+  // Truncate to safe SERP length (~60 chars)
+  if (fullTitle.length > 60) {
+    if (pageTitle && pageTitle.length > 39) {
+      const truncatedPageTitle = pageTitle.slice(0, 39).trim() + '...';
+      fullTitle = `${truncatedPageTitle} | ${SITE_NAME}`;
+    }
+  }
+
   const description = input.description || SITE_DESCRIPTION;
   const canonical = input.canonical
     ? input.canonical.startsWith('http')
