@@ -24,11 +24,14 @@ export function buildMetadata(input: PageMetaInput = {}): Metadata {
   const pageTitle = input.title || '';
   const fullTitle = pageTitle ? `${pageTitle} | ${SITE_NAME}` : SITE_NAME;
   const description = input.description || SITE_DESCRIPTION;
-  const canonical = input.canonical
+  const canonicalRaw = input.canonical
     ? input.canonical.startsWith('http')
       ? input.canonical
       : `${SITE_URL}${input.canonical.startsWith('/') ? '' : '/'}${input.canonical}`
     : SITE_URL;
+
+  // FIX (Audit #04-F): Strip query parameters from canonical URL to avoid indexing filter variants
+  const canonical = canonicalRaw.split('?')[0].split('#')[0];
   const image = input.image || `${SITE_URL}/opengraph-image`;
 
   return {

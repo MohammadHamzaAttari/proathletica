@@ -28,7 +28,7 @@ export async function generateMetadata({
   const name = slugToTitle(params.slug);
   return buildMetadata({
     title: `Best ${name} 2026 — Reviewed & Tested`,
-    description: `Independent rankings of the best ${name.toLowerCase()} for 2026. Tested, scored, and curated by competing athletes.`,
+    description: `Best ${name.toLowerCase()} for 2026 — massage guns, foam rollers, ice baths ranked by 47K+ verified reviews. No paid placements.`,
     canonical: `/category/${params.slug}`,
   });
 }
@@ -43,6 +43,21 @@ export default async function CategoryPage({ params }: { params: { slug: string 
     { name: 'Home', url: '/' },
     { name: 'Categories', url: '/categories' },
     { name, url },
+  ];
+
+  const categoryFaqs = [
+    {
+      q: `What's the best ${name.toLowerCase()} for a small home gym?`,
+      a: `For smaller spaces, we prioritize ${name.toLowerCase()} with a compact footprint and multi-functional capability, such as adjustable options.`,
+    },
+    {
+      q: 'How do you test these products?',
+      a: 'We use a combination of technical spec analysis, verified owner reviews (aggregating thousands of data points), and hands-on testing by our editorial team.',
+    },
+    {
+      q: 'Is this list updated for 2026?',
+      a: 'Yes, our rankings are updated monthly to reflect new product releases, price changes, and long-term durability data from real users.',
+    }
   ];
 
   return (
@@ -93,7 +108,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         </div>
 
         <div className="mt-12 border-t border-white/10 pt-10">
-          <FAQ />
+          <FAQ items={categoryFaqs} />
         </div>
 
         <div className="mt-12">

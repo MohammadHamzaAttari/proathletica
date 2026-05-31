@@ -8,6 +8,12 @@ export const CONTACT_EMAIL = process.env.NEWSLETTER_FROM_EMAIL || 'hello@athleti
 export const NEWSLETTER_FROM_NAME = process.env.NEWSLETTER_FROM_NAME || SITE_NAME;
 export const PINTEREST_DOMAIN_VERIFY = (process.env.PINTEREST_DOMAIN_VERIFY?.startsWith('YOUR_REAL_') ? '' : process.env.PINTEREST_DOMAIN_VERIFY) || '';
 
+export const SOCIAL_LINKS = {
+  twitter: 'https://twitter.com/proathletica',
+  instagram: 'https://instagram.com/proathletica',
+  pinterest: 'https://pinterest.com/proathletica',
+};
+
 export const DEFAULT_AUTHOR = 'Athletica Lab';
 
 export const AMAZON_TAGS = {
