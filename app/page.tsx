@@ -12,8 +12,18 @@ import { LifestyleHubs } from '@/components/LifestyleHubs';
 import { Newsletter } from '@/components/Newsletter';
 import { getAllProducts, getCategoryList, getPublishedArticles } from '@/lib/db';
 import { itemListSchema, jsonLdProps, howToSchema } from '@/lib/seo/schema';
+import { buildMetadata } from '@/lib/seo/metadata';
+import type { Metadata } from 'next';
 
 export const revalidate = 3600;
+
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata({
+    title: 'Best Fitness Gear 2026 — Expertly Tested & Ranked',
+    description: '306 fitness products ranked by 47,000+ data points. Expert-tested home gym gear with no paid placements. Find your perfect equipment → ProAthletica',
+    canonical: '/',
+  });
+}
 
 /* ─────────────────────────────────────────────
    DATA

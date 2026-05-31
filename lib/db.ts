@@ -54,7 +54,7 @@ export async function getProductsByCategory(categorySlug: string): Promise<Produ
     const normalized = normalizeCategory(p.category).toLowerCase().replace(/[^a-z0-9]+/g, '-');
     return normalized.includes(targetSlug) || targetSlug.includes(normalized);
   });
-  return filtered.length > 0 ? filtered : products;
+  return filtered;
 }
 
 export async function getCategoryList(): Promise<Array<{ name: string; slug: string; count: number }>> {

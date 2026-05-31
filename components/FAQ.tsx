@@ -33,11 +33,11 @@ const FAQS = [
   },
 ];
 
-export function FAQ() {
+export function FAQ({ items = FAQS }: { items?: typeof FAQS }) {
   return (
     <div className="space-y-8">
       {/* FAQPage schema — server-rendered for rich result eligibility */}
-      <script {...jsonLdProps(faqSchema(FAQS))} />
+      <script {...jsonLdProps(faqSchema(items))} />
 
       <div className="space-y-2">
         <div className="section-eyebrow text-center">Got Questions?</div>
@@ -50,7 +50,7 @@ export function FAQ() {
       </div>
 
       <div className="space-y-2">
-        {FAQS.map((faq, i) => (
+        {items.map((faq, i) => (
           <details
             key={faq.q}
             className="group rounded-inner border border-white/[0.06] bg-graphite-800 overflow-hidden transition-all"
