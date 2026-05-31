@@ -1,11 +1,30 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search, ShieldCheck, ArrowRight, Play } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function RedesignedHero() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get('q') || '');
+
+  const handleSearch = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    const params = new URLSearchParams(searchParams.toString());
+    if (query.trim()) {
+      params.set('q', query.trim());
+    } else {
+      params.delete('q');
+    }
+    params.delete('page'); // Reset pagination on new search
+
+    router.push(`/?${params.toString()}#top-picks`, { scroll: true });
+  };
+
   return (
     <section className="relative min-h-[500px] flex items-center pt-16 pb-12 overflow-hidden bg-[#05070a]">
       {/* Dynamic Background Elements */}
@@ -57,22 +76,30 @@ export default function RedesignedHero() {
               className="relative max-w-xl group"
             >
               <div className="absolute -inset-1 bg-gradient-to-r from-data-lime/20 to-trust-blue/20 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000" />
-              <div className="relative flex items-center bg-graphite-900 border border-white/10 rounded-2xl p-1.5 focus-within:border-data-lime/50 transition-all">
+              <form
+                onSubmit={handleSearch}
+                className="relative flex items-center bg-graphite-900 border border-white/10 rounded-2xl p-1.5 focus-within:border-data-lime/50 transition-all"
+              >
                 <Search className="w-5 h-5 text-neutral-500 ml-3" />
                 <input
                   type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
                   placeholder="What are you training for?"
                   className="w-full bg-transparent border-none focus:ring-0 text-offwhite px-3 py-2 text-base placeholder:text-neutral-600"
                 />
-                <button className="bg-data-lime text-black font-black px-6 py-2.5 rounded-xl hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-tighter text-sm">
+                <button
+                  type="submit"
+                  className="bg-data-lime text-black font-black px-6 py-2.5 rounded-xl hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-tighter text-sm"
+                >
                   Search
                 </button>
-              </div>
+              </form>
               <div className="mt-3 flex gap-4 text-[10px] font-bold text-neutral-500 uppercase tracking-widest ml-2">
                 <span>Trending:</span>
-                <Link href="/category/dumbbells" className="hover:text-data-lime transition-colors">Dumbbells</Link>
-                <Link href="/category/benches" className="hover:text-data-lime transition-colors">Benches</Link>
-                <Link href="/category/racks" className="hover:text-data-lime transition-colors">Power Racks</Link>
+                <Link href="/?q=dumbbells#top-picks" className="hover:text-data-lime transition-colors">Dumbbells</Link>
+                <Link href="/?q=benches#top-picks" className="hover:text-data-lime transition-colors">Benches</Link>
+                <Link href="/?q=racks#top-picks" className="hover:text-data-lime transition-colors">Power Racks</Link>
               </div>
             </motion.div>
 

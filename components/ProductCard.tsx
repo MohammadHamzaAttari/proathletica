@@ -140,7 +140,7 @@ export function ProductCard({
   const verdict = product.editorial_summary || product.custom_blurb
     || `${shortTitle} delivers consistent performance and is a strong choice in this category.`;
   const pros = (product.pros || []).slice(0, 2);
-  const cons = (product.cons || []).slice(0, 1);
+  const cons = (product.cons || []).slice(0, 2);
 
   const timestamp = formatTimestamp(product.last_scraped_at);
   const { label, variant } = getEditorialMeta(product, rank);
@@ -222,10 +222,10 @@ export function ProductCard({
       </div>
 
       {/* ── CARD BODY ── */}
-      <div className="p-4 flex flex-col flex-1 gap-3">
+      <div className="p-3.5 lg:p-3 flex flex-col flex-1 gap-2.5 lg:gap-1.5">
 
         {/* Trust strip */}
-        <div className="trust-strip">
+        <div className="trust-strip !gap-1">
           <span className="trust-chip trust-chip--amazon" aria-label="Available on Amazon">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M18.42 14.71C15.52 16.65 11.33 17.67 7.71 17.67c-5.04 0-9.58-1.86-13.01-4.95-.27-.24-.03-.57.3-.38 3.71 2.16 8.3 3.46 13.04 3.46 3.2 0 6.72-.66 9.96-2.03.49-.21.9.32.42.94z"/>
@@ -252,14 +252,14 @@ export function ProductCard({
         {/* Brand + Title */}
         <div>
           {product.brand && (
-            <p className="text-[10px] font-semibold text-trust-blue mb-0.5 tracking-wide">
+            <p className="text-[9px] font-semibold text-trust-blue mb-0.5 tracking-wide uppercase">
               {product.brand}
             </p>
           )}
           <h3
             id={`product-title-${product.id}`}
-            className="clamp-2 text-balance font-bold text-offwhite leading-tight"
-            style={{ fontSize: '1rem' }}
+            className="clamp-2 text-balance font-black text-offwhite leading-tight tracking-tight"
+            style={{ fontSize: '0.9375rem' }}
           >
             {shortTitle}
           </h3>
@@ -272,15 +272,15 @@ export function ProductCard({
 
         {/* Verdict — editorial summary */}
         <div className="relative">
-          <div className="absolute -left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-data-lime to-emerald-500 rounded-full opacity-30 group-hover/card:opacity-100 transition-opacity" />
-          <p className="text-[13px] leading-relaxed text-neutral-300 clamp-2 group-hover/card:text-offwhite transition-colors">
+          <div className="absolute -left-3.5 top-0.5 bottom-0.5 w-px bg-gradient-to-b from-data-lime to-emerald-500 rounded-full opacity-20 group-hover/card:opacity-60 transition-opacity" />
+          <p className="text-[12px] leading-snug text-neutral-400 clamp-2 group-hover/card:text-neutral-200 transition-colors">
             {verdict}
           </p>
         </div>
 
         {/* Specs at a glance (Audit #02-B) */}
         {product.specs && Object.keys(product.specs).length > 0 && (
-          <div className="grid grid-cols-2 gap-x-2 gap-y-1 pt-1.5 border-t border-white/[0.04]">
+          <div className="grid grid-cols-2 gap-x-2 gap-y-1 pt-1.5 lg:pt-1 border-t border-white/[0.04]">
             {Object.entries(product.specs).slice(0, 2).map(([key, value]) => (
               <div key={key} className="flex flex-col">
                 <span className="text-[8px] font-black uppercase tracking-widest text-neutral-600">{key}</span>
@@ -291,34 +291,34 @@ export function ProductCard({
         )}
 
         {/* Pros / Cons */}
-        <div className="pros-cons-grid !gap-y-2">
+        <div className="pros-cons-grid !gap-x-3 !gap-y-1.5 lg:!gap-y-0.5 !py-2 !px-2.5 bg-white/[0.01]">
           <div>
-            <div className="pros-cons-label text-savings-green !mb-1">Why it wins</div>
+            <div className="pros-cons-label text-savings-green !text-[9px] !mb-0.5">Why it wins</div>
             <ul className="space-y-0.5" aria-label="Pros">
               {pros.length > 0 ? pros.map((item, i) => (
-                <li key={i} className="pros-cons-item !text-[11px]">
-                  <span className="pros-cons-icon text-savings-green text-[10px]">✓</span>
+                <li key={i} className="pros-cons-item !text-[10px] !leading-tight">
+                  <span className="pros-cons-icon text-savings-green text-[9px]">✓</span>
                   {item}
                 </li>
               )) : (
-                <li className="pros-cons-item !text-[11px]">
-                  <span className="pros-cons-icon text-savings-green text-[10px]">✓</span>
+                <li className="pros-cons-item !text-[10px] !leading-tight">
+                  <span className="pros-cons-icon text-savings-green text-[9px]">✓</span>
                   Strong value
                 </li>
               )}
             </ul>
           </div>
           <div>
-            <div className="pros-cons-label text-neutral-400 !mb-1">Watch out</div>
+            <div className="pros-cons-label text-neutral-500 !text-[9px] !mb-0.5">Watch out</div>
             <ul className="space-y-0.5" aria-label="Cons">
               {cons.length > 0 ? cons.map((item, i) => (
-                <li key={i} className="pros-cons-item text-neutral-400 !text-[11px]">
-                  <span className="pros-cons-icon text-neutral-500 text-[10px]">✗</span>
+                <li key={i} className="pros-cons-item text-neutral-500 !text-[10px] !leading-tight">
+                  <span className="pros-cons-icon text-neutral-600 text-[9px]">✗</span>
                   {item}
                 </li>
               )) : (
-                <li className="pros-cons-item text-neutral-400 !text-[11px]">
-                  <span className="pros-cons-icon text-neutral-500 text-[10px]">✗</span>
+                <li className="pros-cons-item text-neutral-500 !text-[10px] !leading-tight">
+                  <span className="pros-cons-icon text-neutral-600 text-[9px]">✗</span>
                   Limited stock
                 </li>
               )}
@@ -327,30 +327,27 @@ export function ProductCard({
         </div>
 
         {/* ── PRICE + CTA SECTION ── */}
-        <div className="mt-auto pt-2 border-t border-white/[0.06] space-y-2">
+        <div className="mt-auto pt-1.5 lg:pt-1 border-t border-white/[0.06] space-y-1.5 lg:space-y-1">
 
           {/* Price row */}
-          <div className="flex items-baseline justify-between gap-2">
+          <div className="flex items-center justify-between gap-2">
             <div>
               {(product.price_cents || 0) > 0 ? (
                 <div className="flex items-baseline gap-1.5 flex-wrap">
-                  <span className="price-current text-xl">
+                  <span className="price-current !text-lg lg:!text-xl">
                     {formatPrice(product.price_cents, product.currency)}
                   </span>
                   {savings && (
-                    <span className="price-was">
+                    <span className="price-was !text-[11px]">
                       {formatPrice(savings.wasCents, product.currency)}
                     </span>
                   )}
                 </div>
               ) : (
-                <span className="price-current text-neutral-400 text-lg">
+                <span className="price-current text-neutral-400 !text-lg">
                   Check Price
                 </span>
               )}
-              <p className="text-[10px] text-neutral-600">
-                As of {timestamp}
-              </p>
             </div>
 
             {/* Quick compare toggle — top right of price row */}
@@ -359,25 +356,25 @@ export function ProductCard({
                 onClick={() => onCompareToggle(product.id, !isSelected)}
                 aria-pressed={isSelected}
                 aria-label={isSelected ? `Remove ${shortTitle} from comparison` : `Add ${shortTitle} to comparison`}
-                className={`flex-shrink-0 flex items-center gap-1.5 px-2 py-1.5 rounded-lg border text-xs font-bold transition-all duration-200 min-h-[2.25rem] min-w-[2.25rem] ${
+                className={`flex-shrink-0 flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[10px] font-black uppercase tracking-tight transition-all duration-200 ${
                   isSelected
                     ? 'border-data-lime/40 bg-data-lime/10 text-data-lime'
-                    : 'border-white/10 bg-white/3 text-neutral-400 hover:border-white/20 hover:text-neutral-200'
+                    : 'border-white/10 bg-white/3 text-neutral-500 hover:border-white/20 hover:text-neutral-200'
                 }`}
               >
                 {isSelected ? (
                   <>
-                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-                      <path d="M2 2L8 8M8 2L2 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    <svg width="9" height="9" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                      <path d="M2 2L8 8M8 2L2 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                     </svg>
-                    <span className="hidden sm:inline">Remove</span>
+                    <span>Remove</span>
                   </>
                 ) : (
                   <>
-                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-                      <path d="M5 2V8M2 5H8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    <svg width="9" height="9" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                      <path d="M5 2V8M2 5H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                     </svg>
-                    <span className="hidden sm:inline">Compare</span>
+                    <span>Compare</span>
                   </>
                 )}
               </button>
@@ -385,40 +382,41 @@ export function ProductCard({
           </div>
 
           {/* Primary CTA — unified across ALL tiers */}
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <a
               href={trackHref}
               target="_blank"
               rel="sponsored nofollow noopener noreferrer"
               aria-label={`Check price for ${shortTitle} on Amazon (opens in new tab)`}
-              className="cta-primary h-10 text-xs"
+              className="cta-primary h-9 lg:h-8.5 text-[11px]"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M18.42 14.71C15.52 16.65 11.33 17.67 7.71 17.67c-5.04 0-9.58-1.86-13.01-4.95-.27-.24-.03-.57.3-.38 3.71 2.16 8.3 3.46 13.04 3.46 3.2 0 6.72-.66 9.96-2.03.49-.21.9.32.42.94z"/>
                 <path d="M19.63 13.33c-.37-.47-2.43-.22-3.35-.11-.28.03-.32-.21-.07-.39 1.64-1.15 4.33-.82 4.65-.43.32.39-.08 3.1-1.62 4.39-.24.2-.46.09-.36-.17.35-.87 1.12-2.82.75-3.29z"/>
               </svg>
-              Check Price on Amazon
-              <ArrowRight className="w-3.5 h-3.5 flex-shrink-0 ml-1" aria-hidden="true" />
+              Check Price
+              <ArrowRight className="w-3 h-3 flex-shrink-0 ml-1" aria-hidden="true" />
             </a>
-            {(product.review_count || 0) > 0 ? (
-              <div className="text-center text-[9px] font-bold text-neutral-500 uppercase tracking-widest">
-                Based on {formatReviewCount(product.review_count as number)} Amazon reviews
-              </div>
-            ) : null}
+            <div className="flex items-center justify-between text-[8px] font-bold text-neutral-600 uppercase tracking-wider px-1">
+              <span>{timestamp}</span>
+              {product.review_count && (
+                <span>{formatReviewCount(product.review_count)} REVIEWS</span>
+              )}
+            </div>
           </div>
 
           {/* Secondary CTAs (Audit #03-C) */}
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-1.5">
             <Link
               href={`/product/${product.slug || product.asin || product.id}`}
-              className="flex items-center justify-center gap-2 py-2.5 text-[9px] font-black uppercase tracking-[0.1em] text-neutral-400 hover:text-offwhite transition-colors border border-white/[0.06] rounded-lg hover:bg-white/[0.04] bg-white/[0.02]"
+              className="flex items-center justify-center gap-1.5 py-2 text-[8px] font-black uppercase tracking-wider text-neutral-500 hover:text-offwhite transition-colors border border-white/[0.04] rounded-lg hover:bg-white/[0.04] bg-white/[0.01]"
             >
               📖 Review
             </Link>
             <Link
               href={compareHref}
               aria-label={`Compare ${shortTitle} with top rivals`}
-              className="flex items-center justify-center gap-2 py-2.5 text-[9px] font-black uppercase tracking-[0.1em] text-neutral-400 hover:text-trust-blue transition-colors border border-white/[0.06] rounded-lg hover:bg-white/[0.04] bg-white/[0.02]"
+              className="flex items-center justify-center gap-1.5 py-2 text-[8px] font-black uppercase tracking-wider text-neutral-500 hover:text-trust-blue transition-colors border border-white/[0.04] rounded-lg hover:bg-white/[0.04] bg-white/[0.01]"
             >
               📊 Compare
             </Link>

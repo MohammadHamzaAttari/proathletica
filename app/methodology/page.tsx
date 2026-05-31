@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { FlaskConical, ShieldCheck, Target, TrendingUp, Users } from 'lucide-react';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { articleSchema, howToSchema, jsonLdProps } from '@/lib/seo/schema';
-import type { Article } from '@/lib/types';
 
 export const metadata = buildMetadata({
   title: 'Our Methodology',
@@ -38,10 +37,10 @@ export default function MethodologyPage() {
     title: 'The Athletica Lab Protocol: How We Rank Fitness Gear',
     excerpt: 'Rankings should be explainable, repeatable, and honest. We combine large-scale review data with technical specs and editorial oversight to cut through the noise.',
     slug: 'methodology',
-    author_name: 'ProAthletica Editorial Board',
+    author: 'ProAthletica Editorial Board',
     published_at: '2026-05-13T00:00:00Z',
     updated_at: new Date().toISOString(),
-  } as unknown as Article, '/methodology');
+  }, '/methodology');
 
   const howTo = howToSchema({
     name: 'How We Rank Fitness Equipment',

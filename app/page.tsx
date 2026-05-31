@@ -102,7 +102,9 @@ export default async function HomePage() {
       <DisclosureBar />
 
       {/* ── REDESIGNED HERO ── */}
-      <RedesignedHero />
+      <Suspense fallback={<div className="min-h-[500px] animate-pulse bg-graphite-900" />}>
+        <RedesignedHero />
+      </Suspense>
 
       {/* Stats and Hubs in a clean Bento Row below Hero */}
       <section className="container-wide -mt-8 mb-12 relative z-20">

@@ -451,8 +451,23 @@ export function HomepageFilters({
     setSelectedIds(new Set(next));
   };
 
-  const FilterContent = (
+  const renderFilterContent = () => (
     <div className="space-y-8">
+      {/* ── SEARCH (Mobile only) ── */}
+      <div className="lg:hidden space-y-4">
+        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Search</div>
+        <div className="relative">
+          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-neutral-500" />
+          <input
+            type="search"
+            placeholder="Search gear..."
+            value={searchQuery}
+            onChange={(e) => updateParams({ q: e.target.value })}
+            className="h-10 w-full rounded-lg border border-white/10 bg-graphite-900 pl-9 pr-3 text-xs text-offwhite focus:border-data-lime/50 focus:outline-none"
+          />
+        </div>
+      </div>
+
       {/* ── FOCUS FILTERS ── */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -485,6 +500,22 @@ export function HomepageFilters({
               </button>
             );
           })}
+        </div>
+      </div>
+
+      {/* ── CATEGORY ── */}
+      <div className="space-y-4">
+        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Category</div>
+        <div className="relative">
+          <select
+            value={categoryFilter}
+            onChange={(e) => updateParams({ category: e.target.value })}
+            className="h-11 w-full appearance-none rounded-xl border border-white/10 bg-graphite-900 px-4 text-xs font-bold text-offwhite focus:border-data-lime/50 focus:outline-none"
+          >
+            <option value="all">All Categories</option>
+            {categoryOptions.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-neutral-500 pointer-events-none" />
         </div>
       </div>
 
@@ -561,278 +592,275 @@ export function HomepageFilters({
   );
 
   return (
-    <div className="space-y-8">
-      {/* ── COMPACT FILTER BAR ── */}
-      <div className="sticky top-20 z-30 filter-bar">
-        {/* Search */}
-        <div className="relative flex-1 min-w-[200px]">
-          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-neutral-500" />
-          <input
-            type="search"
-            placeholder="Search gear, brands, or goals..."
-            value={searchQuery}
-            onChange={(e) => updateParams({ q: e.target.value })}
-            className="h-10 w-full rounded-lg border border-white/10 bg-graphite-900/50 pl-9 pr-3 text-xs text-offwhite focus:border-data-lime/50 focus:outline-none"
-          />
+    <div className="flex flex-col lg:flex-row gap-8 items-start">
+      {/* ── SIDEBAR FILTERS (Desktop) ── */}
+      <aside className="hidden lg:block w-72 flex-shrink-0 sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto pr-4 custom-scrollbar">
+        <div className="flex items-center gap-2 mb-6">
+          <Filter className="w-4 h-4 text-data-lime" />
+          <h2 className="text-sm font-black uppercase tracking-widest text-offwhite">Refine Picks</h2>
         </div>
+        {renderFilterContent()}
+      </aside>
 
-        {/* Category */}
-        <div className="relative">
-          <select
-            value={categoryFilter}
-            onChange={(e) => updateParams({ category: e.target.value })}
-            className="h-10 appearance-none rounded-lg border border-white/10 bg-graphite-900/50 pl-3 pr-8 text-xs font-bold text-offwhite focus:border-data-lime/50 focus:outline-none"
-          >
-            <option value="all">All Categories</option>
-            {categoryOptions.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
-          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-neutral-500 pointer-events-none" />
-        </div>
+      <div className="flex-1 w-full space-y-8 min-w-0">
+        {/* ── COMPACT TOP BAR ── */}
+        <div className="sticky top-20 z-30 filter-bar">
+          {/* Search */}
+          <div className="relative flex-1 min-w-[200px]">
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-neutral-500" />
+            <input
+              type="search"
+              placeholder="Search gear, brands, or goals..."
+              value={searchQuery}
+              onChange={(e) => updateParams({ q: e.target.value })}
+              className="h-10 w-full rounded-lg border border-white/10 bg-graphite-900/50 pl-9 pr-3 text-xs text-offwhite focus:border-data-lime/50 focus:outline-none"
+            />
+          </div>
 
-        {/* Sort */}
-        <div className="relative">
-          <select
-            value={sortBy}
-            onChange={(e) => updateParams({ sort: e.target.value })}
-            className="h-10 appearance-none rounded-lg border border-white/10 bg-graphite-900/50 pl-3 pr-8 text-xs font-bold text-offwhite focus:border-data-lime/50 focus:outline-none"
-          >
-            <option value="rank">Editor Rank</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
-            <option value="rating-desc">Highest Rated</option>
-            <option value="reviews-desc">Most Reviewed</option>
-          </select>
-          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-neutral-500 pointer-events-none" />
-        </div>
-
-        {/* Advanced Filters Button */}
-        <button
-          onClick={() => setIsMobileFiltersOpen(true)}
-          className="flex items-center gap-2 h-10 px-4 rounded-lg bg-data-lime text-black font-black uppercase tracking-widest text-[10px] hover:shadow-glow-lime transition-all"
-        >
-          <Filter className="w-3 h-3" />
-          <span>Filters</span>
-          {tagFilters.length + (activeFilter !== 'all' ? 1 : 0) + (brandFilter !== 'all' ? 1 : 0) > 0 && (
-            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-black text-data-lime text-[8px]">
-              {tagFilters.length + (activeFilter !== 'all' ? 1 : 0) + (brandFilter !== 'all' ? 1 : 0)}
-            </span>
-          )}
-        </button>
-      </div>
-
-      {/* ── POPULAR GOALS ── */}
-      <div className="flex flex-wrap gap-2 items-center">
-        <span className="text-[10px] font-black uppercase tracking-widest text-neutral-600 mr-2">Popular Goals:</span>
-        {POPULAR_TAGS.map((tag) => {
-          const isActive = tagFilters.includes(tag) || activeFilter === tag;
-          return (
-            <button
-              key={tag}
-              onClick={() => {
-                if (FILTERS.some(f => f.key === tag)) {
-                   setFilter(tag as FilterKey);
-                } else {
-                   toggleTag(tag);
-                }
-              }}
-              className={`px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-tight transition-all ${
-                isActive
-                  ? 'border-data-lime bg-data-lime/15 text-data-lime'
-                  : 'border-white/10 bg-white/5 text-neutral-400 hover:border-white/20 hover:text-offwhite'
-              }`}
+          {/* Sort */}
+          <div className="relative">
+            <select
+              value={sortBy}
+              onChange={(e) => updateParams({ sort: e.target.value })}
+              className="h-10 appearance-none rounded-lg border border-white/10 bg-graphite-900/50 pl-3 pr-8 text-xs font-bold text-offwhite focus:border-data-lime/50 focus:outline-none"
             >
-              {cleanTagName(tag)}
-            </button>
-          );
-        })}
-      </div>
+              <option value="rank">Editor Rank</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="rating-desc">Highest Rated</option>
+              <option value="reviews-desc">Most Reviewed</option>
+            </select>
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-neutral-500 pointer-events-none" />
+          </div>
 
-      {/* ── ACTIVE CHIPS ── */}
-      {activeChips.length > 0 && (
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-[10px] font-black uppercase tracking-widest text-neutral-600 mr-1">Active:</span>
-          {activeChips.map((chip, idx) => (
-            <button
-              key={idx}
-              onClick={chip.onRemove}
-              className="group flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-data-lime/30 bg-data-lime/5 text-[10px] font-bold text-data-lime hover:border-data-lime hover:bg-data-lime/10 transition-all"
-            >
-              {chip.label}
-              <X className="w-3 h-3 text-data-lime/50 group-hover:text-data-lime" />
-            </button>
-          ))}
+          {/* Mobile Filters Toggle */}
           <button
-            onClick={() => updateParams({
-              focus: null,
-              category: null,
-              brand: null,
-              tags: null,
-              q: null,
-              minPrice: null,
-              maxPrice: null
-            })}
-            className="text-[10px] font-bold text-neutral-500 hover:text-offwhite transition-colors underline underline-offset-4"
+            onClick={() => setIsMobileFiltersOpen(true)}
+            className="lg:hidden flex items-center gap-2 h-10 px-4 rounded-lg bg-data-lime text-black font-black uppercase tracking-widest text-[10px] hover:shadow-glow-lime transition-all"
           >
-            Clear All
+            <Filter className="w-3 h-3" />
+            <span>Filters</span>
           </button>
         </div>
-      )}
 
-      {/* ── MOBILE/DRAWER FILTER ── */}
-      <AnimatePresence>
-        {isMobileFiltersOpen && (
-          <div className="fixed inset-0 z-[100] flex justify-start">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-              onClick={() => setIsMobileFiltersOpen(false)}
-            />
-            <motion.div
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="relative w-[90%] max-w-sm bg-graphite-950 shadow-2xl p-6 overflow-y-auto border-r border-white/5"
-            >
-              <div className="flex items-center justify-between mb-8">
-                <div className="text-lg font-black uppercase tracking-tighter text-offwhite">Advanced Filters</div>
-                <button onClick={() => setIsMobileFiltersOpen(false)} className="p-2 text-neutral-400 hover:text-offwhite">
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-              {FilterContent}
-              <div className="sticky bottom-0 mt-10 pt-4 bg-graphite-950/80 backdrop-blur-md">
-                <button
-                  onClick={() => setIsMobileFiltersOpen(false)}
-                  className="w-full h-14 rounded-xl bg-data-lime text-black font-black uppercase tracking-widest text-sm shadow-glow-lime"
-                >
-                  Apply & Close
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* ── RESULTS ── */}
-      <div className="space-y-8 w-full">
-        {/* Results Metadata */}
-        <div className="flex items-center gap-4">
-          <div className="h-px flex-1 bg-white/[0.06]" />
-          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/[0.06] bg-white/[0.02]">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">
-              Showing
-            </span>
-            <span className="text-sm font-black text-data-lime tabular-nums">
-              {isPending ? '...' : totalResults}
-            </span>
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">
-              of {products.length} picks
-            </span>
-          </div>
-          <div className="h-px flex-1 bg-white/[0.06]" />
+        {/* ── POPULAR GOALS ── */}
+        <div className="flex flex-wrap gap-2 items-center">
+          <span className="text-[10px] font-black uppercase tracking-widest text-neutral-600 mr-2">Popular Goals:</span>
+          {POPULAR_TAGS.map((tag) => {
+            const isActive = tagFilters.includes(tag) || activeFilter === tag;
+            return (
+              <button
+                key={tag}
+                onClick={() => {
+                  if (FILTERS.some(f => f.key === tag)) {
+                     setFilter(tag as FilterKey);
+                  } else {
+                     toggleTag(tag);
+                  }
+                }}
+                className={`px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-tight transition-all ${
+                  isActive
+                    ? 'border-data-lime bg-data-lime/15 text-data-lime'
+                    : 'border-white/10 bg-white/5 text-neutral-400 hover:border-white/20 hover:text-offwhite'
+                }`}
+              >
+                {cleanTagName(tag)}
+              </button>
+            );
+          })}
         </div>
 
-        {/* At a glance Comparison */}
-        {filteredProducts.length > 1 && (
-          <div className="space-y-4">
-            <ComparisonTable
-              products={filteredProducts.slice(0, 10)}
-              articleSlug={articleSlug}
-              title={`${activeFilterMeta?.key === 'all' ? 'All Ranked' : activeFilterMeta?.label || 'Top'} Gear Compared`}
-            />
+        {/* ── ACTIVE CHIPS ── */}
+        {activeChips.length > 0 && (
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-[10px] font-black uppercase tracking-widest text-neutral-600 mr-1">Active:</span>
+            {activeChips.map((chip, idx) => (
+              <button
+                key={idx}
+                onClick={chip.onRemove}
+                className="group flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-data-lime/30 bg-data-lime/5 text-[10px] font-bold text-data-lime hover:border-data-lime hover:bg-data-lime/10 transition-all"
+              >
+                {chip.label}
+                <X className="w-3 h-3 text-data-lime/50 group-hover:text-data-lime" />
+              </button>
+            ))}
+            <button
+              onClick={() => updateParams({
+                focus: null,
+                category: null,
+                brand: null,
+                tags: null,
+                q: null,
+                minPrice: null,
+                maxPrice: null
+              })}
+              className="text-[10px] font-bold text-neutral-500 hover:text-offwhite transition-colors underline underline-offset-4"
+            >
+              Clear All
+            </button>
           </div>
         )}
 
-        {/* Product Cards */}
-        <ProductGrid
-          products={pagedProducts}
-          articleSlug={articleSlug}
-          isLoading={isPending}
-          emptyFilterLabel={activeFilterLabel || activeFilterMeta?.label}
-          rankOffset={startIndex}
-          selectedIds={selectedIds}
-          onSelectedIdsChange={updateSelection}
-          showCompareBar={false}
-        />
-
-        <StickyCompareBar
-          selectedProducts={selectedProducts}
-          onRemove={(id) => {
-            const next = new Set(selectedIds);
-            next.delete(id);
-            updateSelection(next);
-          }}
-          onClear={() => updateSelection(new Set())}
-        />
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="relative z-[55] pointer-events-auto flex flex-wrap items-center justify-between gap-3 rounded-pill border border-white/[0.06] bg-graphite-900/60 px-4 py-3">
-            <div className="text-xs font-bold uppercase tracking-widest text-neutral-500">
-              Showing {rangeStart}–{rangeEnd} of {totalResults}
-            </div>
-            <div className="pointer-events-auto flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setPage(currentPage - 1)}
-                disabled={currentPage <= 1}
-                className="h-9 px-3 rounded-pill border border-white/[0.08] text-xs font-bold uppercase tracking-widest text-neutral-400 disabled:opacity-40 disabled:cursor-not-allowed hover:border-white/20 hover:text-offwhite"
+        {/* ── MOBILE/DRAWER FILTER ── */}
+        <AnimatePresence>
+          {isMobileFiltersOpen && (
+            <div className="fixed inset-0 z-[100] flex justify-start">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                onClick={() => setIsMobileFiltersOpen(false)}
+              />
+              <motion.div
+                initial={{ x: '-100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '-100%' }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="relative w-[90%] max-w-sm bg-graphite-950 shadow-2xl p-6 overflow-y-auto border-r border-white/5"
               >
-                Prev
-              </button>
-              <div className="flex items-center gap-1">
-                {paginationPages[0] > 1 && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => setPage(1)}
-                      className="h-9 w-9 rounded-full border border-white/[0.08] text-xs font-bold text-neutral-400 hover:border-white/20 hover:text-offwhite"
-                    >
-                      1
-                    </button>
-                    <span className="text-xs font-bold text-neutral-500 px-1">...</span>
-                  </>
-                )}
-                {paginationPages.map((pageNumber) => {
-                  const isActive = pageNumber === currentPage;
-                  return (
-                    <button
-                      type="button"
-                      key={pageNumber}
-                      onClick={() => setPage(pageNumber)}
-                      className={`h-9 w-9 rounded-full border text-xs font-bold ${isActive ? 'border-data-lime bg-data-lime/15 text-data-lime' : 'border-white/[0.08] text-neutral-400 hover:border-white/20 hover:text-offwhite'}`}
-                    >
-                      {pageNumber}
-                    </button>
-                  );
-                })}
-                {paginationPages[paginationPages.length - 1] < totalPages && (
-                  <>
-                    <span className="text-xs font-bold text-neutral-500 px-1">...</span>
-                    <button
-                      type="button"
-                      onClick={() => setPage(totalPages)}
-                      className="h-9 w-9 rounded-full border border-white/[0.08] text-xs font-bold text-neutral-400 hover:border-white/20 hover:text-offwhite"
-                    >
-                      {totalPages}
-                    </button>
-                  </>
-                )}
+                <div className="flex items-center justify-between mb-8">
+                  <div className="text-lg font-black uppercase tracking-tighter text-offwhite">Advanced Filters</div>
+                  <button onClick={() => setIsMobileFiltersOpen(false)} className="p-2 text-neutral-400 hover:text-offwhite">
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+                {renderFilterContent()}
+                <div className="sticky bottom-0 mt-10 pt-4 bg-graphite-950/80 backdrop-blur-md">
+                  <button
+                    onClick={() => setIsMobileFiltersOpen(false)}
+                    className="w-full h-14 rounded-xl bg-data-lime text-black font-black uppercase tracking-widest text-sm shadow-glow-lime"
+                  >
+                    Apply & Close
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* ── RESULTS ── */}
+        <div className="space-y-8 w-full">
+          {/* Results Metadata */}
+          <div className="flex items-center gap-4">
+            <div className="h-px flex-1 bg-white/[0.06]" />
+            <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/[0.06] bg-white/[0.02]">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">
+                Showing
+              </span>
+              <span className="text-sm font-black text-data-lime tabular-nums">
+                {isPending ? '...' : totalResults}
+              </span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">
+                of {products.length} picks
+              </span>
+            </div>
+            <div className="h-px flex-1 bg-white/[0.06]" />
+          </div>
+
+          {/* Product Cards */}
+          <ProductGrid
+            products={pagedProducts}
+            articleSlug={articleSlug}
+            isLoading={isPending}
+            emptyFilterLabel={activeFilterLabel || activeFilterMeta?.label}
+            rankOffset={startIndex}
+            selectedIds={selectedIds}
+            onSelectedIdsChange={updateSelection}
+            showCompareBar={false}
+          />
+
+          {/* At a glance Comparison - MOVED BELOW PRODUCT CARDS per user request */}
+          {filteredProducts.length > 1 && (
+            <div className="space-y-4 py-8 border-t border-white/[0.06]">
+              <ComparisonTable
+                products={filteredProducts.slice(0, 10)}
+                articleSlug={articleSlug}
+                title={`${activeFilterMeta?.key === 'all' ? 'All Ranked' : activeFilterMeta?.label || 'Top'} Gear Compared`}
+              />
+            </div>
+          )}
+
+          <StickyCompareBar
+            selectedProducts={selectedProducts}
+            onRemove={(id) => {
+              const next = new Set(selectedIds);
+              next.delete(id);
+              updateSelection(next);
+            }}
+            onClear={() => updateSelection(new Set())}
+          />
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="relative z-[55] pointer-events-auto flex flex-wrap items-center justify-between gap-3 rounded-pill border border-white/[0.06] bg-graphite-900/60 px-4 py-3">
+              <div className="text-xs font-bold uppercase tracking-widest text-neutral-500">
+                Showing {rangeStart}–{rangeEnd} of {totalResults}
               </div>
-              <button
-                type="button"
-                onClick={() => setPage(currentPage + 1)}
-                disabled={currentPage >= totalPages}
-                className="h-9 px-3 rounded-pill border border-white/[0.08] text-xs font-bold uppercase tracking-widest text-neutral-400 disabled:opacity-40 disabled:cursor-not-allowed hover:border-white/20 hover:text-offwhite"
-              >
-                Next
-              </button>
+              <div className="pointer-events-auto flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPage(currentPage - 1)}
+                  disabled={currentPage <= 1}
+                  className="h-9 px-3 rounded-pill border border-white/[0.08] text-xs font-bold uppercase tracking-widest text-neutral-400 disabled:opacity-40 disabled:cursor-not-allowed hover:border-white/20 hover:text-offwhite"
+                >
+                  Prev
+                </button>
+                <div className="flex items-center gap-1">
+                  {paginationPages[0] > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setPage(1)}
+                        className="h-9 w-9 rounded-full border border-white/[0.08] text-xs font-bold text-neutral-400 hover:border-white/20 hover:text-offwhite"
+                      >
+                        1
+                      </button>
+                      <span className="text-xs font-bold text-neutral-500 px-1">...</span>
+                    </>
+                  )}
+                  {paginationPages.map((pageNumber) => {
+                    const isActive = pageNumber === currentPage;
+                    return (
+                      <button
+                        type="button"
+                        key={pageNumber}
+                        onClick={() => setPage(pageNumber)}
+                        className={`h-9 w-9 rounded-full border text-xs font-bold transition-all duration-300 ${
+                          isActive
+                            ? 'border-data-lime bg-data-lime/20 text-data-lime shadow-[0_0_15px_rgba(198,255,61,0.3)] scale-110 z-10'
+                            : 'border-white/[0.08] text-neutral-400 hover:border-data-lime/30 hover:text-offwhite hover:shadow-[0_0_10px_rgba(198,255,61,0.1)]'
+                        }`}
+                      >
+                        {pageNumber}
+                      </button>
+                    );
+                  })}
+                  {paginationPages[paginationPages.length - 1] < totalPages && (
+                    <>
+                      <span className="text-xs font-bold text-neutral-500 px-1">...</span>
+                      <button
+                        type="button"
+                        onClick={() => setPage(totalPages)}
+                        className="h-9 w-9 rounded-full border border-white/[0.08] text-xs font-bold text-neutral-400 hover:border-white/20 hover:text-offwhite"
+                      >
+                        {totalPages}
+                      </button>
+                    </>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPage(currentPage + 1)}
+                  disabled={currentPage >= totalPages}
+                  className="h-9 px-3 rounded-pill border border-white/[0.08] text-xs font-bold uppercase tracking-widest text-neutral-400 disabled:opacity-40 disabled:cursor-not-allowed hover:border-white/20 hover:text-offwhite"
+                >
+                  Next
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
