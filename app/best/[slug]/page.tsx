@@ -217,8 +217,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               </h2>
               <p className="text-sm font-medium text-neutral-500">Independently vetted by the lab.</p>
             </div>
-            <ComparisonTable products={article.products} articleSlug={article.slug} title="Comparison at a glance" />
             <ProductGrid products={article.products} articleSlug={article.slug} />
+            <ComparisonTable products={article.products} articleSlug={article.slug} title="Comparison at a glance" />
           </section>
         ) : null}
 

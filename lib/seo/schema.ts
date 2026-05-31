@@ -127,7 +127,7 @@ export function productSchema(product: Product) {
 /* ─────────────────────────────────────────────
    ARTICLE (E-E-A-T enhanced)
 ───────────────────────────────────────────── */
-export function articleSchema(article: Article, url: string) {
+export function articleSchema(article: Partial<Article> & { title: string; updated_at: string }, url: string) {
   const canonicalUrl = url.startsWith('http') ? url : `${SITE_URL}${url}`;
   return {
     '@context': 'https://schema.org',

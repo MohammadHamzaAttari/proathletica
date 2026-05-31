@@ -1,6 +1,9 @@
+'use client';
+
+import { useState } from 'react';
 import { formatPrice, formatReviewCount, formatTimestamp } from '@/lib/format';
 import type { Product } from '@/lib/types';
-import { ShieldCheck, Star } from 'lucide-react';
+import { ShieldCheck, Star, ChevronDown, ChevronUp, Table } from 'lucide-react';
 
 type EnhancedProduct = Product & {
   custom_blurb?: string | null;
@@ -24,27 +27,61 @@ export function ComparisonTable({
   articleSlug: string;
   title?: string;
 }) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const rows = products.slice(0, 4);
   if (rows.length === 0) return null;
 
   return (
-    <section className="product-card p-6 sm:p-8 border-data-lime/20 shadow-[0_0_50px_rgba(198,255,61,0.05)]">
-      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <div className="editorial-badge editorial-badge--trending mb-3">
-            <ShieldCheck className="w-3 h-3" />
-            DATA-VERIFIED COMPARISON
+    <section className={`product-card transition-all duration-500 overflow-hidden ${isExpanded ? 'p-6 sm:p-8 border-data-lime/30 shadow-[0_0_50px_rgba(198,255,61,0.08)]' : 'p-4 sm:p-6 border-white/10 hover:border-data-lime/20'}`}>
+      <div className={`flex flex-col gap-6 md:flex-row md:items-center md:justify-between ${isExpanded ? 'mb-8' : ''}`}>
+        <div className="flex-1">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="editorial-badge editorial-badge--trending !m-0">
+              <ShieldCheck className="w-3 h-3" />
+              DATA-VERIFIED COMPARISON
+            </div>
+            {!isExpanded && (
+              <span className="text-[10px] font-black text-data-lime uppercase tracking-widest animate-pulse">
+                • {rows.length} Picks Analyzed
+              </span>
+            )}
           </div>
-          <h2 className="text-3xl font-black uppercase tracking-tighter text-offwhite">
+          <h2 className={`${isExpanded ? 'text-3xl' : 'text-xl'} font-black uppercase tracking-tighter text-offwhite transition-all duration-300`}>
             {title}
           </h2>
+          {isExpanded && (
+            <p className="mt-4 max-w-xl text-sm text-neutral-400 leading-relaxed">
+              Rankings combine verified review data, specs, and price-to-performance analysis from the Athletica Lab.
+            </p>
+          )}
         </div>
-        <p className="max-w-xs text-sm text-neutral-400 leading-relaxed">
-          Rankings combine verified review data, specs, and price-to-performance analysis from the Athletica Lab.
-        </p>
+
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className={`flex items-center justify-center gap-3 px-6 h-12 rounded-xl font-black uppercase tracking-widest text-xs transition-all duration-300 ${
+            isExpanded
+              ? 'bg-white/5 text-neutral-400 hover:bg-white/10'
+              : 'bg-data-lime text-black shadow-glow-lime hover:scale-[1.02] active:scale-[0.98]'
+          }`}
+        >
+          {isExpanded ? (
+            <>
+              <ChevronUp className="w-4 h-4" />
+              Collapse Table
+            </>
+          ) : (
+            <>
+              <Table className="w-4 h-4" />
+              View Comparison Table
+              <ChevronDown className="w-4 h-4" />
+            </>
+          )}
+        </button>
       </div>
 
-      {/* Desktop Table */}
+      {isExpanded && (
+        <div className="animate-in fade-in slide-in-from-top-4 duration-500">
+          {/* Desktop Table */}
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full border-collapse text-left">
           <thead>
@@ -193,11 +230,13 @@ export function ComparisonTable({
         })}
       </div>
 
-      <div className="mt-8 pt-6 border-t border-white/[0.04] text-center">
-        <p className="text-2xs text-neutral-600 uppercase tracking-[0.2em] font-bold">
-          Updated {formatTimestamp(new Date().toISOString())} • Data-Verified by ProAthletica Lab
-        </p>
-      </div>
+          <div className="mt-8 pt-6 border-t border-white/[0.04] text-center">
+            <p className="text-2xs text-neutral-600 uppercase tracking-[0.2em] font-bold">
+              Updated {formatTimestamp(new Date().toISOString())} • Data-Verified by ProAthletica Lab
+            </p>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
