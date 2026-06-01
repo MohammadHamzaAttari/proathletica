@@ -43,9 +43,11 @@ export function websiteSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
+    '@id': `${SITE_URL}/#website`,
     name: SITE_NAME,
     url: SITE_URL,
     description: 'Data-driven fitness gear rankings for home gym builders, apartment dwellers, and beginners.',
+    publisher: { '@id': `${SITE_URL}/#organization` },
     potentialAction: {
       '@type': 'SearchAction',
       target: `${SITE_URL}/search?q={search_term_string}`,
@@ -61,6 +63,7 @@ export function breadcrumbSchema(items: Array<{ name: string; url: string }>) {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
+    '@id': `${SITE_URL}/#breadcrumb`,
     itemListElement: items.map((item, index) => ({
       '@type': 'ListItem',
       position: index + 1,
@@ -75,9 +78,11 @@ export function breadcrumbSchema(items: Array<{ name: string; url: string }>) {
 ───────────────────────────────────────────── */
 export function productSchema(product: Product) {
   const priceStr = product.price_cents ? (product.price_cents / 100).toFixed(2) : undefined;
+  const productUrl = `${SITE_URL}/product/${product.slug || product.asin}`;
   return {
     '@context': 'https://schema.org',
     '@type': 'Product',
+    '@id': `${productUrl}/#product`,
     name: product.title,
     image: product.image_url ? [product.image_url] : undefined,
     description: product.description || product.editorial_summary || product.keyword || product.title,
@@ -139,24 +144,19 @@ export function productSchema(product: Product) {
 ───────────────────────────────────────────── */
 export function articleSchema(article: Partial<Article> & { title: string; updated_at: string }, url: string) {
   const canonicalUrl = url.startsWith('http') ? url : `${SITE_URL}${url}`;
+  const authorSlug = article.author?.toLowerCase().replace(/\s+/g, '-');
   return {
     '@context': 'https://schema.org',
     '@type': 'Article',
+    '@id': `${canonicalUrl}/#article`,
     headline: article.title,
     description: article.excerpt || undefined,
     image: article.hero_image ? [article.hero_image] : undefined,
     author: {
-      '@type': 'Person',
-      name: article.author || 'ProAthletica Editorial Team',
-      url: `${SITE_URL}/about`,
+      '@id': authorSlug ? `${SITE_URL}/author/${authorSlug}/#person` : `${SITE_URL}/about/#person`,
     },
     publisher: {
-      '@type': 'Organization',
-      name: SITE_NAME,
-      logo: {
-        '@type': 'ImageObject',
-        url: `${SITE_URL}/favicon.svg`,
-      },
+      '@id': `${SITE_URL}/#organization`,
     },
     datePublished: article.published_at || article.updated_at,
     dateModified: article.updated_at,
@@ -212,6 +212,7 @@ export function faqSchema(faqs: Array<{ q: string; a: string }>) {
    PERSON schema — author E-E-A-T
 ───────────────────────────────────────────── */
 export function personSchema(person: {
+  id: string;
   name: string;
   jobTitle: string;
   description: string;
@@ -219,9 +220,11 @@ export function personSchema(person: {
   url?: string;
   image?: string;
 }) {
+  const personUrl = person.url || `${SITE_URL}/author/${person.id}`;
   return {
     '@context': 'https://schema.org',
     '@type': 'Person',
+    '@id': `${personUrl}/#person`,
     name: person.name,
     jobTitle: person.jobTitle,
     description: person.description,
@@ -230,9 +233,7 @@ export function personSchema(person: {
       credentialCategory: c,
     })),
     worksFor: {
-      '@type': 'Organization',
-      name: SITE_NAME,
-      url: SITE_URL,
+      '@id': `${SITE_URL}/#organization`,
     },
     ...(person.url ? { url: person.url } : {}),
     ...(person.image ? { image: person.image } : {}),

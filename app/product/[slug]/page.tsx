@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getProductById, getAllProducts } from '@/lib/db';
 import { buildMetadata } from '@/lib/seo/metadata';
-import { productSchema, jsonLdProps, breadcrumbSchema, organizationSchema, websiteSchema } from '@/lib/seo/schema';
+import { productSchema, jsonLdProps, breadcrumbSchema } from '@/lib/seo/schema';
 import { DisclosureBar } from '@/components/DisclosureBar';
 import { formatPrice, formatTimestamp } from '@/lib/format';
 import Image from 'next/image';
@@ -59,7 +59,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
   return (
     <>
-      <script {...jsonLdProps([organizationSchema(), websiteSchema(), productSchema(product), breadcrumbSchema(breadcrumbs)])} />
+      <script {...jsonLdProps([productSchema(product), breadcrumbSchema(breadcrumbs)])} />
       <DisclosureBar />
 
       <div className="bg-[#0E1116]">

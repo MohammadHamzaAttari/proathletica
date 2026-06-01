@@ -15,7 +15,7 @@ import { StickyMobileCTA } from '@/components/StickyMobileCTA';
 import { generateArticleSummary } from '@/lib/ai/article-summary';
 import { getArticleBySlug, getPublishedArticles, getProductsByCategory } from '@/lib/db';
 import { buildMetadata } from '@/lib/seo/metadata';
-import { articleSchema, breadcrumbSchema, itemListSchema, jsonLdProps, organizationSchema, websiteSchema, faqSchema } from '@/lib/seo/schema';
+import { articleSchema, breadcrumbSchema, itemListSchema, jsonLdProps, faqSchema } from '@/lib/seo/schema';
 
 export const revalidate = 3600;
 
@@ -98,8 +98,6 @@ export default async function ArticlePage({ params }: { params: { slug: string }
     <>
       <script
         {...jsonLdProps([
-          organizationSchema(),
-          websiteSchema(),
           articleSchema(article, url),
           breadcrumbSchema(breadcrumbs),
           ...(displayProducts.length > 0 ? [itemListSchema(displayProducts, url)] : []),

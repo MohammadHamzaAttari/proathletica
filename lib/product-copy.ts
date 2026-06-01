@@ -249,6 +249,17 @@ export function buildProductEditorialCopy(product: ProductSource): ProductEditor
 function getFallbackSpecs(product: ProductSource): Record<string, string> {
   const cat = (product.category || '').toLowerCase();
   const title = (product.title || '').toLowerCase();
+
+  // FIX (Audit v5): Prioritize footwear specs to prevent treadmill spec overlap
+  if (cat.includes('run') || title.includes('running') || title.includes('shoe')) {
+    return {
+      'Type': 'Neutral / Stability Support',
+      'Cushioning': 'High-Energy Foam Midsole',
+      'Material': 'Engineered Mesh Upper',
+      'Weight': '9.8 oz (Size 9)',
+      'Warranty': '90-Day Satisfaction Guarantee',
+    };
+  }
   
   if (cat.includes('bench') || title.includes('bench')) {
     return {
@@ -290,15 +301,6 @@ function getFallbackSpecs(product: ProductSource): Record<string, string> {
     };
   }
 
-  if (cat.includes('run') || title.includes('running') || title.includes('shoe')) {
-    return {
-      'Type': 'Neutral / Stability Support',
-      'Cushioning': 'High-Energy Foam Midsole',
-      'Material': 'Engineered Mesh Upper',
-      'Weight': '9.8 oz (Size 9)',
-      'Warranty': '90-Day Satisfaction Guarantee',
-    };
-  }
 
   return {
     'Adjustability': 'Fixed / Standard Fit',
