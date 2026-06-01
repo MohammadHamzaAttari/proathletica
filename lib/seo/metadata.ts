@@ -35,7 +35,7 @@ export function buildMetadata(input: PageMetaInput = {}): Metadata {
 
   return {
     metadataBase: new URL(baseUrl),
-    title: input.title, // If undefined, layout template uses 'default'
+    title: input.title ? { absolute: `${input.title} | ${SITE_NAME}` } : undefined,
     description: description.length > 160 ? description.slice(0, 157) + '...' : description,
     alternates: { canonical },
     robots: input.noindex

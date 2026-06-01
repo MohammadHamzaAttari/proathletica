@@ -18,7 +18,8 @@ export const revalidate = 3600;
 
 export const metadata = buildMetadata({
   title: 'Best Home Fitness Gear 2026 — Expertly Tested & Ranked',
-  description: 'Independent, data-backed reviews of the best home gym equipment of 2026. We rank adjustable dumbbells, weight benches, and more based on 47,000+ data points.',
+  description: '306 fitness products ranked by 47,000+ data points. Expert-tested home gym gear — no paid placements. Find your perfect setup → ProAthletica',
+  canonical: '/',
 });
 
 /* ─────────────────────────────────────────────

@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   
   const shortTitle = product.short_title || product.title.split(' ').slice(0, 5).join(' ');
   return buildMetadata({
-    title: `${shortTitle} Review 2026: Pros, Cons & Verdict`,
+    title: `${shortTitle} Review 2026`,
     description: `Expert review of the ${product.title}. We tested it for durability, performance, and value. See our honest verdict and price trends. Updated May 2026.`,
     canonical: `/product/${params.slug}`,
     pinterestImage: `/api/pinterest/${product.asin || product.id}`,
@@ -92,7 +92,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
                   {product.image_url ? (
                     <Image
                       src={product.image_url.replace('UL320', 'SL800')}
-                      alt={shortTitle}
+                      alt={`${shortTitle} Review & Test Results`}
                       width={800}
                       height={800}
                       className="object-contain w-full h-full"

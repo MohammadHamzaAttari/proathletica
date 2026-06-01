@@ -19,10 +19,10 @@ import { jsonLdProps, organizationSchema, websiteSchema } from '@/lib/seo/schema
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `Best Home Fitness Gear 2026 — Tested & Ranked`,
+    default: `Best Home Fitness Gear 2026 — Expertly Tested & Ranked | ${SITE_NAME}`,
     template: `%s | ${SITE_NAME}`,
   },
-  description: "Independent, data-backed reviews of the best home gym equipment, adjustable dumbbells, and fitness gear for 2026. Expertly tested for quality and value.",
+  description: "Discover the best home fitness gear for 2026 — ranked using 47,000+ data points by certified coaches. Compare 306 products. No paid placements.",
   applicationName: SITE_NAME,
   authors: [{ name: SITE_NAME }],
   referrer: 'strict-origin-when-cross-origin',
