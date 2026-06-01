@@ -15,10 +15,16 @@ const CATEGORY_LINKS = [
 const COMPANY_LINKS = [
   { href: '/about', label: 'About' },
   { href: '/methodology', label: 'Our Methodology' },
-  { href: '/best/best-home-gym-equipment-2026', label: 'Best of 2026' },
+  { href: '/categories', label: 'Best of 2026' },
   { href: '/compare', label: 'Compare Products' },
   { href: '/contact', label: 'Contact' },
   { href: '/disclosure', label: 'Affiliate Disclosure' },
+];
+
+const TOOL_LINKS = [
+  { href: '/tools/calorie-calculator', label: 'Calorie Calculator' },
+  { href: '/search', label: 'Search Gear' },
+  { href: '/sitemap.xml', label: 'XML Sitemap' },
 ];
 
 const LEGAL_LINKS = [
@@ -106,6 +112,25 @@ export function Footer() {
                       className="flex items-center gap-2 text-sm text-neutral-500 hover:text-data-lime transition-colors duration-150"
                     >
                       <span className="text-data-lime/50 text-xs">→</span>
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+
+          {/* Tools */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-black uppercase tracking-[0.18em] text-offwhite">Tools</h3>
+            <nav aria-label="Footer tools navigation">
+              <ul className="space-y-2.5">
+                {TOOL_LINKS.map(({ href, label }) => (
+                  <li key={href}>
+                    <Link
+                      href={href}
+                      className="text-sm text-neutral-500 hover:text-offwhite transition-colors duration-150"
+                    >
                       {label}
                     </Link>
                   </li>

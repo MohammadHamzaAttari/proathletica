@@ -26,9 +26,14 @@ export function buildMetadata(input: PageMetaInput = {}): Metadata {
   // FIX (Audit v3): Robust canonical handling.
   const baseUrl = SITE_URL.replace(/\/$/, '');
   const canonicalPath = input.canonical || '';
-  const canonical = canonicalPath.startsWith('http')
-    ? canonicalPath
-    : `${baseUrl}${canonicalPath.startsWith('/') ? '' : '/'}${canonicalPath}`.replace(/\/$/, '');
+  const canonical = (
+    canonicalPath.startsWith('http')
+      ? canonicalPath
+      : `${baseUrl}${canonicalPath.startsWith('/') ? '' : '/'}${canonicalPath}`
+  )
+    .split('?')[0]
+    .split('#')[0]
+    .replace(/\/$/, '');
 
   const image = input.image || `${baseUrl}/opengraph-image`;
 

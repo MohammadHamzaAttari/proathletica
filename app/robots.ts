@@ -10,7 +10,24 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       // Default: allow all, block internal API and admin
-      { userAgent: '*', allow: '/', disallow: ['/api/', '/admin/'] },
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: [
+          '/api/',
+          '/admin/',
+          '/*?q=*',
+          '/*?focus=*',
+          '/*?category=*',
+          '/*?brand=*',
+          '/*?sort=*',
+          '/*?tags=*',
+          '/*?page=*',
+          '/*?minPrice=*',
+          '/*?maxPrice=*',
+          '/*?ids=*',
+        ],
+      },
 
       // FIX: explicitly allow AI crawlers (they respect robots.txt)
       { userAgent: 'GPTBot', allow: '/' },
