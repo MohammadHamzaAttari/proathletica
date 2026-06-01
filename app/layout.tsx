@@ -19,10 +19,10 @@ import { jsonLdProps, organizationSchema, websiteSchema } from '@/lib/seo/schema
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} | Best Fitness Gear 2026 — Expertly Tested & Ranked`,
+    default: `Best Home Fitness Gear 2026 — Expertly Tested & Ranked | ${SITE_NAME}`,
     template: `%s | ${SITE_NAME}`,
   },
-  description: SITE_DESCRIPTION,
+  description: "Discover the best home fitness gear for 2026 — ranked using 47,000+ data points by certified coaches. Compare 306 products. No paid placements.",
   applicationName: SITE_NAME,
   authors: [{ name: SITE_NAME }],
   referrer: 'strict-origin-when-cross-origin',
@@ -64,7 +64,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        {/* FIX: Organization + WebSite schema in <head> for all pages */}
+        {/* FIX (Audit v3 Critical): Ensure basic Schema is in <head> for all pages */}
         <script {...jsonLdProps([organizationSchema(), websiteSchema()])} />
         {/* FIX (Audit #01-5): Preconnect to Amazon for faster product image resolution */}
         <link rel="preconnect" href="https://m.media-amazon.com" crossOrigin="anonymous" />

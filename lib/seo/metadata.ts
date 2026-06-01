@@ -21,28 +21,29 @@ interface PageMetaInput {
  * Facebook, and AI crawlers all see it.
  */
 export function buildMetadata(input: PageMetaInput = {}): Metadata {
-  const pageTitle = input.title || '';
-  const fullTitle = pageTitle ? `${pageTitle} | ${SITE_NAME}` : SITE_NAME;
   const description = input.description || SITE_DESCRIPTION;
-  const canonical = input.canonical
-    ? input.canonical.startsWith('http')
-      ? input.canonical
-      : `${SITE_URL}${input.canonical.startsWith('/') ? '' : '/'}${input.canonical}`
-    : SITE_URL;
-  const image = input.image || `${SITE_URL}/opengraph-image`;
+
+  // FIX (Audit v3): Robust canonical handling.
+  // Ensure we have a trailing-slash-free base URL and correct paths.
+  const baseUrl = SITE_URL.replace(/\/$/, '');
+  const canonicalPath = input.canonical || '';
+  const canonical = canonicalPath.startsWith('http')
+    ? canonicalPath
+    : `${baseUrl}${canonicalPath.startsWith('/') ? '' : '/'}${canonicalPath}`.replace(/\/$/, '');
+
+  const image = input.image || `${baseUrl}/opengraph-image`;
 
   return {
-    metadataBase: new URL(SITE_URL),
-    title: fullTitle,
-    description,
-    // FIX: canonical is now server-rendered HTML, not a client useEffect
+    metadataBase: new URL(baseUrl),
+    title: input.title ? { absolute: `${input.title} | ${SITE_NAME}` } : undefined,
+    description: description.length > 160 ? description.slice(0, 157) + '...' : description,
     alternates: { canonical },
     robots: input.noindex
       ? { index: false, follow: false }
       : { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
     openGraph: {
-      title: fullTitle,
-      description,
+      title: input.title || SITE_NAME,
+      description: description.length > 160 ? description.slice(0, 157) + '...' : description,
       url: canonical,
       siteName: SITE_NAME,
       type: input.type || 'website',
@@ -58,8 +59,8 @@ export function buildMetadata(input: PageMetaInput = {}): Metadata {
     },
     twitter: {
       card: 'summary_large_image',
-      title: fullTitle,
-      description,
+      title: input.title || SITE_NAME,
+      description: description.length > 160 ? description.slice(0, 157) + '...' : description,
       images: [image],
     },
     other: {

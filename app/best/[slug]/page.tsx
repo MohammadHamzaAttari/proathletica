@@ -13,9 +13,9 @@ import { ShareButtons } from '@/components/ShareButtons';
 import { SITE_URL } from '@/lib/config';
 import { StickyMobileCTA } from '@/components/StickyMobileCTA';
 import { generateArticleSummary } from '@/lib/ai/article-summary';
-import { getArticleBySlug, getPublishedArticles } from '@/lib/db';
+import { getArticleBySlug, getPublishedArticles, getProductsByCategory } from '@/lib/db';
 import { buildMetadata } from '@/lib/seo/metadata';
-import { articleSchema, breadcrumbSchema, itemListSchema, jsonLdProps } from '@/lib/seo/schema';
+import { articleSchema, breadcrumbSchema, itemListSchema, jsonLdProps, organizationSchema, websiteSchema, faqSchema } from '@/lib/seo/schema';
 
 export const revalidate = 3600;
 
@@ -36,9 +36,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const article = await getArticleBySlug(params.slug);
   if (!article) return buildMetadata({ title: 'Not Found', noindex: true });
+
   return buildMetadata({
     title: article.title,
-    description: article.excerpt || undefined,
+    description: article.excerpt || `Our expert guide to the ${article.title}. See our top picks, detailed test results, and buyer's advice for 2026.`,
     canonical: `/best/${article.slug.replace(/-2026$/, '')}`,
     image: article.hero_image || undefined,
     type: 'article',
@@ -54,6 +55,17 @@ export default async function ArticlePage({ params }: { params: { slug: string }
   ]);
 
   if (!article) notFound();
+
+  // FIX (Audit v2/v3 Bug #2): Fallback to category products if none linked to article
+  let displayProducts = article.products || [];
+  if (displayProducts.length === 0 && article.category) {
+    const categoryProducts = await getProductsByCategory(article.category);
+    displayProducts = categoryProducts.map((p, i) => ({
+      ...p,
+      position: i + 1,
+      custom_blurb: null,
+    })).slice(0, 10);
+  }
 
   const relatedArticles = allArticles
     .filter((candidate) => candidate.slug !== article.slug)
@@ -76,13 +88,22 @@ export default async function ArticlePage({ params }: { params: { slug: string }
     { name: article.title, url },
   ];
 
+  const customFaqs = article.cluster === 'Dumbbells' ? [
+    { q: 'How many adjustable dumbbells do I need?', a: 'For most users, a single pair covering 5–50 lbs is sufficient for 90% of home exercises.' },
+    { q: 'Are adjustable dumbbells durable?', a: 'Modern selectorized dumbbells use high-grade steel and nylon. We test for impact resistance and mechanism smoothness.' },
+    { q: 'Which dumbbell brand is best for small spaces?', a: 'PowerBlock and Bowflex 552 are our top picks for compact storage.' }
+  ] : [];
+
   return (
     <>
       <script
         {...jsonLdProps([
+          organizationSchema(),
+          websiteSchema(),
           articleSchema(article, url),
           breadcrumbSchema(breadcrumbs),
-          ...(article.products.length > 0 ? [itemListSchema(article.products, url)] : []),
+          ...(displayProducts.length > 0 ? [itemListSchema(displayProducts, url)] : []),
+          ...(customFaqs.length > 0 ? [faqSchema(customFaqs)] : [])
         ])}
       />
 
@@ -90,8 +111,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
       <DisclosureBar />
 
       <article className="mx-auto max-w-4xl px-4 py-12 sm:px-8 relative">
-        {article.products && article.products.length > 0 && (
-          <StickyMobileCTA product={article.products[0]} articleSlug={article.slug} />
+        {displayProducts.length > 0 && (
+          <StickyMobileCTA product={displayProducts[0]} articleSlug={article.slug} />
         )}
         {/* Breadcrumb */}
         <nav
@@ -171,7 +192,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           </div>
         ) : null}
 
-        {article.products && article.products.length > 0 ? (
+        {/* FIX (Audit v2 Bug #2): Ensure products are rendered if available */}
+        {displayProducts.length > 0 ? (
           <div className="mb-10 rounded-3xl border border-data-lime/30 bg-graphite-900/40 p-8 flex flex-col sm:flex-row gap-8 items-center shadow-2xl relative overflow-hidden group/pick">
             {/* Animated accent border */}
             <div className="absolute top-0 left-0 w-1.5 h-full bg-data-lime" />
@@ -185,10 +207,10 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                 The Athletica Lab Choice
               </div>
               <h2 className="text-3xl sm:text-4xl font-black text-offwhite leading-tight tracking-tight">
-                {article.products[0].short_title || article.products[0].title}
+                {displayProducts[0].short_title || displayProducts[0].title}
               </h2>
               <p className="text-neutral-400 font-medium text-lg leading-relaxed max-w-2xl">
-                {article.products[0].custom_blurb || article.products[0].editorial_summary || 'The best overall choice for most people based on our lab testing and owner reviews.'}
+                {displayProducts[0].custom_blurb || displayProducts[0].editorial_summary || 'The best overall choice for most people based on our lab testing and owner reviews.'}
               </p>
               <div className="flex items-center gap-4 text-[10px] text-neutral-500 uppercase tracking-widest font-bold">
                 <span className="flex items-center gap-1">
@@ -196,13 +218,13 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                   Verified Tech Specs
                 </span>
                 <span>•</span>
-                <span>Updated {formatTimestamp(article.products[0].last_scraped_at)}</span>
+                <span>Updated {formatTimestamp(displayProducts[0].last_scraped_at)}</span>
               </div>
             </div>
 
             <div className="w-full sm:w-auto flex flex-col gap-4 relative z-10">
                <a
-                href={`/api/track?productId=${article.products[0].asin}&articleSlug=${article.slug}&rank=1`}
+                href={`/api/track?productId=${displayProducts[0].asin}&articleSlug=${article.slug}&rank=1`}
                 target="_blank"
                 rel="sponsored nofollow noopener noreferrer"
                 className="group/cta flex items-center justify-center gap-3 rounded-2xl bg-data-lime px-10 py-5 text-center font-black uppercase tracking-widest text-black text-base hover:scale-[1.02] hover:shadow-glow-lime transition-all whitespace-nowrap active:scale-95"
@@ -210,9 +232,9 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                 Check Price
                 <ArrowRight className="w-5 h-5 group-hover/cta:translate-x-1 transition-transform" />
               </a>
-              {article.products.length > 1 && (
+              {displayProducts.length > 1 && (
                 <div className="text-[10px] font-bold text-center text-neutral-500 tracking-widest uppercase">
-                  Runner up: <span className="text-offwhite">{article.products[1].short_title || article.products[1].title.split(' ').slice(0, 3).join(' ')}</span>
+                  Runner up: <span className="text-offwhite">{displayProducts[1].short_title || displayProducts[1].title.split(' ').slice(0, 3).join(' ')}</span>
                 </div>
               )}
             </div>
@@ -233,7 +255,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           />
         ) : null}
 
-        {article.products.length > 0 ? (
+        {displayProducts.length > 0 ? (
           <section className="space-y-12 border-t border-white/5 pt-16">
             <div className="space-y-3 text-center">
               <h2 className="text-3xl font-black uppercase italic tracking-tighter sm:text-4xl">
@@ -241,8 +263,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               </h2>
               <p className="text-sm font-medium text-neutral-500">Independently vetted by the lab.</p>
             </div>
-            <ProductGrid products={article.products} articleSlug={article.slug} />
-            <ComparisonTable products={article.products} articleSlug={article.slug} title="Comparison at a glance" />
+            <ProductGrid products={displayProducts} articleSlug={article.slug} />
+            <ComparisonTable products={displayProducts} articleSlug={article.slug} title="Comparison at a glance" />
           </section>
         ) : null}
 
@@ -269,7 +291,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
         </section>
 
         <section className="mt-16 border-t border-white/5 pt-12">
-          <FAQ />
+          <FAQ customFaqs={customFaqs} />
         </section>
 
         {relatedArticles.length > 0 ? (

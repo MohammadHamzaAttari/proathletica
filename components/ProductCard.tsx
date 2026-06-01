@@ -169,7 +169,7 @@ export function ProductCard({
         {product.image_url ? (
           <Image
             src={product.image_url.replace(/\._AC_UL\d+_\.jpg/, '._AC_SL800_.jpg')}
-            alt={shortTitle}
+              alt={`${shortTitle} Review & Test Results`}
             fill
             unoptimized
             className="object-contain p-4"

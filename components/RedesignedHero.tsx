@@ -59,8 +59,8 @@ export default function RedesignedHero() {
               </div>
 
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-offwhite leading-[0.95] tracking-tight">
-                THE FUTURE OF <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-data-lime to-emerald-400">HOME FITNESS.</span>
+                BEST HOME <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-data-lime to-emerald-400">FITNESS GEAR 2026.</span>
               </h1>
 
               <p className="mt-4 text-base md:text-lg text-neutral-400 max-w-xl leading-relaxed">
