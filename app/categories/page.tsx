@@ -88,8 +88,35 @@ export default async function CategoriesPage() {
         </div>
       )}
 
+      {/* Tools Section (Audit Fix) */}
+      <div className="mt-24 space-y-8">
+        <div className="space-y-2">
+          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-trust-blue">Athletic Performance</div>
+          <h2 className="text-3xl font-black uppercase italic tracking-tighter text-white leading-none">Free Precision Tools</h2>
+        </div>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <Link
+            href="/tools/calorie-calculator"
+            className="group relative overflow-hidden rounded-card border border-white/[0.06] bg-graphite-800 p-8 transition-all hover:border-trust-blue/30"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-trust-blue/10 text-trust-blue mb-4">
+              <Zap className="w-6 h-6" />
+            </div>
+            <h3 className="text-xl font-black uppercase tracking-tight text-white group-hover:text-trust-blue transition-colors">Daily Calorie Calculator</h3>
+            <p className="mt-2 text-sm text-neutral-500 leading-relaxed">Calculate your maintenance calories using the data-verified Mifflin-St Jeor equation.</p>
+            <div className="mt-6 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-trust-blue">
+              Calculate Now <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
+          <div className="rounded-card border border-white/[0.06] bg-neutral-900/20 p-8 border-dashed flex flex-col justify-center">
+            <h3 className="text-lg font-black uppercase tracking-tight text-neutral-600">More Tools Coming Soon</h3>
+            <p className="mt-1 text-sm text-neutral-700 uppercase font-bold tracking-widest">1RM Tracker · Macro Distribution</p>
+          </div>
+        </div>
+      </div>
+
       {/* Trust Footer */}
-      <div className="mt-24 rounded-card border border-white/[0.06] bg-neutral-900/40 p-10">
+      <div className="mt-12 rounded-card border border-white/[0.06] bg-neutral-900/40 p-10">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
           <div className="space-y-2">
             <h3 className="text-xl font-black uppercase tracking-tight text-offwhite">The Independent Standard</h3>

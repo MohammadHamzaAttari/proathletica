@@ -24,18 +24,28 @@ export function buildMetadata(input: PageMetaInput = {}): Metadata {
   const description = input.description || SITE_DESCRIPTION;
 
   // FIX (Audit v3): Robust canonical handling.
-  // Ensure we have a trailing-slash-free base URL and correct paths.
   const baseUrl = SITE_URL.replace(/\/$/, '');
   const canonicalPath = input.canonical || '';
-  const canonical = canonicalPath.startsWith('http')
-    ? canonicalPath
-    : `${baseUrl}${canonicalPath.startsWith('/') ? '' : '/'}${canonicalPath}`.replace(/\/$/, '');
+  const canonical = (
+    canonicalPath.startsWith('http')
+      ? canonicalPath
+      : `${baseUrl}${canonicalPath.startsWith('/') ? '' : '/'}${canonicalPath}`
+  )
+    .split('?')[0]
+    .split('#')[0]
+    .replace(/\/$/, '');
 
   const image = input.image || `${baseUrl}/opengraph-image`;
 
+  // FIX (Audit v5): Use template correctly. Layout appends | SITE_NAME
+  // If we want absolute control, we use { absolute: ... }
+  // But to avoid duplication, we provide just the title and let template handle it,
+  // OR we provide absolute title and ensure layout doesn't double-dip.
+  const pageTitle = input.title;
+
   return {
     metadataBase: new URL(baseUrl),
-    title: input.title ? { absolute: `${input.title} | ${SITE_NAME}` } : undefined,
+    title: pageTitle ? { absolute: `${pageTitle} | ${SITE_NAME}` } : undefined,
     description: description.length > 160 ? description.slice(0, 157) + '...' : description,
     alternates: { canonical },
     robots: input.noindex

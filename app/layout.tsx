@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: `Best Home Fitness Gear 2026 — Expertly Tested & Ranked | ${SITE_NAME}`,
-    template: `%s | ${SITE_NAME}`,
+    template: `%s`, // v5: remove template suffix to avoid double brand name
   },
   description: "Discover the best home fitness gear for 2026 — ranked using 47,000+ data points by certified coaches. Compare 306 products. No paid placements.",
   applicationName: SITE_NAME,

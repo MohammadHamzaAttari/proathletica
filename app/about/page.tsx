@@ -42,6 +42,7 @@ const EDITORS = [
 
 export default function AboutPage() {
   const schemas = EDITORS.map(e => personSchema({
+    id: e.id,
     name: e.name,
     jobTitle: e.role,
     description: e.bio,

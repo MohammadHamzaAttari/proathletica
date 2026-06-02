@@ -11,7 +11,7 @@ import { HomepageFilters } from '@/components/HomepageFilters';
 import { LifestyleHubs } from '@/components/LifestyleHubs';
 import { Newsletter } from '@/components/Newsletter';
 import { getAllProducts, getCategoryList, getPublishedArticles } from '@/lib/db';
-import { itemListSchema, jsonLdProps, howToSchema, faqSchema, organizationSchema, websiteSchema } from '@/lib/seo/schema';
+import { itemListSchema, jsonLdProps, howToSchema, faqSchema } from '@/lib/seo/schema';
 import { buildMetadata } from '@/lib/seo/metadata';
 
 export const revalidate = 3600;
@@ -117,8 +117,6 @@ export default async function HomePage() {
 
   /* JSON-LD schemas */
   const schemas = [
-    organizationSchema(),
-    websiteSchema(),
     ...(featured.length > 0 ? [itemListSchema(featured.slice(0, 12), '/')] : []),
     faqSchema(faqItems),
     howToSchema({

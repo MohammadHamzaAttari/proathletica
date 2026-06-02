@@ -43,6 +43,7 @@ export default async function AuthorBioPage({ params }: { params: { slug: string
   }).slice(0, 3);
 
   const schema = personSchema({
+    id: author.id,
     name: author.name,
     jobTitle: author.role,
     description: author.longBio,

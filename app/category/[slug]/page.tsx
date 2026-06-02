@@ -11,7 +11,7 @@ import { QuickFilters } from '@/components/QuickFilters';
 import { slugToTitle } from '@/lib/format';
 import { getCategoryList, getProductsByCategory } from '@/lib/db';
 import { buildMetadata } from '@/lib/seo/metadata';
-import { breadcrumbSchema, itemListSchema, jsonLdProps, organizationSchema, websiteSchema } from '@/lib/seo/schema';
+import { breadcrumbSchema, itemListSchema, jsonLdProps } from '@/lib/seo/schema';
 
 export const revalidate = 3600;
 
@@ -52,7 +52,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
 
   return (
     <>
-      <script {...jsonLdProps([organizationSchema(), websiteSchema(), breadcrumbSchema(breadcrumbs), itemListSchema(products, url)])} />
+      <script {...jsonLdProps([breadcrumbSchema(breadcrumbs), itemListSchema(products, url)])} />
       <DisclosureBar />
 
       <div className="mx-auto max-w-6xl px-6 py-12">
