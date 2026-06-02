@@ -65,6 +65,7 @@ export function normalizeCategory(category?: string | null): string {
   return category
     .trim()
     .toLowerCase()
+    .replace(/[-_]/g, ' ')
     .replace(/\s+/g, ' ')
     .split(' ')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))

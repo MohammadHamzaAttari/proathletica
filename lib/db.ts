@@ -50,24 +50,30 @@ export const getProductById = unstable_cache(
 export async function getProductsByCategory(categorySlug: string): Promise<Product[]> {
   const products = await getAllProducts();
   const targetSlug = categorySlug.toLowerCase().replace(/^best-/, '').replace(/-gear$/, '');
-  const filtered = products.filter((p) => {
-    const normalized = normalizeCategory(p.category).toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    return normalized.includes(targetSlug) || targetSlug.includes(normalized);
+  return products.filter((p) => {
+    const name = normalizeCategory(p.category);
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    return slug === targetSlug;
   });
-  return filtered.length > 0 ? filtered : products;
 }
 
 export async function getCategoryList(): Promise<Array<{ name: string; slug: string; count: number }>> {
   const products = await getAllProducts();
-  const map = new Map<string, number>();
+  const map = new Map<string, { name: string; count: number }>();
   for (const product of products) {
-    const category = normalizeCategory(product.category);
-    map.set(category, (map.get(category) || 0) + 1);
+    const name = normalizeCategory(product.category);
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const existing = map.get(slug);
+    if (existing) {
+      existing.count += 1;
+    } else {
+      map.set(slug, { name, count: 1 });
+    }
   }
   return Array.from(map.entries())
-    .map(([name, count]) => ({
+    .map(([slug, { name, count }]) => ({
       name,
-      slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      slug,
       count,
     }))
     .sort((a, b) => b.count - a.count);
