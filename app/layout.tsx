@@ -1,7 +1,14 @@
 import type { Metadata, Viewport } from 'next';
+import { Inter } from 'next/font/google';
 import Script from 'next/script';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import './globals.css';
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-sans',
+});
 import { CookieConsent } from '@/components/CookieConsent';
 import { ExitIntentModal } from '@/components/ExitIntentModal';
 import { Footer } from '@/components/Footer';
@@ -89,7 +96,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className="min-h-screen bg-[#0A0D12] font-sans text-neutral-100 antialiased">
+      <body className={`${inter.variable} min-h-screen bg-[#0A0D12] font-sans text-neutral-100 antialiased`}>
         <Header />
         <CompareProvider>
           <main>{children}</main>

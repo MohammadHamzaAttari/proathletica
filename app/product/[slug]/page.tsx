@@ -96,7 +96,6 @@ export default async function ProductPage({ params }: { params: { slug: string }
                       width={800}
                       height={800}
                       className="object-contain w-full h-full"
-                      unoptimized
                       priority
                     />
                   ) : (

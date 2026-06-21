@@ -48,11 +48,7 @@ export default function RedesignedHero() {
         <div className="grid lg:grid-cols-12 gap-16 items-center">
           {/* Left Content */}
           <div className="lg:col-span-7 space-y-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
+            <div className="space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-morphism border-white/10 text-offwhite/80 text-[10px] font-bold tracking-widest uppercase mb-4">
                 <span className="flex h-1.5 w-1.5 rounded-full bg-data-lime animate-pulse" />
                 Independent Data Labs
@@ -66,15 +62,10 @@ export default function RedesignedHero() {
               <p className="mt-4 text-base md:text-lg text-neutral-400 max-w-xl leading-relaxed">
                 We&apos;ve decoded 47,000+ data points to rank the gear that actually transforms your home gym. No fluff, just science-backed rankings.
               </p>
-            </motion.div>
+            </div>
 
             {/* Amazon-style Functional Search */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="relative max-w-xl group"
-            >
+            <div className="relative max-w-xl group">
               <div className="absolute -inset-1 bg-gradient-to-r from-data-lime/20 to-trust-blue/20 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000" />
               <form
                 onSubmit={handleSearch}
@@ -102,14 +93,9 @@ export default function RedesignedHero() {
                 <Link href="/?q=benches#top-picks" className="hover:text-data-lime transition-colors">Benches</Link>
                 <Link href="/?q=racks#top-picks" className="hover:text-data-lime transition-colors">Power Racks</Link>
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="flex flex-wrap gap-5 items-center"
-            >
+            <div className="flex flex-wrap gap-5 items-center">
               <Link href="#top-picks" className="cta-primary h-12 px-8 rounded-xl text-sm">
                 Explore Rankings
                 <ArrowRight className="w-4 h-4" />
@@ -120,7 +106,7 @@ export default function RedesignedHero() {
                 </div>
                 See How We Test
               </Link>
-            </motion.div>
+            </div>
           </div>
 
           {/* Right Content - Visual Showcase */}
@@ -175,6 +161,7 @@ export default function RedesignedHero() {
                     alt="Hero Showcase"
                     fill
                     priority
+                    sizes="(max-width: 1024px) 1px, 600px"
                     className="object-cover rounded-full opacity-60 mix-blend-screen"
                   />
                 </div>

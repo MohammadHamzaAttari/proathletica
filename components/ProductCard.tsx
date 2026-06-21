@@ -158,8 +158,8 @@ export function ProductCard({
 
   return (
     <article
-      className={`product-card animate-card-in gpu flex flex-col h-full group/card transition-all duration-500 hover:ring-2 hover:ring-data-lime/30 ${isRank1 ? 'product-card--rank1 ring-2 ring-data-lime/40' : ''}`}
-      style={{ animationDelay: `${animationDelay}ms` }}
+      className={`product-card gpu flex flex-col h-full group/card transition-all duration-500 hover:ring-2 hover:ring-data-lime/30 ${isRank1 ? 'product-card--rank1 ring-2 ring-data-lime/40' : 'animate-card-in'}`}
+      style={{ animationDelay: isRank1 ? '0ms' : `${animationDelay}ms` }}
       aria-labelledby={`product-title-${product.id}`}
     >
       {/* ── IMAGE AREA ── */}
