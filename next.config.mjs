@@ -49,6 +49,13 @@ const nextConfig = {
         ],
       },
       {
+        // Prevent indexing of open graph image page route while allowing scraping/crawling of the image
+        source: '/opengraph-image',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+        ],
+      },
+      {
         // FIX (Audit #01-C): immutable cache for hashed static assets
         source: '/_next/static/(.*)',
         headers: [

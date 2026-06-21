@@ -20,15 +20,14 @@ export default function OpenGraphImage() {
           color: 'white',
         }}
       >
-        <div style={{ fontSize: 28, color: '#34d399', fontWeight: 800, textTransform: 'uppercase' }}>
+        <div style={{ display: 'flex', fontSize: 28, color: '#34d399', fontWeight: 800, textTransform: 'uppercase' }}>
           ProAthletica
         </div>
-        <div style={{ fontSize: 72, fontWeight: 900, lineHeight: 1, marginTop: 20 }}>
-          Tested Gear.
-          <br />
-          Real Athletes.
+        <div style={{ display: 'flex', flexDirection: 'column', fontSize: 72, fontWeight: 900, lineHeight: 1.1, marginTop: 20 }}>
+          <div style={{ display: 'flex' }}>Tested Gear.</div>
+          <div style={{ display: 'flex' }}>Real Athletes.</div>
         </div>
-        <div style={{ marginTop: 24, fontSize: 28, color: '#a3a3a3' }}>
+        <div style={{ display: 'flex', marginTop: 24, fontSize: 28, color: '#a3a3a3' }}>
           Independent buyer guides for fitness gear and home gym equipment.
         </div>
       </div>
