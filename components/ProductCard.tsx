@@ -171,7 +171,6 @@ export function ProductCard({
             src={product.image_url.replace(/\._AC_UL\d+_\.jpg/, '._AC_SL800_.jpg')}
               alt={`${shortTitle} Review & Test Results`}
             fill
-            unoptimized
             className="object-contain p-4"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
             priority={rank === 0}
@@ -409,6 +408,7 @@ export function ProductCard({
           <div className="grid grid-cols-2 gap-1.5">
             <Link
               href={`/product/${product.slug || product.asin || product.id}`}
+              aria-label={`Read full review of ${shortTitle}`}
               className="flex items-center justify-center gap-1.5 py-2 text-[8px] font-black uppercase tracking-wider text-neutral-500 hover:text-offwhite transition-colors border border-white/[0.04] rounded-lg hover:bg-white/[0.04] bg-white/[0.01]"
             >
               📖 Review

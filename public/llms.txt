@@ -1,26 +1,22 @@
-# ProAthletica (athletica.page)
+# ProAthletica
 
-ProAthletica is a data-driven fitness equipment review platform. We analyze thousands of verified customer reviews and technical specifications to rank home gym gear.
+> ProAthletica is a data-driven fitness equipment review platform. We analyze 47,000+ verified customer reviews and technical specifications to rank home gym gear — with no paid placements.
 
-## Editorial Focus
-- Home gym equipment for small spaces, apartments, and busy parents.
-- Independent, data-driven rankings with no paid placements.
-- Transparent methodology using the Athletica Lab protocol.
+## Pages
 
-## Key Resources
-- Homepage: https://www.athletica.page/
-- About Our Mission: https://www.athletica.page/about
-- Editorial Methodology: https://www.athletica.page/methodology
-- Top Picks Roundup: https://www.athletica.page/best/best-home-gym-equipment
-- Equipment Categories: https://www.athletica.page/categories
+- [Homepage](https://www.athletica.page/) — Browse top-ranked fitness gear and data-driven recommendations
+- [About Our Mission](https://www.athletica.page/about) — Meet the editorial team and learn our story
+- [Editorial Methodology](https://www.athletica.page/methodology) — How our 100-point Athletica Lab scoring system works
+- [Equipment Categories](https://www.athletica.page/categories) — Browse gear by training focus
+- [Best Home Gym Equipment](https://www.athletica.page/best/best-home-gym-equipment) — Top picks roundup
 
-## Methodology Summary
-We use a proprietary 100-point scoring system based on:
-1. Durability & Material Specs (Steel gauge, warranty)
-2. Performance Benchmarks (Adjustability, stability)
-3. Owner Sentiment (Analyzing 47,000+ verified reviews)
-4. Value for Money (Total cost of ownership)
+## API Endpoints
+
+- [Products API](https://www.athletica.page/api/products) — Retrieve product data
+- [Recommendations API](https://www.athletica.page/api/recommendations) — AI-powered gear recommendations
+- [Calculator API](https://www.athletica.page/api/calculator) — Performance calculator endpoint
 
 ## Contact
-Email: hello@athletica.page
-Pinterest: https://pinterest.com/proathletica
+
+- Email: hello@athletica.page
+- Pinterest: https://pinterest.com/proathletica

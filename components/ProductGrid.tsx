@@ -165,7 +165,9 @@ export function ProductGrid({
             </div>
           ))
         ) : products.length === 0 ? (
-          <EmptyState filterLabel={emptyFilterLabel} />
+          <div role="listitem" className="col-span-full">
+            <EmptyState filterLabel={emptyFilterLabel} />
+          </div>
         ) : (
           products.map((product, index) => (
             <div key={product.id} role="listitem" className="h-full">

@@ -55,6 +55,7 @@ export function Header() {
             <input
               type="text"
               placeholder="Search gear..."
+              aria-label="Search gear"
               className="h-9 w-48 rounded-xl border border-white/10 bg-white/[0.04] pl-9 pr-4 text-xs font-semibold text-offwhite placeholder:text-neutral-600 focus:border-trust-blue/50 focus:bg-white/[0.08] focus:outline-none transition-all"
             />
           </div>

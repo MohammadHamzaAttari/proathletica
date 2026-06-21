@@ -168,7 +168,7 @@ export function StickyCompareBar({
 
       {/* ── MODAL ── */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-8" role="dialog" aria-modal="true">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-8" role="dialog" aria-modal="true" aria-labelledby="comparison-modal-title">
           <div className="absolute inset-0 bg-[#0A0D12]/95 backdrop-blur-md" onClick={() => setIsModalOpen(false)} />
           
           <div className="relative w-full max-w-7xl max-h-[90vh] glass-card rounded-card overflow-hidden flex flex-col shadow-2xl animate-cardIn">
@@ -177,7 +177,7 @@ export function StickyCompareBar({
             <div className="px-6 py-5 border-b border-white/10 flex items-center justify-between">
               <div>
                 <div className="section-eyebrow">Smart Comparison</div>
-                <h3 className="text-xl font-bold text-offwhite mt-1">Side-by-Side Analysis</h3>
+                <h3 id="comparison-modal-title" className="text-xl font-bold text-offwhite mt-1">Side-by-Side Analysis</h3>
               </div>
               <button onClick={() => setIsModalOpen(false)} className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-neutral-400 hover:text-white transition">
                 <X className="w-5 h-5" />

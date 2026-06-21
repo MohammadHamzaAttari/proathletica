@@ -505,9 +505,10 @@ export function HomepageFilters({
 
       {/* ── CATEGORY ── */}
       <div className="space-y-4">
-        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Category</div>
+        <label htmlFor="category-select" className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Category</label>
         <div className="relative">
           <select
+            id="category-select"
             value={categoryFilter}
             onChange={(e) => updateParams({ category: e.target.value })}
             className="h-11 w-full appearance-none rounded-xl border border-white/10 bg-graphite-900 px-4 text-xs font-bold text-offwhite focus:border-data-lime/50 focus:outline-none"
@@ -542,9 +543,10 @@ export function HomepageFilters({
 
       {/* ── BRANDS ── */}
       <div className="space-y-4">
-        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Brands</div>
+        <label htmlFor="brand-select" className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">Brands</label>
         <div className="relative">
           <select
+            id="brand-select"
             value={brandFilter}
             onChange={(e) => updateParams({ brand: e.target.value })}
             className="h-11 w-full appearance-none rounded-xl border border-white/10 bg-graphite-900 px-4 text-xs font-bold text-offwhite focus:border-data-lime/50 focus:outline-none"
@@ -622,6 +624,7 @@ export function HomepageFilters({
             <select
               value={sortBy}
               onChange={(e) => updateParams({ sort: e.target.value })}
+              aria-label="Sort products"
               className="h-10 appearance-none rounded-lg border border-white/10 bg-graphite-900/50 pl-3 pr-8 text-xs font-bold text-offwhite focus:border-data-lime/50 focus:outline-none"
             >
               <option value="rank">Editor Rank</option>

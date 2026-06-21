@@ -269,6 +269,7 @@ export default async function HomePage() {
             {/* "View all" tile */}
             <Link
               href="/categories"
+              role="listitem"
               className="group flex flex-col items-center justify-center rounded-lg border border-dashed border-white/[0.10] bg-graphite-800/40 p-3 sm:p-4 transition-all hover:border-trust-blue/40 hover:bg-trust-blue/[0.04]"
             >
               <ArrowRight className="w-4 h-4 text-trust-blue mb-1 group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />

@@ -44,11 +44,13 @@ export default function CalorieCalculator() {
 
       <form onSubmit={calculate} className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Gender</label>
-            <div className="flex p-1 rounded-lg bg-graphite-900 border border-white/5">
+          <fieldset className="space-y-2">
+            <legend className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Gender</legend>
+            <div className="flex p-1 rounded-lg bg-graphite-900 border border-white/5" role="radiogroup" aria-label="Gender">
               <button
                 type="button"
+                role="radio"
+                aria-checked={gender === 'male'}
                 onClick={() => setGender('male')}
                 className={`flex-1 py-2 text-xs font-bold rounded-md transition-all ${gender === 'male' ? 'bg-data-lime text-black' : 'text-neutral-400 hover:text-white'}`}
               >
@@ -56,16 +58,19 @@ export default function CalorieCalculator() {
               </button>
               <button
                 type="button"
+                role="radio"
+                aria-checked={gender === 'female'}
                 onClick={() => setGender('female')}
                 className={`flex-1 py-2 text-xs font-bold rounded-md transition-all ${gender === 'female' ? 'bg-data-lime text-black' : 'text-neutral-400 hover:text-white'}`}
               >
                 Female
               </button>
             </div>
-          </div>
+          </fieldset>
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Age</label>
+            <label htmlFor="calc-age" className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Age</label>
             <input
+              id="calc-age"
               type="number"
               value={age}
               onChange={(e) => setAge(e.target.value)}
@@ -78,8 +83,9 @@ export default function CalorieCalculator() {
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Weight (kg)</label>
+            <label htmlFor="calc-weight" className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Weight (kg)</label>
             <input
+              id="calc-weight"
               type="number"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
@@ -89,8 +95,9 @@ export default function CalorieCalculator() {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Height (cm)</label>
+            <label htmlFor="calc-height" className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Height (cm)</label>
             <input
+              id="calc-height"
               type="number"
               value={height}
               onChange={(e) => setHeight(e.target.value)}
@@ -102,8 +109,9 @@ export default function CalorieCalculator() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Activity Level</label>
+          <label htmlFor="calc-activity" className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Activity Level</label>
           <select
+            id="calc-activity"
             value={activity}
             onChange={(e) => setActivity(e.target.value)}
             className="w-full h-11 bg-graphite-900 border border-white/5 rounded-lg px-4 text-sm text-white focus:border-data-lime/50 focus:outline-none appearance-none"

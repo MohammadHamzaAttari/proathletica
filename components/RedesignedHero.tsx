@@ -86,6 +86,7 @@ export default function RedesignedHero() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="What are you training for?"
+                  aria-label="Search training goal"
                   className="w-full bg-transparent border-none focus:ring-0 text-offwhite px-3 py-2 text-base placeholder:text-neutral-600"
                 />
                 <button
@@ -173,6 +174,7 @@ export default function RedesignedHero() {
                     src="/images/hero-bg.png"
                     alt="Hero Showcase"
                     fill
+                    priority
                     className="object-cover rounded-full opacity-60 mix-blend-screen"
                   />
                 </div>
