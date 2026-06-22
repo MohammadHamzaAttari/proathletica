@@ -1,18 +1,20 @@
+import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Trophy, TrendingUp } from 'lucide-react';
-import { BuyerGuide } from '@/components/BuyerGuide';
 import { DisclosureBar } from '@/components/DisclosureBar';
 import { FAQ } from '@/components/FAQ';
-import { GymQuiz } from '@/components/GymQuiz';
 import RedesignedHero from '@/components/RedesignedHero';
 import { HeroStats } from '@/components/HeroStats';
-import { HomepageFilters } from '@/components/HomepageFilters';
-import { LifestyleHubs } from '@/components/LifestyleHubs';
 import { Newsletter } from '@/components/Newsletter';
 import { getAllProducts, getCategoryList, getPublishedArticles } from '@/lib/db';
 import { itemListSchema, jsonLdProps, howToSchema, faqSchema } from '@/lib/seo/schema';
 import { buildMetadata } from '@/lib/seo/metadata';
+
+const BuyerGuide = dynamic(() => import('@/components/BuyerGuide').then(m => m.BuyerGuide));
+const GymQuiz = dynamic(() => import('@/components/GymQuiz').then(m => m.GymQuiz), { ssr: false });
+const HomepageFilters = dynamic(() => import('@/components/HomepageFilters').then(m => m.HomepageFilters));
+const LifestyleHubs = dynamic(() => import('@/components/LifestyleHubs').then(m => m.LifestyleHubs));
 
 export const revalidate = 3600;
 

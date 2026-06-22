@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic';
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
@@ -10,12 +11,13 @@ const inter = Inter({
   variable: '--font-sans',
 });
 import { CookieConsent } from '@/components/CookieConsent';
-import { ExitIntentModal } from '@/components/ExitIntentModal';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { CompareProvider } from '@/components/CompareProvider';
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, PINTEREST_DOMAIN_VERIFY } from '@/lib/config';
 import { jsonLdProps, organizationSchema, websiteSchema } from '@/lib/seo/schema';
+
+const ExitIntentModal = dynamic(() => import('@/components/ExitIntentModal').then(m => m.ExitIntentModal), { ssr: false });
 
 /**
  * FIX (Audit #02-A): global metadata uses Next.js Metadata API — server-rendered.
@@ -101,7 +103,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <CompareProvider>
           <main>{children}</main>
         </CompareProvider>
-        <Footer />
+        <Footer year={new Date().getFullYear()} />
         <CookieConsent />
         <ExitIntentModal />
 

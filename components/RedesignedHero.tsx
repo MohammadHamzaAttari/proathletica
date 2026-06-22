@@ -157,10 +157,11 @@ export default function RedesignedHero() {
                 <div className="relative h-full w-full rounded-full border border-white/5 p-8 overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-tr from-data-lime/10 to-transparent" />
                   <Image
-                    src="/images/hero-bg.png"
+                    src="/images/hero-bg.webp"
                     alt="Hero Showcase"
                     fill
                     priority
+                    quality={75}
                     sizes="(max-width: 1024px) 1px, 600px"
                     className="object-cover rounded-full opacity-60 mix-blend-screen"
                   />

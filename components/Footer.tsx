@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Dumbbell, ExternalLink } from 'lucide-react';
 import { CONTACT_EMAIL } from '@/lib/config';
@@ -33,7 +34,9 @@ const LEGAL_LINKS = [
   { href: '/data-deletion-request', label: 'Data Deletion' },
 ];
 
-export function Footer() {
+export function Footer({ year: initialYear }: { year?: number } = {}) {
+  const [year, setYear] = useState(initialYear ?? 2026);
+  useEffect(() => { setYear(new Date().getFullYear()); }, []);
   return (
     <footer className="border-t border-white/[0.05] bg-[#0A0D12]" role="contentinfo">
       {/* Trust strip above footer */}
@@ -196,7 +199,7 @@ export function Footer() {
       <div className="border-t border-white/[0.04] py-5">
         <div className="container-site flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-2xs text-neutral-700">
-            © {new Date().getFullYear()} ProAthletica. All rights reserved.
+            © {year} ProAthletica. All rights reserved.
           </p>
           <nav aria-label="Legal navigation">
             <ul className="flex items-center gap-4">

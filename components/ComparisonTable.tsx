@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { formatPrice, formatReviewCount, formatTimestamp } from '@/lib/format';
 import type { Product } from '@/lib/types';
 import { ShieldCheck, Star, ChevronDown, ChevronUp, Table } from 'lucide-react';
@@ -28,6 +28,8 @@ export function ComparisonTable({
   title?: string;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [displayDate, setDisplayDate] = useState('');
+  useEffect(() => { setDisplayDate(formatTimestamp(new Date().toISOString())); }, []);
   const rows = products.slice(0, 4);
   if (rows.length === 0) return null;
 
@@ -232,7 +234,7 @@ export function ComparisonTable({
 
           <div className="mt-8 pt-6 border-t border-white/[0.04] text-center">
             <p className="text-2xs text-neutral-600 uppercase tracking-[0.2em] font-bold">
-              Updated {formatTimestamp(new Date().toISOString())} • Data-Verified by ProAthletica Lab
+              {displayDate ? `Updated ${displayDate} • ` : ''}Data-Verified by ProAthletica Lab
             </p>
           </div>
         </div>
