@@ -81,7 +81,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
     content_html: article.content_html,
   });
 
-  const url = `/best/${article.slug}`;
+  const canonicalSlug = article.slug.replace(/-2026$/, '');
+  const url = `/best/${canonicalSlug}`;
   const breadcrumbs = [
     { name: 'Home', url: '/' },
     { name: 'Buyer Guides', url: '/' },
@@ -110,7 +111,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
       <article className="mx-auto max-w-4xl px-4 py-12 sm:px-8 relative">
         {displayProducts.length > 0 && (
-          <StickyMobileCTA product={displayProducts[0]} articleSlug={article.slug} />
+          <StickyMobileCTA product={displayProducts[0]} articleSlug={canonicalSlug} />
         )}
         {/* Breadcrumb */}
         <nav
@@ -222,7 +223,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
             <div className="w-full sm:w-auto flex flex-col gap-4 relative z-10">
                <a
-                href={`/api/track?productId=${displayProducts[0].asin}&articleSlug=${article.slug}&rank=1`}
+                href={`/api/track?productId=${displayProducts[0].asin}&articleSlug=${canonicalSlug}&rank=1`}
                 target="_blank"
                 rel="sponsored nofollow noopener noreferrer"
                 className="group/cta flex items-center justify-center gap-3 rounded-2xl bg-data-lime px-10 py-5 text-center font-black uppercase tracking-widest text-black text-base hover:scale-[1.02] hover:shadow-glow-lime transition-all whitespace-nowrap active:scale-95"
@@ -261,8 +262,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               </h2>
               <p className="text-sm font-medium text-neutral-500">Independently vetted by the lab.</p>
             </div>
-            <ProductGrid products={displayProducts} articleSlug={article.slug} />
-            <ComparisonTable products={displayProducts} articleSlug={article.slug} title="Comparison at a glance" />
+            <ProductGrid products={displayProducts} articleSlug={canonicalSlug} />
+            <ComparisonTable products={displayProducts} articleSlug={canonicalSlug} title="Comparison at a glance" />
           </section>
         ) : null}
 
@@ -306,7 +307,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               {relatedArticles.map((candidate) => (
                 <Link
                   key={candidate.id}
-                  href={`/best/${candidate.slug}`}
+                  href={`/best/${candidate.slug.replace(/-2026$/, '')}`}
                   className="rounded-2xl border border-white/5 bg-neutral-900/30 p-5 hover:border-emerald-500/30"
                 >
                   <div className="text-sm font-black uppercase tracking-wide text-emerald-400">
@@ -323,7 +324,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
         ) : null}
 
         <section className="mt-16 border-t border-white/5 pt-12">
-          <Newsletter source={`article:${article.slug}`} />
+          <Newsletter source={`article:${canonicalSlug}`} />
         </section>
       </article>
     </>

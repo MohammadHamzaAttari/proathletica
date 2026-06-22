@@ -75,7 +75,7 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
               filteredArticles.slice(0, 12).map((article) => (
                 <Link
                   key={article.id}
-                  href={`/best/${article.slug}`}
+                  href={`/best/${article.slug.replace(/-2026$/, '')}`}
                   className="block rounded-2xl border border-white/5 bg-neutral-900/40 p-5 hover:border-emerald-500/30"
                 >
                   <div className="text-sm font-black text-white">{article.title}</div>
