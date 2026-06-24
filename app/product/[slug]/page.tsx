@@ -1,12 +1,12 @@
-import { notFound } from 'next/navigation';
-import { getProductById, getAllProducts } from '@/lib/db';
+import { notFound, redirect } from 'next/navigation';
+import { getProductById, getAllProducts, getPublishedArticles } from '@/lib/db';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { productSchema, jsonLdProps, breadcrumbSchema } from '@/lib/seo/schema';
 import { DisclosureBar } from '@/components/DisclosureBar';
 import { formatPrice, formatTimestamp } from '@/lib/format';
 import Image from 'next/image';
 import Link from 'next/link';
-import { User, Calendar, FlaskConical, ShieldCheck } from 'lucide-react';
+import { User, Calendar, FlaskConical, ShieldCheck, Ruler, Clock } from 'lucide-react';
 import { AUTHORS } from '@/lib/editorial';
 import { MultiMerchantSelector } from '@/components/MultiMerchantSelector';
 import { PriceTrackerTrigger } from '@/components/PriceTrackerTrigger';
@@ -18,6 +18,10 @@ export async function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug || p.asin || p.id }));
 }
 
+function canonicalSlug(product: { slug?: string | null; asin?: string; id: string }): string {
+  return product.slug || product.asin?.toLowerCase() || product.id;
+}
+
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const product = await getProductById(params.slug);
   if (!product) return buildMetadata({ title: 'Product Not Found', noindex: true });
@@ -26,7 +30,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return buildMetadata({
     title: `${shortTitle} Review 2026`,
     description: `Expert review of the ${product.title}. We tested it for durability, performance, and value. See our honest verdict and price trends. Updated May 2026.`,
-    canonical: `/product/${params.slug}`,
+    canonical: `/product/${canonicalSlug(product)}`,
     pinterestImage: `/api/pinterest/${product.asin || product.id}`,
     image: product.image_url || undefined,
     priceAmount: product.price_cents ? product.price_cents / 100 : undefined,
@@ -35,11 +39,23 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function ProductPage({ params }: { params: { slug: string } }) {
-  const product = await getProductById(params.slug);
+  const [product, allArticles] = await Promise.all([
+    getProductById(params.slug),
+    getPublishedArticles(),
+  ]);
   if (!product) notFound();
+
+  const canonical = canonicalSlug(product);
+  if (params.slug !== canonical) {
+    redirect(`/product/${canonical}`);
+  }
 
   const shortTitle = product.short_title || product.title.split(' ').slice(0, 6).join(' ');
   const verdict = product.editorial_summary || 'Strong performance with measurable tradeoffs versus competitors.';
+
+  const relatedArticles = allArticles
+    .filter((a) => a.category === product.category || a.cluster === product.category?.toLowerCase().replace(/\s+/g, '-'))
+    .slice(0, 3);
 
   const breadcrumbs = [
     { name: 'Home', url: '/' },
@@ -188,6 +204,20 @@ export default async function ProductPage({ params }: { params: { slug: string }
                 </p>
               </div>
 
+              {/* Data-driven review summary for unique content */}
+              <div className="space-y-4 text-sm leading-relaxed text-neutral-300 border border-white/5 rounded-3xl p-8 bg-neutral-900/30">
+                <div className="uppercase text-xs font-black tracking-[0.125em] text-data-lime mb-4">REVIEW SUMMARY</div>
+                {product.rating && product.review_count ? (
+                  <p>The {product.brand || shortTitle} holds a <strong className="text-white">{product.rating}/5</strong> rating across <strong className="text-white">{product.review_count.toLocaleString()}</strong> verified customer reviews. {product.rating >= 4.5 ? 'This places it among the top-rated products in its category, with consistently strong customer satisfaction across durability, performance, and value.' : product.rating >= 4 ? 'This reflects solid performance with most customers reporting positive results for home use.' : 'This indicates room for improvement in certain areas that we detail in our pros and considerations below.'}</p>
+                ) : null}
+                {product.best_for_tags && product.best_for_tags.length > 0 ? (
+                  <p className="mt-3">Best suited for: <strong className="text-white">{product.best_for_tags.join(', ')}</strong>. {product.price_cents ? `At ${formatPrice(product.price_cents)}, ` : ''}{product.rating && product.rating >= 4.3 ? 'it delivers strong value relative to its performance metrics.' : 'it competes in a crowded price segment where small differences in features matter.'}</p>
+                ) : null}
+                {(product.specs && Object.keys(product.specs).length > 0) ? (
+                  <p className="mt-3">{product.brand ? `${product.brand} ` : ''}positions this product with {Object.values(product.specs).slice(0, 2).join(' and ')}, making it {product.category ? `a solid contender in the ${product.category.toLowerCase()} category` : 'a well-rounded choice for most buyers'}.</p>
+                ) : null}
+              </div>
+
               {/* Multi-Merchant Pricing Selector */}
               <MultiMerchantSelector product={product} />
 
@@ -232,6 +262,24 @@ export default async function ProductPage({ params }: { params: { slug: string }
                 </div>
               </div>
 
+              {/* Specs Table */}
+              {product.specs && Object.keys(product.specs).length > 0 && (
+                <div className="rounded-3xl border border-white/5 bg-neutral-900/50 p-8">
+                  <div className="uppercase text-xs font-black tracking-[0.125em] text-neutral-400 mb-6 flex items-center gap-2">
+                    <Ruler className="w-4 h-4 text-trust-blue" />
+                    TECHNICAL SPECIFICATIONS
+                  </div>
+                  <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+                    {Object.entries(product.specs).map(([key, value]) => (
+                      <div key={key} className="border-b border-white/5 pb-3">
+                        <dt className="text-[10px] uppercase tracking-widest text-neutral-500 font-bold mb-1">{key}</dt>
+                        <dd className="text-sm font-semibold text-neutral-200">{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )}
+
               {/* Author Info Card */}
               <div className="rounded-3xl border border-white/[0.06] bg-[#161B22] p-6 flex flex-col sm:flex-row gap-6 items-start sm:items-center">
                 <div className={`flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl border text-3xl ${author.color}`}>
@@ -248,6 +296,30 @@ export default async function ProductPage({ params }: { params: { slug: string }
                   </Link>
                 </div>
               </div>
+
+              {/* Related buyer guides */}
+              {relatedArticles.length > 0 && (
+                <div className="border-t border-white/10 pt-8">
+                  <div className="uppercase text-xs font-black tracking-[0.125em] text-neutral-400 mb-4 flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-data-lime" />
+                    RELATED BUYER GUIDES
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    {relatedArticles.map((a) => (
+                      <Link
+                        key={a.id}
+                        href={`/best/${a.slug.replace(/-2026$/, '')}`}
+                        className="block rounded-2xl border border-white/5 bg-neutral-900/30 p-4 hover:border-emerald-500/30 transition-colors"
+                      >
+                        <div className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-1">
+                          {a.cluster || a.category || 'Guide'}
+                        </div>
+                        <div className="text-sm font-black text-white leading-tight">{a.title}</div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="text-xs text-neutral-500 border-t border-white/10 pt-8">
                 Last updated {formatTimestamp(product.last_scraped_at)}. 

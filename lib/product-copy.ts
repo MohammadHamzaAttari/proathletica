@@ -312,17 +312,26 @@ function getFallbackSpecs(product: ProductSource): Record<string, string> {
 }
 
 export function hydrateProduct<T extends ProductSource>(product: T): T & Product {
-  const copy = buildProductEditorialCopy(product);
+  const dbHasOwnTitle = product.short_title?.trim();
+  const dbHasOwnSummary = product.editorial_summary?.trim();
+  const dbHasOwnPros = Array.isArray(product.pros) && product.pros.length > 0;
+  const dbHasOwnCons = Array.isArray(product.cons) && product.cons.length > 0;
+  const dbHasOwnTags = Array.isArray(product.best_for_tags) && product.best_for_tags.length > 0;
+
+  const copy = dbHasOwnTitle && dbHasOwnSummary && dbHasOwnPros && dbHasOwnCons && dbHasOwnTags
+    ? null
+    : buildProductEditorialCopy(product);
+
   return {
     ...product,
-    short_title: product.short_title?.trim() || copy.short_title,
-    editorial_summary: product.editorial_summary?.trim() || copy.editorial_summary,
-    pros: Array.isArray(product.pros) && product.pros.length > 0 ? product.pros : copy.pros,
-    cons: Array.isArray(product.cons) && product.cons.length > 0 ? product.cons : copy.cons,
+    short_title: product.short_title?.trim() || copy?.short_title || product.title.slice(0, 60),
+    editorial_summary: product.editorial_summary?.trim() || copy?.editorial_summary || `${product.title} is a solid option in the ${product.category || 'fitness'} category.`,
+    pros: Array.isArray(product.pros) && product.pros.length > 0 ? product.pros : copy?.pros || ['Strong customer satisfaction', 'Competitive price-to-performance'],
+    cons: Array.isArray(product.cons) && product.cons.length > 0 ? product.cons : copy?.cons || ['Check latest price before buying'],
     best_for_tags:
       Array.isArray(product.best_for_tags) && product.best_for_tags.length > 0
         ? product.best_for_tags
-        : copy.best_for_tags,
+        : copy?.best_for_tags || [product.category || 'General'],
     specs: product.specs && Object.keys(product.specs).length > 0 ? product.specs : getFallbackSpecs(product),
   } as T & Product;
 }

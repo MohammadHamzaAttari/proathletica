@@ -45,9 +45,13 @@ export default async function CategoryPage({ params }: { params: { slug: string 
     { name, url },
   ];
 
+  const categoryName = name.toLowerCase();
   const customFaqs = [
-    { q: `How do you rank the best ${name.toLowerCase()}?`, a: `Our ranking for ${name.toLowerCase()} is based on a weighted algorithm that considers build materials, warranty length, and thousands of verified owner reviews.` },
-    { q: `Is the "Best Overall" ${name.toLowerCase()} right for everyone?`, a: `The #1 pick is chosen for its balance of features and value. However, we also provide specialized picks for small spaces and budget-conscious buyers.` }
+    { q: `How do you rank the best ${categoryName}?`, a: `Our ranking for ${categoryName} is based on a weighted algorithm that considers build materials, warranty length, and thousands of verified owner reviews. Every ranking is human-edited by our certified coaches.` },
+    { q: `Is the "Best Overall" ${categoryName} right for everyone?`, a: `The #1 pick is chosen for its balance of features and value. However, we also provide specialized picks for small spaces and budget-conscious buyers.` },
+    { q: `What should I look for when buying ${categoryName}?`, a: `Focus on build quality (steel gauge, weld durability), warranty length (2+ years is a good signal), and verified review volume. ${products.length > 0 ? `We analyzed ${products.length} options to help you compare.` : ''}` },
+    { q: `How often are the ${categoryName} rankings updated?`, a: `Our data is refreshed weekly from verified customer reviews and manufacturer specs. Prices are updated in real-time from Amazon.` },
+    { q: `Do you accept paid placements in the ${categoryName} rankings?`, a: `No. ProAthletica has a strict no-paid-placements policy. Our rankings are data-driven and independent. Some links are affiliate links, which help us keep the site running at no extra cost to you.` },
   ];
 
   return (

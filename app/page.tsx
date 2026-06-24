@@ -18,11 +18,14 @@ const LifestyleHubs = dynamic(() => import('@/components/LifestyleHubs').then(m 
 
 export const revalidate = 3600;
 
-export const metadata = buildMetadata({
-  title: 'Best Home Fitness Gear 2026 — Expertly Tested & Ranked',
-  description: '306 fitness products ranked by 47,000+ data points. Expert-tested home gym gear — no paid placements. Find your perfect setup → ProAthletica',
-  canonical: '/',
-});
+export async function generateMetadata() {
+  const products = await getAllProducts().catch(() => []);
+  return buildMetadata({
+    title: 'Best Home Fitness Gear 2026 — Expertly Tested & Ranked',
+    description: `${products.length} fitness products ranked by 47,000+ data points. Expert-tested home gym gear — no paid placements. Find your perfect setup → ProAthletica`,
+    canonical: '/',
+  });
+}
 
 /* ─────────────────────────────────────────────
    DATA

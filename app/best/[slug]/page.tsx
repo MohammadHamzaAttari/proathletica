@@ -15,7 +15,7 @@ import { StickyMobileCTA } from '@/components/StickyMobileCTA';
 import { generateArticleSummary } from '@/lib/ai/article-summary';
 import { getArticleBySlug, getPublishedArticles, getProductsByCategory } from '@/lib/db';
 import { buildMetadata } from '@/lib/seo/metadata';
-import { articleSchema, breadcrumbSchema, itemListSchema, jsonLdProps, faqSchema } from '@/lib/seo/schema';
+import { articleSchema, breadcrumbSchema, itemListSchema, jsonLdProps, howToSchema, generateArticleFaqs, generateArticleHowToSteps } from '@/lib/seo/schema';
 
 export const revalidate = 3600;
 
@@ -75,7 +75,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
     )
     .slice(0, 3);
 
-  const quickTake = await generateArticleSummary({
+  const quickTake = generateArticleSummary({
     title: article.title,
     excerpt: article.excerpt,
     content_html: article.content_html,
@@ -89,11 +89,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
     { name: article.title, url },
   ];
 
-  const customFaqs = article.cluster === 'Dumbbells' ? [
-    { q: 'How many adjustable dumbbells do I need?', a: 'For most users, a single pair covering 5–50 lbs is sufficient for 90% of home exercises.' },
-    { q: 'Are adjustable dumbbells durable?', a: 'Modern selectorized dumbbells use high-grade steel and nylon. We test for impact resistance and mechanism smoothness.' },
-    { q: 'Which dumbbell brand is best for small spaces?', a: 'PowerBlock and Bowflex 552 are our top picks for compact storage.' }
-  ] : [];
+  const customFaqs = generateArticleFaqs(article);
+  const howToSteps = generateArticleHowToSteps(article.content_html);
 
   return (
     <>
@@ -102,7 +99,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           articleSchema(article, url),
           breadcrumbSchema(breadcrumbs),
           ...(displayProducts.length > 0 ? [itemListSchema(displayProducts, url)] : []),
-          ...(customFaqs.length > 0 ? [faqSchema(customFaqs)] : [])
+          ...(howToSteps.length > 0 ? [howToSchema({ name: article.title, description: article.excerpt || `How to choose the best ${article.category || 'fitness equipment'}`, steps: howToSteps })] : [])
         ])}
       />
 
