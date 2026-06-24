@@ -26,10 +26,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const product = await getProductById(params.slug);
   if (!product) return buildMetadata({ title: 'Product Not Found', noindex: true });
   
-  const shortTitle = product.short_title || product.title.split(' ').slice(0, 5).join(' ');
+  const shortTitle = (product.short_title || product.title.split(' ').slice(0, 5).join(' ')).slice(0, 40);
   return buildMetadata({
     title: `${shortTitle} Review 2026`,
-    description: `Expert review of the ${product.title}. We tested it for durability, performance, and value. See our honest verdict and price trends. Updated May 2026.`,
+    description: `Expert review of the ${product.title.split(' ').slice(0, 8).join(' ')}. We tested it for durability, performance, and value. See our honest verdict and price trends. Updated May 2026.`,
     canonical: `/product/${canonicalSlug(product)}`,
     pinterestImage: `/api/pinterest/${product.asin || product.id}`,
     image: product.image_url || undefined,

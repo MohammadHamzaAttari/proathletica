@@ -87,7 +87,7 @@ export default async function HomePage() {
     getLiveStats(),
   ]);
 
-  const featured = products;
+  const featured = products.slice(0, 30);
 
   const faqItems = [
     {
@@ -146,6 +146,7 @@ export default async function HomePage() {
       <DisclosureBar />
 
       {/* ── REDESIGNED HERO ── */}
+      <h1 className="sr-only">Best Home Fitness Gear 2026 — Expert-Tested Rankings by ProAthletica</h1>
       <Suspense fallback={<div className="min-h-[500px] animate-pulse bg-graphite-900" />}>
         <RedesignedHero />
       </Suspense>

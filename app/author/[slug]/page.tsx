@@ -19,8 +19,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   if (!author) return buildMetadata({ title: 'Author Not Found', noindex: true });
 
   return buildMetadata({
-    title: `${author.name}, ${author.role} at ${SITE_NAME}`,
-    description: `Learn about ${author.name}'s professional training background, credentials, and their data-backed gear testing methodology.`,
+    title: `${author.name} — ${SITE_NAME} Editor`,
+    description: `Learn about ${author.name}'s professional training background, credentials, and data-backed gear testing methodology.`,
     canonical: `/author/${params.slug}`,
   });
 }

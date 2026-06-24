@@ -54,10 +54,10 @@ export default function RedesignedHero() {
                 Independent Data Labs
               </div>
 
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-offwhite leading-[0.95] tracking-tight">
+              <div className="text-4xl md:text-6xl lg:text-7xl font-black text-offwhite leading-[0.95] tracking-tight">
                 BEST HOME <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-data-lime to-emerald-400 uppercase">FITNESS GEAR 2026.</span>
-              </h1>
+              </div>
 
               <p className="mt-4 text-base md:text-lg text-neutral-400 max-w-xl leading-relaxed">
                 We&apos;ve decoded 47,000+ data points to rank the gear that actually transforms your home gym. No fluff, just science-backed rankings.

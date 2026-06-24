@@ -9,7 +9,7 @@ import { Newsletter } from '@/components/Newsletter';
 import { ProductGrid } from '@/components/ProductGrid';
 import { QuickFilters } from '@/components/QuickFilters';
 import { slugToTitle } from '@/lib/format';
-import { getCategoryList, getProductsByCategory } from '@/lib/db';
+import { getCategoryList, getProductsByCategory, getPublishedArticles } from '@/lib/db';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { breadcrumbSchema, itemListSchema, jsonLdProps } from '@/lib/seo/schema';
 
@@ -34,7 +34,10 @@ export async function generateMetadata({
 }
 
 export default async function CategoryPage({ params }: { params: { slug: string } }) {
-  const products = await getProductsByCategory(params.slug);
+  const [products, allArticles] = await Promise.all([
+    getProductsByCategory(params.slug),
+    getPublishedArticles().catch(() => []),
+  ]);
   if (!products.length) notFound();
 
   const name = slugToTitle(params.slug);
@@ -95,6 +98,38 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         <div className="mt-8">
           <ProductGrid products={products} articleSlug={`category-${params.slug}`} />
         </div>
+
+        {/* Related buyer guides */}
+        {(() => {
+          const slugLower = params.slug.toLowerCase();
+          const related = allArticles.filter((a) =>
+            a.category?.toLowerCase() === slugLower ||
+            a.cluster?.toLowerCase() === slugLower ||
+            slugLower.includes(a.cluster?.toLowerCase() || '') ||
+            a.cluster?.toLowerCase().includes(slugLower)
+          ).slice(0, 3);
+          return related.length > 0 ? (
+            <div className="mt-12 border-t border-white/10 pt-10">
+              <div className="uppercase text-xs font-black tracking-[0.125em] text-data-lime mb-4 flex items-center gap-2">
+                BUYER GUIDES
+              </div>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {related.map((a) => (
+                  <Link
+                    key={a.id}
+                    href={`/best/${a.slug.replace(/-2026$/, '')}`}
+                    className="block rounded-2xl border border-white/5 bg-neutral-900/30 p-5 hover:border-emerald-500/30 transition-colors"
+                  >
+                    <div className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-1">
+                      {a.cluster || a.category || 'Guide'}
+                    </div>
+                    <div className="text-sm font-black text-white leading-tight">{a.title}</div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : null;
+        })()}
 
         {/* Buying guide + trust content */}
         <div className="mt-12 border-t border-white/10 pt-10">
